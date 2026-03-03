@@ -1,5 +1,5 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp, type FirebaseApp } from 'firebase/app';
+import { getFirestore, type Firestore } from 'firebase/firestore';
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -10,5 +10,40 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+// Check if Firebase is actually configured (not placeholder values)
+export function isFirebaseConfigured(): boolean {
+    const key = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+    return !!(
+        key && projectId &&
+        !key.includes('YOUR_') &&
+        !projectId.includes('YOUR_')
+    );
+}
+
+let app: FirebaseApp | null = null;
+let _db: Firestore | null = null;
+
+function getDb(): Firestore {
+    if (!isFirebaseConfigured()) {
+        throw new Error('Firebase not configured');
+    }
+    if (!app) {
+        app = initializeApp(firebaseConfig);
+    }
+    if (!_db) {
+        _db = getFirestore(app);
+    }
+    return _db;
+}
+
+export const db = new Proxy({} as Firestore, {
+    get(_, prop) {
+        const realDb = getDb();
+        const value = (realDb as Record<string | symbol, unknown>)[prop];
+        if (typeof value === 'function') {
+            return value.bind(realDb);
+        }
+        return value;
+    }
+});
