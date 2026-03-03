@@ -60,6 +60,16 @@ export default function SmartVCard() {
 
   const t = translations[language];
 
+  // Compute freshness badge based on contact data
+  const getFreshnessBadge = () => {
+    if (!contactData.updatedAt) return null;
+    const days = Math.floor((Date.now() - new Date(contactData.updatedAt).getTime()) / (1000 * 60 * 60 * 24));
+    if (days <= 7) return { label: language === 'fr' ? 'à jour' : 'up to date', color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' };
+    if (days <= 30) return { label: language === 'fr' ? 'récent' : 'recent', color: 'bg-orange-500/15 text-orange-400 border-orange-500/30' };
+    return { label: language === 'fr' ? 'obsolète' : 'outdated', color: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30' };
+  };
+  const freshnessBadge = getFreshnessBadge();
+
   // Detect browser language on mount
   useEffect(() => {
     const browserLang = navigator.language.split('-')[0] as Language;
@@ -261,18 +271,22 @@ export default function SmartVCard() {
                           className="w-full h-full rounded-full object-cover relative z-10"
                         />
                       </div>
-                      <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full border-2 border-zinc-900 shadow-lg" />
                     </motion.div>
 
                     {/* Name & Title */}
-                    <motion.h2
+                    <motion.div
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2, duration: 0.5 }}
-                      className="text-2xl font-bold text-white text-center tracking-tight"
+                      className="flex items-center justify-center gap-2"
                     >
-                      Nonames-spirit
-                    </motion.h2>
+                      <h2 className="text-2xl font-bold text-white tracking-tight">Nonames-spirit</h2>
+                      {freshnessBadge && (
+                        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full border ${freshnessBadge.color}`}>
+                          {freshnessBadge.label}
+                        </span>
+                      )}
+                    </motion.div>
                     <motion.p
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
