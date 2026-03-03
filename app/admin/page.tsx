@@ -35,7 +35,8 @@ const GROUPS = ['Identité', 'Téléphone', 'Email', 'Web & Réseaux', 'Adresse'
 type Feedback = { type: 'success' | 'error'; message: string } | null;
 
 export default function AdminPage() {
-    const [token, setToken] = useState<string | null>(null);
+    const [authenticated, setAuthenticated] = useState(false);
+    const [checkingAuth, setCheckingAuth] = useState(true);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -48,20 +49,24 @@ export default function AdminPage() {
     const [saveFeedback, setSaveFeedback] = useState<Feedback>(null);
     const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['Identité']));
 
-    // Check for saved token on mount
+    // Check auth status on mount via httpOnly cookie
     useEffect(() => {
-        const savedToken = localStorage.getItem('admin_token');
-        if (savedToken) {
-            setToken(savedToken);
-        }
+        fetch('/api/auth/me')
+            .then(res => {
+                if (res.ok) {
+                    setAuthenticated(true);
+                }
+            })
+            .catch(() => { })
+            .finally(() => setCheckingAuth(false));
     }, []);
 
     // Load contact data when authenticated
     useEffect(() => {
-        if (token) {
+        if (authenticated) {
             loadContactData();
         }
-    }, [token]);
+    }, [authenticated]);
 
     const loadContactData = async () => {
         try {
@@ -96,8 +101,7 @@ export default function AdminPage() {
                 return;
             }
 
-            localStorage.setItem('admin_token', json.token);
-            setToken(json.token);
+            setAuthenticated(true);
             setUsername('');
             setPassword('');
         } catch {
@@ -107,9 +111,9 @@ export default function AdminPage() {
         }
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('admin_token');
-        setToken(null);
+    const handleLogout = async () => {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        setAuthenticated(false);
         setContactData({});
     };
 
@@ -122,7 +126,6 @@ export default function AdminPage() {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({ fields: contactData }),
             });
@@ -164,7 +167,15 @@ export default function AdminPage() {
     };
 
     // AUTH SCREEN
-    if (!token) {
+    if (checkingAuth) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-black to-zinc-950 text-white flex items-center justify-center">
+                <Loader2 className="animate-spin text-orange-400" size={32} />
+            </div>
+        );
+    }
+
+    if (!authenticated) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-black to-zinc-950 text-white flex items-center justify-center px-6">
                 <motion.div

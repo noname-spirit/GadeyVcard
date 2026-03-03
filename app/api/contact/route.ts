@@ -33,13 +33,18 @@ export async function GET() {
 // PUT - Update contact data (auth required)
 export async function PUT(req: NextRequest) {
     try {
-        // Verify auth
-        const authHeader = req.headers.get('authorization');
-        if (!authHeader?.startsWith('Bearer ')) {
+        // Verify auth — read from httpOnly cookie (primary) or Authorization header (fallback)
+        let token = req.cookies.get('admin_token')?.value;
+        if (!token) {
+            const authHeader = req.headers.get('authorization');
+            if (authHeader?.startsWith('Bearer ')) {
+                token = authHeader.split(' ')[1];
+            }
+        }
+        if (!token) {
             return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
         }
 
-        const token = authHeader.split(' ')[1];
         const payload = verifyToken(token);
         if (!payload) {
             return NextResponse.json({ error: 'Token invalide' }, { status: 401 });
