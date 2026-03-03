@@ -109,9 +109,10 @@ export default function SmartVCard() {
 
   // Download vCard
   const downloadVCard = () => {
+    // Download dynamically generated VCF from API
     const link = document.createElement('a');
-    link.href = '/contact.vcf';
-    link.download = 'Lionel_Contact.vcf';
+    link.href = '/api/contact/vcf';
+    link.download = 'Contact.vcf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -497,8 +498,12 @@ export default function SmartVCard() {
               ? '© 2026 Noname-spirit. Tous droits réservés.'
               : '© 2026 Noname-spirit. All rights reserved.'}
           </p>
-          <div className="flex items-center justify-center gap-2 mt-1">
-          </div>
+          <a
+            href="/admin"
+            className="inline-block mt-2 text-zinc-600 hover:text-zinc-400 text-xs transition-colors duration-200"
+          >
+            {language === 'fr' ? 'Accéder à mon compte' : 'Access my account'}
+          </a>
         </motion.div>
       </div>
     </div>
