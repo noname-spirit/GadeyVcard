@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { Download, Instagram, Youtube, Globe, Send, Check, AlertCircle, RotateCw, ScanLine, X } from 'lucide-react';
+import { Download, Instagram, Youtube, Globe, Send, Check, AlertCircle, RotateCw, ScanLine, X, Phone, Mail, MessageCircle, Sun, Moon } from 'lucide-react';
 
 // Type declaration for Meta Pixel
 declare global {
@@ -69,6 +69,7 @@ export default function SmartVCard() {
   const [scannerReady, setScannerReady] = useState(false);
   const scannerRef = useRef<HTMLDivElement>(null);
   const html5QrScannerRef = useRef<any>(null);
+  const [isDark, setIsDark] = useState(true);
 
   const t = translations[language];
 
@@ -89,6 +90,32 @@ export default function SmartVCard() {
       setLanguage('fr');
     }
   }, []);
+
+  // Theme: detect from localStorage or system preference
+  useEffect(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+      setIsDark(saved === 'dark');
+    } else {
+      setIsDark(window.matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+  }, []);
+
+  // Theme: sync to document background
+  useEffect(() => {
+    const bg = isDark ? '#09090b' : '#fafafa';
+    document.documentElement.style.background = bg;
+    document.body.style.background = isDark
+      ? 'linear-gradient(to bottom right, #09090b, #0a0a0a, #09090b)'
+      : '#fafafa';
+  }, [isDark]);
+
+  const toggleTheme = () => {
+    setIsDark(prev => {
+      localStorage.setItem('theme', !prev ? 'dark' : 'light');
+      return !prev;
+    });
+  };
 
   // Fetch contact data for dynamic links
   useEffect(() => {
@@ -250,8 +277,58 @@ export default function SmartVCard() {
     },
   };
 
+  // Theme color tokens
+  const c = {
+    pageBg: isDark ? 'from-zinc-950 via-black to-zinc-950' : 'from-zinc-50 via-white to-zinc-50',
+    pageText: isDark ? 'text-white' : 'text-zinc-900',
+    titleGradient: isDark ? 'from-white via-white to-zinc-400' : 'from-zinc-900 via-zinc-800 to-zinc-500',
+    langBg: isDark ? 'bg-zinc-900/60 border-zinc-800/40' : 'bg-zinc-100/80 border-zinc-300/40',
+    langInactive: isDark ? 'text-zinc-500 hover:text-zinc-300' : 'text-zinc-400 hover:text-zinc-700',
+    subtitle: isDark ? 'text-zinc-500' : 'text-zinc-400',
+    cardBg: isDark ? 'from-zinc-900 via-zinc-900/95 to-black border-zinc-800/60' : 'from-white via-zinc-50 to-zinc-100 border-zinc-200/80',
+    cardShadow: isDark ? 'shadow-2xl shadow-orange-500/5' : 'shadow-xl shadow-zinc-300/40',
+    nameColor: isDark ? 'text-white' : 'text-zinc-900',
+    socialBtn: isDark
+      ? 'bg-zinc-800/50 hover:bg-orange-500/15 border-zinc-700/30 hover:border-orange-500/40'
+      : 'bg-zinc-100 hover:bg-orange-500/10 border-zinc-200 hover:border-orange-500/40',
+    socialIcon: isDark ? 'text-zinc-300 hover:text-orange-400' : 'text-zinc-500 hover:text-orange-500',
+    actionCall: isDark
+      ? 'bg-zinc-800/50 hover:bg-emerald-500/15 border-zinc-700/30 hover:border-emerald-500/40 text-zinc-300 hover:text-emerald-400'
+      : 'bg-zinc-100 hover:bg-emerald-500/10 border-zinc-200 hover:border-emerald-500/40 text-zinc-600 hover:text-emerald-500',
+    actionMail: isDark
+      ? 'bg-zinc-800/50 hover:bg-blue-500/15 border-zinc-700/30 hover:border-blue-500/40 text-zinc-300 hover:text-blue-400'
+      : 'bg-zinc-100 hover:bg-blue-500/10 border-zinc-200 hover:border-blue-500/40 text-zinc-600 hover:text-blue-500',
+    actionWhatsapp: isDark
+      ? 'bg-zinc-800/50 hover:bg-green-500/15 border-zinc-700/30 hover:border-green-500/40 text-zinc-300 hover:text-green-400'
+      : 'bg-zinc-100 hover:bg-green-500/10 border-zinc-200 hover:border-green-500/40 text-zinc-600 hover:text-green-500',
+    qrText: isDark ? 'text-zinc-300' : 'text-zinc-600',
+    qrSubtext: isDark ? 'text-zinc-500' : 'text-zinc-400',
+    flipBtn: isDark
+      ? 'text-zinc-400 hover:text-white border-zinc-800/40 hover:border-zinc-700/60 hover:bg-zinc-900/30'
+      : 'text-zinc-500 hover:text-zinc-900 border-zinc-200 hover:border-zinc-300 hover:bg-zinc-100',
+    formBg: isDark ? 'from-zinc-900/60 via-zinc-900/40 to-black/80 border-zinc-800/40' : 'from-white/90 via-zinc-50/70 to-zinc-100/60 border-zinc-200/80',
+    formTitle: isDark ? 'text-white' : 'text-zinc-900',
+    formSubtitle: isDark ? 'text-zinc-500' : 'text-zinc-400',
+    inputBg: isDark
+      ? 'bg-zinc-900/60 text-white placeholder-zinc-600 border-zinc-800/40'
+      : 'bg-white/80 text-zinc-900 placeholder-zinc-400 border-zinc-200',
+    scanBtn: isDark
+      ? 'bg-zinc-800/60 hover:bg-zinc-700/60 border-zinc-700/40 hover:border-orange-500/30 text-zinc-300 hover:text-orange-400'
+      : 'bg-zinc-100 hover:bg-zinc-200 border-zinc-200 hover:border-orange-500/30 text-zinc-500 hover:text-orange-500',
+    scanOverlay: isDark ? 'bg-black/80' : 'bg-black/50',
+    scanModal: isDark ? 'bg-zinc-900 border-zinc-800/60' : 'bg-white border-zinc-200',
+    scanTitle: isDark ? 'text-white' : 'text-zinc-900',
+    scanClose: isDark ? 'text-zinc-500 hover:text-white hover:bg-zinc-800' : 'text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100',
+    scanHint: isDark ? 'text-zinc-500' : 'text-zinc-400',
+    footerText: isDark ? 'text-zinc-600' : 'text-zinc-400',
+    footerLink: isDark ? 'text-zinc-600 hover:text-zinc-400' : 'text-zinc-400 hover:text-zinc-600',
+    toggleBtn: isDark
+      ? 'bg-zinc-900/60 border-zinc-800/40 text-zinc-400 hover:text-orange-400'
+      : 'bg-zinc-100/80 border-zinc-300/40 text-zinc-500 hover:text-orange-500',
+  };
+
   return (
-    <div className="bg-gradient-to-br from-zinc-950 via-black to-zinc-950 text-white min-h-screen overflow-x-hidden">
+    <div className={`bg-gradient-to-br ${c.pageBg} ${c.pageText} min-h-screen overflow-x-hidden transition-colors duration-300`}>
       {/* Meta Pixel Script — ID validated to prevent XSS */}
       {/^[0-9]+$/.test(process.env.NEXT_PUBLIC_META_PIXEL_ID || '') && (
         <script
@@ -281,28 +358,35 @@ export default function SmartVCard() {
           className="text-center mb-3 flex flex-col items-center gap-1"
         >
           <div className="flex items-center gap-4 justify-center">
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-white via-white to-zinc-400 bg-clip-text text-transparent tracking-tight">
+            <h1 className={`text-3xl md:text-4xl font-bold bg-gradient-to-r ${c.titleGradient} bg-clip-text text-transparent tracking-tight`}>
               {t.title}
             </h1>
             {/* Language Selector */}
-            <div className="flex gap-1 bg-zinc-900/60 rounded-full px-1.5 py-1 border border-zinc-800/40 backdrop-blur-xl">
+            <div className={`flex gap-1 ${c.langBg} rounded-full px-1.5 py-1 border backdrop-blur-xl transition-colors duration-300`}>
               <button
                 onClick={() => setLanguage('fr')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 ${language === 'fr' ? 'bg-orange-500/15 text-orange-400' : 'text-zinc-500 hover:text-zinc-300'
+                className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 ${language === 'fr' ? 'bg-orange-500/15 text-orange-400' : c.langInactive
                   }`}
               >
                 FR
               </button>
               <button
                 onClick={() => setLanguage('en')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 ${language === 'en' ? 'bg-orange-500/15 text-orange-400' : 'text-zinc-500 hover:text-zinc-300'
+                className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 ${language === 'en' ? 'bg-orange-500/15 text-orange-400' : c.langInactive
                   }`}
               >
                 EN
               </button>
+              <button
+                onClick={toggleTheme}
+                className={`px-2 py-1 rounded-full transition-all duration-200 ${c.toggleBtn}`}
+                title={isDark ? 'Mode clair' : 'Mode sombre'}
+              >
+                {isDark ? <Sun size={12} /> : <Moon size={12} />}
+              </button>
             </div>
           </div>
-          <p className="text-sm text-zinc-500 font-medium tracking-wide">{t.subtitle}</p>
+          <p className={`text-sm ${c.subtitle} font-medium tracking-wide`}>{t.subtitle}</p>
         </motion.div>
 
         {/* 3D Flip Card */}
@@ -339,7 +423,7 @@ export default function SmartVCard() {
                 }}
                 className="absolute w-full h-full"
               >
-                <div className="w-full h-full bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-black rounded-3xl px-4 pb-0 border border-zinc-800/60 backdrop-blur-2xl shadow-2xl shadow-orange-500/5 flex flex-col items-center justify-center">
+                <div className={`w-full h-full bg-gradient-to-br ${c.cardBg} rounded-3xl px-4 pb-0 border backdrop-blur-2xl ${c.cardShadow} flex flex-col items-center justify-center transition-colors duration-300`}>
                   {/* Decorative Top Line */}
                   <div className="absolute top-0 left-12 right-12 h-px bg-gradient-to-r from-transparent via-orange-500/20 to-transparent mt-2" />
 
@@ -369,7 +453,7 @@ export default function SmartVCard() {
                       transition={{ delay: 0.2, duration: 0.5 }}
                       className="flex items-center justify-center gap-2"
                     >
-                      <h2 className="text-2xl font-bold text-white tracking-tight">Nonames-spirit</h2>
+                      <h2 className={`text-2xl font-bold ${c.nameColor} tracking-tight`}>Nonames-spirit</h2>
                       {freshnessBadge && (
                         <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full border ${freshnessBadge.color}`}>
                           {freshnessBadge.label}
@@ -404,12 +488,52 @@ export default function SmartVCard() {
                           rel="noopener noreferrer"
                           whileHover={{ scale: 1.15, y: -3 }}
                           whileTap={{ scale: 0.95 }}
-                          className="p-1.5 rounded-full bg-zinc-800/50 hover:bg-orange-500/15 border border-zinc-700/30 hover:border-orange-500/40 transition-all duration-300"
+                          className={`p-1.5 rounded-full ${c.socialBtn} border transition-all duration-300`}
                         >
-                          <social.icon size={20} className="text-zinc-300 hover:text-orange-400 transition-colors" />
+                          <social.icon size={20} className={`${c.socialIcon} transition-colors`} />
                         </motion.a>
                       ))}
                     </motion.div>
+
+                    {/* Quick Action Buttons */}
+                    {(contactData.tel_mobile || contactData.email_personal || contactData.email_work || contactData.whatsapp) && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.32, duration: 0.5 }}
+                        className="flex justify-center gap-2 w-full"
+                      >
+                        {contactData.tel_mobile && (
+                          <a
+                            href={`tel:${contactData.tel_mobile}`}
+                            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl ${c.actionCall} border transition-all duration-300 text-xs font-medium`}
+                          >
+                            <Phone size={14} />
+                            {language === 'fr' ? 'Appeler' : 'Call'}
+                          </a>
+                        )}
+                        {(contactData.email_personal || contactData.email_work) && (
+                          <a
+                            href={`mailto:${contactData.email_personal || contactData.email_work}`}
+                            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl ${c.actionMail} border transition-all duration-300 text-xs font-medium`}
+                          >
+                            <Mail size={14} />
+                            Email
+                          </a>
+                        )}
+                        {contactData.whatsapp && (
+                          <a
+                            href={`https://wa.me/${contactData.whatsapp.replace(/[^0-9]/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl ${c.actionWhatsapp} border transition-all duration-300 text-xs font-medium`}
+                          >
+                            <MessageCircle size={14} />
+                            WhatsApp
+                          </a>
+                        )}
+                      </motion.div>
+                    )}
 
                     {/* Save Contact Button */}
                     <motion.button
@@ -440,7 +564,7 @@ export default function SmartVCard() {
                 }}
                 className="absolute w-full h-full"
               >
-                <div className="w-full h-full bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-black rounded-3xl p-10 border border-zinc-800/60 backdrop-blur-2xl shadow-2xl shadow-orange-500/5 flex flex-col items-center justify-center">
+                <div className={`w-full h-full bg-gradient-to-br ${c.cardBg} rounded-3xl p-10 border backdrop-blur-2xl ${c.cardShadow} flex flex-col items-center justify-center transition-colors duration-300`}>
 
                   {/* QR Content Wrapper with Gap */}
                   <div className="flex flex-col items-center w-full gap-6">
@@ -450,10 +574,10 @@ export default function SmartVCard() {
                       transition={{ delay: 0.2, duration: 0.5 }}
                       className="text-center"
                     >
-                      <p className="text-zinc-300 font-medium text-sm mb-1">
+                      <p className={`${c.qrText} font-medium text-sm mb-1`}>
                         {language === 'fr' ? '📱 Scannez avec votre appareil' : '📱 Scan with your device'}
                       </p>
-                      <p className="text-zinc-500 text-xs">
+                      <p className={`${c.qrSubtext} text-xs`}>
                         {language === 'fr' ? 'Accès instantané au profil' : 'Instant profile access'}
                       </p>
                     </motion.div>
@@ -472,7 +596,7 @@ export default function SmartVCard() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4, duration: 0.5 }}
-                      className="text-center text-zinc-500 text-xs"
+                      className={`text-center ${c.qrSubtext} text-xs`}
                     >
                       {language === 'fr' ? '✓ URL disponible et vérifiée' : '✓ Valid and verified URL'}
                     </motion.p>
@@ -490,7 +614,7 @@ export default function SmartVCard() {
             onClick={() => setIsFlipped(!isFlipped)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full py-1 rounded-2xl font-medium text-sm text-zinc-400 hover:text-white transition-all duration-300 flex items-center justify-center gap-2 border border-zinc-800/40 hover:border-zinc-700/60 hover:bg-zinc-900/30 "
+            className={`w-full py-1 rounded-2xl font-medium text-sm ${c.flipBtn} transition-all duration-300 flex items-center justify-center gap-2 border`}
           >
             <RotateCw size={18} className={`transition-transform duration-500 ${isFlipped ? 'rotate-180' : ''}`} />
             {isFlipped ? (language === 'fr' ? 'Retour au profil' : 'Back to Profile') : t.viewQR}
@@ -504,7 +628,7 @@ export default function SmartVCard() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="w-full max-w-md "
         >
-          <div className="relative bg-gradient-to-br from-zinc-900/60 via-zinc-900/40 to-black/80 rounded-3xl px-6 border border-zinc-800/40 backdrop-blur-2xl shadow-2xl shadow-orange-500/5 pt-5 pb-2">
+          <div className={`relative bg-gradient-to-br ${c.formBg} rounded-3xl px-6 border backdrop-blur-2xl ${c.cardShadow} pt-5 pb-2 transition-colors duration-300`}>
             {/* Decorative Top Line */}
             <div className="absolute top-0 left-12 right-12 h-px bg-gradient-to-r from-transparent via-orange-500/20 to-transparent" />
 
@@ -512,7 +636,7 @@ export default function SmartVCard() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
-              className="text-xl font-bold mb-2 text-center text-white tracking-tight"
+              className={`text-xl font-bold mb-2 text-center ${c.formTitle} tracking-tight`}
             >
               {t.exchangeTitle}
             </motion.h3>
@@ -520,7 +644,7 @@ export default function SmartVCard() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.35, duration: 0.5 }}
-              className="text-center text-zinc-500 mb-4 text-xs tracking-wide"
+              className={`text-center ${c.formSubtitle} mb-4 text-xs tracking-wide`}
             >
               {t.exchangeSubtitle}
             </motion.p>
@@ -538,7 +662,7 @@ export default function SmartVCard() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
-                  className="w-full px-5 py-1 bg-zinc-900/60 text-white text-sm placeholder-zinc-600 rounded-xl border border-zinc-800/40 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium"
+                  className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
                 />
               </motion.div>
 
@@ -554,7 +678,7 @@ export default function SmartVCard() {
                   value={formData.contact}
                   onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
                   whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
-                  className="w-full px-5 py-1 bg-zinc-900/60 text-white text-sm placeholder-zinc-600 rounded-xl border border-zinc-800/40 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium"
+                  className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
                 />
               </motion.div>
 
@@ -583,7 +707,7 @@ export default function SmartVCard() {
                   onClick={startScanner}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="py-2 px-3 bg-zinc-800/60 hover:bg-zinc-700/60 border border-zinc-700/40 hover:border-orange-500/30 rounded-xl font-medium text-sm flex items-center justify-center gap-1.5 transition-all duration-300 text-zinc-300 hover:text-orange-400"
+                  className={`py-2 px-3 ${c.scanBtn} border rounded-xl font-medium text-sm flex items-center justify-center gap-1.5 transition-all duration-300`}
                   title={t.scanQR}
                 >
                   <ScanLine size={17} />
@@ -599,7 +723,7 @@ export default function SmartVCard() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
+                  className={`fixed inset-0 z-50 ${c.scanOverlay} backdrop-blur-sm flex items-center justify-center p-6`}
                   onClick={closeScanner}
                 >
                   <motion.div
@@ -607,13 +731,13 @@ export default function SmartVCard() {
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.9, opacity: 0 }}
                     onClick={e => e.stopPropagation()}
-                    className="bg-zinc-900 rounded-2xl border border-zinc-800/60 p-5 w-full max-w-sm"
+                    className={`${c.scanModal} rounded-2xl border p-5 w-full max-w-sm`}
                   >
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-bold text-white">{t.scanTitle}</h3>
+                      <h3 className={`text-sm font-bold ${c.scanTitle}`}>{t.scanTitle}</h3>
                       <button
                         onClick={closeScanner}
-                        className="p-1 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all"
+                        className={`p-1 rounded-lg ${c.scanClose} transition-all`}
                       >
                         <X size={18} />
                       </button>
@@ -623,7 +747,7 @@ export default function SmartVCard() {
                       ref={scannerRef}
                       className="w-full rounded-xl overflow-hidden bg-black"
                     />
-                    <p className="text-zinc-500 text-xs text-center mt-3">
+                    <p className={`${c.scanHint} text-xs text-center mt-3`}>
                       {scannerReady ? t.scanHint : (language === 'fr' ? 'Chargement de la caméra...' : 'Loading camera...')}
                     </p>
                   </motion.div>
@@ -666,14 +790,14 @@ export default function SmartVCard() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="mt-0.2 text-center"
         >
-          <p className="text-zinc-600 text-xs font-medium tracking-wider">
+          <p className={`${c.footerText} text-xs font-medium tracking-wider`}>
             {language === 'fr'
               ? '© 2026 Noname-spirit. Tous droits réservés.'
               : '© 2026 Noname-spirit. All rights reserved.'}
           </p>
           <a
             href="/admin"
-            className="inline-block mt-2 text-zinc-600 hover:text-zinc-400 text-xs transition-colors duration-200"
+            className={`inline-block mt-2 ${c.footerLink} text-xs transition-colors duration-200`}
           >
             {language === 'fr' ? 'Accéder à mon compte' : 'Access my account'}
           </a>
