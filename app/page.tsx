@@ -56,6 +56,7 @@ export default function SmartVCard() {
     type: 'success' | 'error' | null;
     message: string;
   }>({ type: null, message: '' });
+  const [contactData, setContactData] = useState<Record<string, string>>({});
 
   const t = translations[language];
 
@@ -65,6 +66,14 @@ export default function SmartVCard() {
     if (browserLang === 'fr') {
       setLanguage('fr');
     }
+  }, []);
+
+  // Fetch contact data for dynamic links
+  useEffect(() => {
+    fetch('/api/contact')
+      .then(res => res.json())
+      .then(json => { if (json.data) setContactData(json.data); })
+      .catch(() => { });
   }, []);
 
   // Handle form submission
@@ -144,23 +153,25 @@ export default function SmartVCard() {
 
   return (
     <div className="bg-gradient-to-br from-zinc-950 via-black to-zinc-950 text-white min-h-screen overflow-x-hidden">
-      {/* Meta Pixel Script */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${process.env.NEXT_PUBLIC_META_PIXEL_ID || ''}');
-            fbq('track', 'PageView');
-          `,
-        }}
-      />
+      {/* Meta Pixel Script — ID validated to prevent XSS */}
+      {/^[0-9]+$/.test(process.env.NEXT_PUBLIC_META_PIXEL_ID || '') && (
+        <script
+          dangerouslySetInnerHTML={{
+            __html: [
+              '!function(f,b,e,v,n,t,s)',
+              '{if(f.fbq)return;n=f.fbq=function(){n.callMethod?',
+              'n.callMethod.apply(n,arguments):n.queue.push(arguments)};',
+              'if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";',
+              'n.queue=[];t=b.createElement(e);t.async=!0;',
+              't.src=v;s=b.getElementsByTagName(e)[0];',
+              's.parentNode.insertBefore(t,s)}(window, document,"script",',
+              '"https://connect.facebook.net/en_US/fbevents.js");',
+              `fbq('init', '${process.env.NEXT_PUBLIC_META_PIXEL_ID}');`,
+              "fbq('track', 'PageView');",
+            ].join('\n'),
+          }}
+        />
+      )}
 
       <div className="flex flex-col items-center w-full px-6 pt-2 pb-6">
         {/* Header */}
@@ -244,9 +255,11 @@ export default function SmartVCard() {
                     >
                       <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 p-[3px] flex items-center justify-center shadow-lg shadow-orange-500/30 relative">
                         <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-500/20 to-transparent blur-xl" />
-                        <div className="w-full h-full rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center relative z-10">
-                          <span className="text-5xl font-bold bg-gradient-to-br from-orange-400 to-orange-300 bg-clip-text text-transparent">L</span>
-                        </div>
+                        <img
+                          src="/noname-spirit.jpg"
+                          alt="Profile"
+                          className="w-full h-full rounded-full object-cover relative z-10"
+                        />
                       </div>
                       <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full border-2 border-zinc-900 shadow-lg" />
                     </motion.div>
@@ -266,7 +279,7 @@ export default function SmartVCard() {
                       transition={{ delay: 0.25, duration: 0.5 }}
                       className="text-center text-orange-400/80 font-medium text-xs tracking-widest uppercase"
                     >
-                      Designer & Stratège Marketing
+                      {contactData.title || (language === 'fr' ? 'Titre / Poste non spécifié' : 'Title / Position not specified')}
                     </motion.p>
 
                     {/* Social Icons */}
@@ -277,10 +290,10 @@ export default function SmartVCard() {
                       className="flex justify-center gap-3"
                     >
                       {[
-                        { href: 'https://instagram.com', icon: Instagram, label: 'Instagram' },
-                        { href: 'https://youtube.com', icon: Youtube, label: 'YouTube' },
-                        { href: 'https://example.com', icon: Globe, label: 'Website' },
-                      ].map((social, index) => (
+                        { href: contactData.instagram || 'https://instagram.com', icon: Instagram, label: 'Instagram' },
+                        { href: contactData.youtube || 'https://youtube.com', icon: Youtube, label: 'YouTube' },
+                        { href: contactData.url || '#', icon: Globe, label: 'Website' },
+                      ].filter(s => s.href && s.href !== '#').map((social, index) => (
                         <motion.a
                           key={index}
                           href={social.href}

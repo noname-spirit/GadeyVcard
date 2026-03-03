@@ -1,24 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateToken } from '@/lib/admin';
+import bcrypt from 'bcryptjs';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 // Fallback login using environment variables (when Firebase is not configured)
-function checkEnvCredentials(username: string, password: string): { userId: string; username: string } | null {
+// Passwords are stored as bcrypt hashes encoded in base64 (avoids $ issues in .env)
+async function checkEnvCredentials(username: string, password: string): Promise<{ userId: string; username: string } | null> {
     const user1 = process.env.ADMIN_USER_1;
-    const pass1 = process.env.ADMIN_PASS_1;
+    const hash1b64 = process.env.ADMIN_PASS_HASH_1;
     const user2 = process.env.ADMIN_USER_2;
-    const pass2 = process.env.ADMIN_PASS_2;
+    const hash2b64 = process.env.ADMIN_PASS_HASH_2;
 
-    if (user1 && pass1 && username === user1 && password === pass1) {
-        return { userId: 'env-user-1', username: user1 };
+    if (user1 && hash1b64 && username === user1) {
+        const hash1 = Buffer.from(hash1b64, 'base64').toString('utf-8');
+        if (await bcrypt.compare(password, hash1)) {
+            return { userId: 'env-user-1', username: user1 };
+        }
     }
-    if (user2 && pass2 && username === user2 && password === pass2) {
-        return { userId: 'env-user-2', username: user2 };
+    if (user2 && hash2b64 && username === user2) {
+        const hash2 = Buffer.from(hash2b64, 'base64').toString('utf-8');
+        if (await bcrypt.compare(password, hash2)) {
+            return { userId: 'env-user-2', username: user2 };
+        }
     }
     return null;
 }
 
 export async function POST(req: NextRequest) {
     try {
+        // Rate limiting: 5 attempts per 15 minutes per IP
+        const ip = getClientIp(req);
+        const limit = checkRateLimit(`login:${ip}`, 5, 15 * 60 * 1000);
+        if (!limit.allowed) {
+            const retryMinutes = Math.ceil(limit.retryAfterMs / 60000);
+            return NextResponse.json(
+                { error: `Trop de tentatives. Réessayez dans ${retryMinutes} min.` },
+                { status: 429, headers: { 'Retry-After': String(Math.ceil(limit.retryAfterMs / 1000)) } }
+            );
+        }
+
         const { username, password } = await req.json();
 
         if (!username || !password) {
@@ -29,14 +49,21 @@ export async function POST(req: NextRequest) {
         }
 
         // Try env credentials first (always works, no Firebase needed)
-        const envUser = checkEnvCredentials(username, password);
+        const envUser = await checkEnvCredentials(username, password);
         if (envUser) {
-            const token = generateToken(envUser);
-            return NextResponse.json({
+            const jwtToken = generateToken(envUser);
+            const response = NextResponse.json({
                 success: true,
-                token,
                 user: envUser,
             });
+            response.cookies.set('admin_token', jwtToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                path: '/',
+                maxAge: 2 * 60 * 60, // 2 hours
+            });
+            return response;
         }
 
         // Try Firebase if configured
@@ -59,12 +86,19 @@ export async function POST(req: NextRequest) {
                     const isValid = await bcrypt.compare(password, userData.password);
 
                     if (isValid) {
-                        const token = generateToken({ userId: userDoc.id, username });
-                        return NextResponse.json({
+                        const jwtToken = generateToken({ userId: userDoc.id, username });
+                        const response = NextResponse.json({
                             success: true,
-                            token,
                             user: { id: userDoc.id, username },
                         });
+                        response.cookies.set('admin_token', jwtToken, {
+                            httpOnly: true,
+                            secure: process.env.NODE_ENV === 'production',
+                            sameSite: 'strict',
+                            path: '/',
+                            maxAge: 2 * 60 * 60,
+                        });
+                        return response;
                     }
                 }
             }
