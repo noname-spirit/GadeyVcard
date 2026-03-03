@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { Download, Instagram, Youtube, Globe, Send, Check, AlertCircle, RotateCw, Heart } from 'lucide-react';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { Download, Instagram, Youtube, Globe, Send, Check, AlertCircle, RotateCw, ScanLine, X } from 'lucide-react';
 
 // Type declaration for Meta Pixel
 declare global {
@@ -27,6 +25,11 @@ const translations = {
     formName: 'Votre nom',
     formContact: 'Email ou Line ID',
     formSubmit: 'Envoyer',
+    scanQR: 'Scanner un QR',
+    scanTitle: 'Scanner le QR Code',
+    scanHint: 'Placez le QR code devant la caméra',
+    scanSuccess: 'QR détecté ! Contact enregistré.',
+    scanError: 'Impossible d\'accéder à la caméra',
     successMessage: 'Merci ! Vos informations ont été enregistrées.',
     errorMessage: 'Une erreur est survenue. Veuillez réessayer.',
     loading: 'Envoi en cours...',
@@ -41,6 +44,11 @@ const translations = {
     formName: 'Your Name',
     formContact: 'Email or Line ID',
     formSubmit: 'Send',
+    scanQR: 'Scan a QR',
+    scanTitle: 'Scan QR Code',
+    scanHint: 'Place the QR code in front of the camera',
+    scanSuccess: 'QR detected! Contact saved.',
+    scanError: 'Unable to access camera',
     successMessage: 'Thank you! Your information has been saved.',
     errorMessage: 'An error occurred. Please try again.',
     loading: 'Sending...',
@@ -57,6 +65,10 @@ export default function SmartVCard() {
     message: string;
   }>({ type: null, message: '' });
   const [contactData, setContactData] = useState<Record<string, string>>({});
+  const [showScanner, setShowScanner] = useState(false);
+  const [scannerReady, setScannerReady] = useState(false);
+  const scannerRef = useRef<HTMLDivElement>(null);
+  const html5QrScannerRef = useRef<any>(null);
 
   const t = translations[language];
 
@@ -86,6 +98,78 @@ export default function SmartVCard() {
       .catch(() => { });
   }, []);
 
+  // QR Scanner
+  const stopScanner = useCallback(async () => {
+    if (html5QrScannerRef.current) {
+      try {
+        await html5QrScannerRef.current.stop();
+        html5QrScannerRef.current.clear();
+      } catch { /* ignore */ }
+      html5QrScannerRef.current = null;
+    }
+    setScannerReady(false);
+  }, []);
+
+  const startScanner = useCallback(async () => {
+    setShowScanner(true);
+    setScannerReady(false);
+    // Dynamic import to avoid SSR issues
+    const { Html5Qrcode } = await import('html5-qrcode');
+
+    // Wait for DOM element
+    await new Promise(r => setTimeout(r, 300));
+
+    const scannerId = 'qr-scanner-region';
+    const el = document.getElementById(scannerId);
+    if (!el) return;
+
+    const scanner = new Html5Qrcode(scannerId);
+    html5QrScannerRef.current = scanner;
+
+    try {
+      await scanner.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 220, height: 220 } },
+        async (decodedText: string) => {
+          // QR detected — stop scanner and save as lead
+          await scanner.stop();
+          scanner.clear();
+          html5QrScannerRef.current = null;
+          setShowScanner(false);
+          setScannerReady(false);
+
+          // Save scanned QR as lead
+          try {
+            await fetch('/api/leads', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: '[QR Scan]',
+                contact: decodedText,
+                language: language,
+              }),
+            });
+            setFeedback({ type: 'success', message: t.scanSuccess });
+          } catch {
+            setFeedback({ type: 'error', message: t.errorMessage });
+          }
+          setTimeout(() => setFeedback({ type: null, message: '' }), 4000);
+        },
+        () => { /* ignore scan errors */ }
+      );
+      setScannerReady(true);
+    } catch {
+      setFeedback({ type: 'error', message: t.scanError });
+      setShowScanner(false);
+      setTimeout(() => setFeedback({ type: null, message: '' }), 3000);
+    }
+  }, [language, t]);
+
+  const closeScanner = useCallback(async () => {
+    await stopScanner();
+    setShowScanner(false);
+  }, [stopScanner]);
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,13 +185,18 @@ export default function SmartVCard() {
     setIsLoading(true);
 
     try {
-      // Save to Firebase Firestore
-      await addDoc(collection(db, 'leads'), {
-        name: formData.name,
-        contact: formData.contact,
-        timestamp: serverTimestamp(),
-        language: language,
+      // Save lead via API
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          contact: formData.contact,
+          language: language,
+        }),
       });
+
+      if (!res.ok) throw new Error('Save failed');
 
       setFeedback({ type: 'success', message: t.successMessage });
       setFormData({ name: '', contact: '' });
@@ -469,21 +558,78 @@ export default function SmartVCard() {
                 />
               </motion.div>
 
-              {/* Submit Button */}
-              <motion.button
+              {/* Buttons Row */}
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.5 }}
-                type="submit"
-                disabled={isLoading}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-xl font-semibold text-sm flex items-center justify-center gap-2.5 hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none group mt-1"
+                className="w-full flex gap-2 mt-1"
               >
-                <Send size={19} className={`transition-transform duration-300 ${isLoading ? 'animate-spin' : 'group-hover:translate-x-1'}`} />
-                {isLoading ? t.loading : t.formSubmit}
-              </motion.button>
+                {/* Submit Button */}
+                <motion.button
+                  type="submit"
+                  disabled={isLoading}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none group"
+                >
+                  <Send size={17} className={`transition-transform duration-300 ${isLoading ? 'animate-spin' : 'group-hover:translate-x-1'}`} />
+                  {isLoading ? t.loading : t.formSubmit}
+                </motion.button>
+
+                {/* Scan QR Button */}
+                <motion.button
+                  type="button"
+                  onClick={startScanner}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="py-2 px-3 bg-zinc-800/60 hover:bg-zinc-700/60 border border-zinc-700/40 hover:border-orange-500/30 rounded-xl font-medium text-sm flex items-center justify-center gap-1.5 transition-all duration-300 text-zinc-300 hover:text-orange-400"
+                  title={t.scanQR}
+                >
+                  <ScanLine size={17} />
+                  <span className="hidden sm:inline text-xs">{t.scanQR}</span>
+                </motion.button>
+              </motion.div>
             </form>
+
+            {/* QR Scanner Modal */}
+            <AnimatePresence>
+              {showScanner && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
+                  onClick={closeScanner}
+                >
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    onClick={e => e.stopPropagation()}
+                    className="bg-zinc-900 rounded-2xl border border-zinc-800/60 p-5 w-full max-w-sm"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-sm font-bold text-white">{t.scanTitle}</h3>
+                      <button
+                        onClick={closeScanner}
+                        className="p-1 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                    <div
+                      id="qr-scanner-region"
+                      ref={scannerRef}
+                      className="w-full rounded-xl overflow-hidden bg-black"
+                    />
+                    <p className="text-zinc-500 text-xs text-center mt-3">
+                      {scannerReady ? t.scanHint : (language === 'fr' ? 'Chargement de la caméra...' : 'Loading camera...')}
+                    </p>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Feedback Message */}
             {feedback.type && (
