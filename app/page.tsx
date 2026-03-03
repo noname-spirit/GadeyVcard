@@ -142,7 +142,7 @@ export default function SmartVCard() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-zinc-950 via-black to-zinc-950 text-white">
+    <div className="bg-gradient-to-br from-zinc-950 via-black to-zinc-950 text-white min-h-screen overflow-x-hidden">
       {/* Meta Pixel Script */}
       <script
         dangerouslySetInnerHTML={{
@@ -161,7 +161,7 @@ export default function SmartVCard() {
         }}
       />
 
-      <div className="flex flex-col items-center w-full px-6 pt-6 pb-16">
+      <div className="flex flex-col items-center w-full px-6 pt-2 pb-6">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -199,7 +199,7 @@ export default function SmartVCard() {
           initial={cardVariants.initial}
           animate={cardVariants.animate}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="mb-4 w-full max-w-md"
+          className="mb-0 w-full max-w-md"
           style={{
             perspective: '1200px',
           }}
@@ -228,9 +228,9 @@ export default function SmartVCard() {
                 }}
                 className="absolute w-full h-full"
               >
-                <div className="w-full h-full bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-black rounded-3xl px-8 pt-16 pb-12 border border-zinc-800/60 backdrop-blur-2xl shadow-2xl shadow-orange-500/5 flex flex-col items-center justify-center">
+                <div className="w-full h-full bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-black rounded-3xl px-4 pb-0 border border-zinc-800/60 backdrop-blur-2xl shadow-2xl shadow-orange-500/5 flex flex-col items-center justify-center">
                   {/* Decorative Top Line */}
-                  <div className="absolute top-0 left-12 right-12 h-px bg-gradient-to-r from-transparent via-orange-500/20 to-transparent mt-6" />
+                  <div className="absolute top-0 left-12 right-12 h-px bg-gradient-to-r from-transparent via-orange-500/20 to-transparent mt-2" />
 
                   {/* Content Wrapper with Gap */}
                   <div className="flex flex-col items-center w-full gap-5">
@@ -257,7 +257,7 @@ export default function SmartVCard() {
                       transition={{ delay: 0.2, duration: 0.5 }}
                       className="text-2xl font-bold text-white text-center tracking-tight"
                     >
-                      Lionel
+                      Nonames-spirit
                     </motion.h2>
                     <motion.p
                       initial={{ opacity: 0, y: 5 }}
@@ -373,7 +373,7 @@ export default function SmartVCard() {
             onClick={() => setIsFlipped(!isFlipped)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full py-1 rounded-2xl font-medium text-sm text-zinc-400 hover:text-white transition-all duration-300 flex items-center justify-center gap-2 border border-zinc-800/40 hover:border-zinc-700/60 hover:bg-zinc-900/30 mt-2"
+            className="w-full py-1 rounded-2xl font-medium text-sm text-zinc-400 hover:text-white transition-all duration-300 flex items-center justify-center gap-2 border border-zinc-800/40 hover:border-zinc-700/60 hover:bg-zinc-900/30 "
           >
             <RotateCw size={18} className={`transition-transform duration-500 ${isFlipped ? 'rotate-180' : ''}`} />
             {isFlipped ? (language === 'fr' ? 'Retour au profil' : 'Back to Profile') : t.viewQR}
@@ -387,7 +387,7 @@ export default function SmartVCard() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="w-full max-w-md "
         >
-          <div className="relative bg-gradient-to-br from-zinc-900/60 via-zinc-900/40 to-black/80 rounded-3xl px-6 border border-zinc-800/40 backdrop-blur-2xl shadow-2xl shadow-orange-500/5 pt-5 pb-5">
+          <div className="relative bg-gradient-to-br from-zinc-900/60 via-zinc-900/40 to-black/80 rounded-3xl px-6 border border-zinc-800/40 backdrop-blur-2xl shadow-2xl shadow-orange-500/5 pt-5 pb-2">
             {/* Decorative Top Line */}
             <div className="absolute top-0 left-12 right-12 h-px bg-gradient-to-r from-transparent via-orange-500/20 to-transparent" />
 
@@ -490,17 +490,14 @@ export default function SmartVCard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-0.5 text-center"
+          className="mt-0.2 text-center"
         >
           <p className="text-zinc-600 text-xs font-medium tracking-wider">
             {language === 'fr'
               ? '© 2026 Noname-spirit. Tous droits réservés.'
               : '© 2026 Noname-spirit. All rights reserved.'}
           </p>
-          <div className="flex items-center justify-center gap-2 mt-4">
-            <div className="h-px w-8 bg-gradient-to-r from-transparent to-orange-500/50" />
-            <Heart size={14} className="text-orange-500/60" />
-            <div className="h-px w-8 bg-gradient-to-l from-transparent to-orange-500/50" />
+          <div className="flex items-center justify-center gap-2 mt-1">
           </div>
         </motion.div>
       </div>

@@ -20,10 +20,12 @@
 html,
 body {
   scroll-padding-top: 2rem;
+  overflow-x: hidden;
 }
 
 html {
   scroll-behavior: smooth;
+  background: #09090b;
 }
 
 body {
@@ -43,11 +45,12 @@ body {
 
 /* Remove default scrollbar styling on webkit browsers */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 0px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #09090b;
 }
 
 ::-webkit-scrollbar-thumb {
