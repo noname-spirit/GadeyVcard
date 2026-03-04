@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
@@ -13,13 +13,18 @@ export const metadata: Metadata = {
   description:
     'Designer & Stratège Marketing - Partage élégant de coordonnées avec capture de leads',
   keywords: ['vCard', 'contact', 'designer', 'marketing', 'thaïlande'],
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
-  themeColor: '#09090b',
   openGraph: {
     title: 'Smart vCard - Lionel',
     description: 'Designer & Stratège Marketing basé en Thaïlande',
     type: 'website',
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: '#09090b',
 };
 
 export default function RootLayout({
