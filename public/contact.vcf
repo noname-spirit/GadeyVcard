@@ -1,12 +1,11 @@
 BEGIN:VCARD
 VERSION:3.0
-FN:Lionel
-TITLE:Designer & Stratège Marketing
-TEL:+66XXXXXXXXXX
-EMAIL:lionel@example.com
-URL:https://lionel-portfolio.com
-X-SOCIAL-PROFILE;TYPE=INSTAGRAM:https://instagram.com/lionel
-X-SOCIAL-PROFILE;TYPE=YOUTUBE:https://youtube.com/@lionel
-NOTE:Designer & Stratège Marketing basé en Thaïlande
-PHOTO;VALUE=uri:https://avatars.example.com/lionel.jpg
+FN:Nonames-spirit
+TITLE:Graphiste Logo & Web | Branding
+ORG:Noname-spirit
+TEL;TYPE=CELL:+33761234327
+EMAIL;TYPE=WORK:bonjour@noname-spirit.com
+URL:https://noname-spirit.vercel.app/
+X-SOCIALPROFILE;TYPE=instagram:https://www.instagram.com/nonamespirit/
+NOTE:Travaillons ensemble
 END:VCARD
