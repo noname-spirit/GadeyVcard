@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { generateVCF } from '@/lib/admin';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { readLocalContact } from '@/lib/local-storage';
+import fs from 'fs';
+import path from 'path';
 
 // Default contact data (fallback for production)
 const DEFAULT_CONTACT = {
@@ -15,6 +17,20 @@ const DEFAULT_CONTACT = {
     url: 'https://noname-spirit.vercel.app/',
     note: 'Travaillons ensemble : https://linktr.ee/nonamespirit',
 };
+
+// Get photo as base64 for VCF embedding
+function getPhotoBase64(): string | null {
+    try {
+        const photoPath = path.join(process.cwd(), 'public', 'noname-spirit.jpg');
+        if (fs.existsSync(photoPath)) {
+            const photoBuffer = fs.readFileSync(photoPath);
+            return photoBuffer.toString('base64');
+        }
+    } catch (error) {
+        console.log('Could not load photo for VCF:', error);
+    }
+    return null;
+}
 
 // Try Firebase, fall back to local JSON, then default
 async function getContactData(): Promise<Record<string, string> | null> {
@@ -52,7 +68,10 @@ export async function GET() {
             return new NextResponse('Contact not found', { status: 404 });
         }
 
-        const vcfContent = generateVCF(data);
+        // Get photo base64 for embedding
+        const photoBase64 = getPhotoBase64();
+
+        const vcfContent = generateVCF(data, photoBase64);
         const fileName = data.fn
             ? `${data.fn.replace(/\s+/g, '_')}_Contact.vcf`
             : 'Contact.vcf';
