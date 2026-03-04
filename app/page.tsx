@@ -256,29 +256,11 @@ export default function SmartVCard() {
 
     try {
       if (isMobile) {
-        // On mobile: Fetch VCF and open it directly (triggers Contacts app)
-        const response = await fetch('/api/contact/vcf');
-        const vcfContent = await response.text();
-
-        // Create a blob with vCard content
-        const blob = new Blob([vcfContent], { type: 'text/vcard; charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-
-        // Open with the Contacts app - use the blob URL
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'Contact.vcf';
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-
-        // Cleanup
-        setTimeout(() => {
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-        }, 100);
+        // On mobile: Open native Contacts app with VCF
+        // Use window.location.href to trigger iOS/Android to open Contacts app
+        window.location.href = '/api/contact/vcf';
       } else {
-        // On desktop: Simple download
+        // On desktop: Download VCF file
         const link = document.createElement('a');
         link.href = '/api/contact/vcf';
         link.download = 'Contact.vcf';
@@ -288,7 +270,7 @@ export default function SmartVCard() {
       }
     } catch (error) {
       console.error('Error downloading vCard:', error);
-      // Fallback to simple download
+      // Fallback
       window.location.href = '/api/contact/vcf';
     } finally {
       setIsSavingContact(false);
