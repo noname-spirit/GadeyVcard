@@ -60,10 +60,11 @@ export async function GET() {
         return new NextResponse(vcfContent, {
             status: 200,
             headers: {
-                'Content-Type': 'text/vcard',
-                'Content-Disposition': `inline; filename="${fileName}"`,
+                'Content-Type': 'text/x-vcard; charset=utf-8',
+                'Content-Disposition': `attachment; filename="${fileName}"`,
                 'Cache-Control': 'no-store, no-cache, must-revalidate',
                 'Pragma': 'no-cache',
+                'Content-Length': String(new TextEncoder().encode(vcfContent).length),
             },
         });
     } catch (error) {
