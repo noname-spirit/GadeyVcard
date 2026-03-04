@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { Download, Instagram, Youtube, Globe, Send, Check, AlertCircle, RotateCw, ScanLine, X, Phone, Mail, MessageCircle, Sun, Moon } from 'lucide-react';
+import { useDeviceDetection, getDeviceClasses, getImageSize } from '@/lib/useDeviceDetection';
 
 // Type declaration for Meta Pixel
 declare global {
@@ -72,6 +73,9 @@ export default function SmartVCard() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const html5QrScannerRef = useRef<any>(null);
   const [isDark, setIsDark] = useState(true);
+
+  // Device detection
+  const device = useDeviceDetection();
 
   const t = translations[language];
 
@@ -342,16 +346,16 @@ export default function SmartVCard() {
         />
       )}
 
-      <div className="flex flex-col items-center w-full h-screen overflow-y-auto px-3 sm:px-6 py-1 sm:py-2 gap-1 sm:gap-2">
+      <div className={`flex flex-col items-center w-full h-screen overflow-y-auto ${getDeviceClasses(device.screenSize, 'container')} ${getDeviceClasses(device.screenSize, 'gap')} transition-all duration-300`}>
         {/* Header - 12% */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-1 sm:mb-3 flex flex-col items-center gap-0.5 sm:gap-1"
+          className={`text-center ${getDeviceClasses(device.screenSize, 'header')} flex flex-col items-center transition-all`}
         >
           <div className="flex items-center gap-2 sm:gap-4 justify-center">
-            <h1 className={`text-xl sm:text-3xl md:text-4xl font-bold bg-linear-to-r ${c.titleGradient} bg-clip-text text-transparent tracking-tight`}>
+            <h1 className={`${getDeviceClasses(device.screenSize, 'titleSize')} font-bold bg-linear-to-r ${c.titleGradient} bg-clip-text text-transparent tracking-tight transition-all`}>
               {t.title}
             </h1>
             {/* Language Selector */}
@@ -424,7 +428,7 @@ export default function SmartVCard() {
                   <div className="absolute top-0 left-12 right-12 h-px bg-linear-to-r from-transparent via-orange-500/20 to-transparent mt-2" />
 
                   {/* Content Wrapper with Gap */}
-                  <div className="flex flex-col items-center w-full gap-2 sm:gap-5">
+                  <div className={`flex flex-col items-center w-full ${getDeviceClasses(device.screenSize, 'gap')} transition-all duration-300`}>
                     {/* Profile Photo */}
                     <motion.div
                       initial={{ scale: 0.8, opacity: 0 }}
@@ -432,13 +436,13 @@ export default function SmartVCard() {
                       transition={{ delay: 0.1, duration: 0.6 }}
                       className="relative"
                     >
-                      <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-full bg-linear-to-br from-orange-400 via-orange-500 to-orange-600 p-0.75 flex items-center justify-center shadow-lg shadow-orange-500/30 relative">
+                      <div className={`${getDeviceClasses(device.screenSize, 'photoSize')} rounded-full bg-linear-to-br from-orange-400 via-orange-500 to-orange-600 p-0.75 flex items-center justify-center shadow-lg shadow-orange-500/30 relative`}>
                         <div className="absolute inset-0 rounded-full bg-linear-to-br from-orange-500/20 to-transparent blur-xl" />
                         <Image
                           src="/noname-spirit.jpg"
                           alt="Profile"
-                          width={80}
-                          height={80}
+                          width={getImageSize(device.screenSize)}
+                          height={getImageSize(device.screenSize)}
                           className="w-full h-full rounded-full object-cover relative z-10"
                         />
                       </div>
@@ -451,7 +455,7 @@ export default function SmartVCard() {
                       transition={{ delay: 0.2, duration: 0.5 }}
                       className="flex items-center justify-center gap-2"
                     >
-                      <h2 className={`text-lg sm:text-2xl font-bold ${c.nameColor} tracking-tight`}>Nonames-spirit</h2>
+                      <h2 className={`${getDeviceClasses(device.screenSize, 'titleSize')} font-bold ${c.nameColor} tracking-tight transition-all`}>Nonames-spirit</h2>
                       {freshnessBadge && (
                         <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full border ${freshnessBadge.color}`}>
                           {freshnessBadge.label}
@@ -626,7 +630,7 @@ export default function SmartVCard() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="w-full max-w-md"
         >
-          <div className={`relative bg-linear-to-br ${c.formBg} rounded-3xl px-3 sm:px-6 py-2 sm:pt-5 sm:pb-2 border backdrop-blur-2xl ${c.cardShadow} transition-colors duration-300`}>
+          <div className={`relative bg-linear-to-br ${c.formBg} rounded-3xl ${getDeviceClasses(device.screenSize, 'formContainer')} border backdrop-blur-2xl ${c.cardShadow} transition-colors duration-300`}>
             {/* Decorative Top Line */}
             <div className="absolute top-0 left-12 right-12 h-px bg-linear-to-r from-transparent via-orange-500/20 to-transparent" />
 
@@ -634,7 +638,7 @@ export default function SmartVCard() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
-              className={`text-base sm:text-xl font-bold mb-1 sm:mb-2 text-center ${c.formTitle} tracking-tight`}
+              className={`${getDeviceClasses(device.screenSize, 'formTitle')} font-bold text-center ${c.formTitle} tracking-tight transition-all`}
             >
               {t.exchangeTitle}
             </motion.h3>
