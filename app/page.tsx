@@ -598,10 +598,10 @@ export default function SmartVCard() {
                       <Download size={19} className={`transition-transform ${isSavingContact ? 'animate-spin' : 'group-hover:translate-y-0.5'}`} />
                       {isSavingContact ? (language === 'fr' ? 'Ajout en cours...' : 'Adding...') : t.saveContact}
                     </motion.button>
-                    
+
                     {/* Mobile instruction hint */}
                     <p className={`text-center text-[10px] ${c.subtitle} mt-1`}>
-                      {language === 'fr' 
+                      {language === 'fr'
                         ? '📱 Après téléchargement, ouvrez le fichier pour ajouter le contact'
                         : '📱 After download, open the file to add contact'}
                     </p>
