@@ -52,7 +52,7 @@ export const VCARD_FIELDS = [
 export type ContactData = Record<string, string>;
 
 // Generate VCF string from contact data
-export function generateVCF(data: ContactData): string {
+export function generateVCF(data: ContactData, photoBase64?: string | null): string {
   const lines: string[] = [
     'BEGIN:VCARD',
     'VERSION:3.0',
@@ -92,7 +92,25 @@ export function generateVCF(data: ContactData): string {
   if (data.whatsapp) lines.push(`TEL;TYPE=WHATSAPP:${data.whatsapp}`);
 
   if (data.note) lines.push(`NOTE:${data.note}`);
-  if (data.photo_url) lines.push(`PHOTO;VALUE=uri:${data.photo_url}`);
+
+  // Photo embedded as base64 (iOS/Android compatible)
+  if (photoBase64) {
+    // VCard 3.0 format with base64 encoding - fold lines at 75 chars
+    const photoLine = `PHOTO;ENCODING=b;TYPE=JPEG:${photoBase64}`;
+    // Split into 75-char chunks for VCF compliance
+    const chunks: string[] = [];
+    for (let i = 0; i < photoLine.length; i += 75) {
+      if (i === 0) {
+        chunks.push(photoLine.substring(i, i + 75));
+      } else {
+        chunks.push(' ' + photoLine.substring(i, i + 75));
+      }
+    }
+    lines.push(chunks.join('\r\n'));
+  } else if (data.photo_url) {
+    lines.push(`PHOTO;VALUE=uri:${data.photo_url}`);
+  }
+
   if (data.bday) lines.push(`BDAY:${data.bday}`);
 
   lines.push('END:VCARD');
