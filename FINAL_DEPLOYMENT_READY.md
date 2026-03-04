@@ -166,12 +166,12 @@ Check:
 
 ## 🎯 URLs Importantes
 
-| Service | URL |
-|---------|-----|
-| Vercel Dashboard | https://vercel.com/dashboard |
-| Firebase Console | https://console.firebase.google.com |
-| Your Site | https://[your-vercel-domain].vercel.app |
-| Admin Panel | https://[your-vercel-domain].vercel.app/admin |
+| Service          | URL                                           |
+| ---------------- | --------------------------------------------- |
+| Vercel Dashboard | https://vercel.com/dashboard                  |
+| Firebase Console | https://console.firebase.google.com           |
+| Your Site        | https://[your-vercel-domain].vercel.app       |
+| Admin Panel      | https://[your-vercel-domain].vercel.app/admin |
 
 ---
 
