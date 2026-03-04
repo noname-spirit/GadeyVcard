@@ -321,7 +321,7 @@ export default function SmartVCard() {
   };
 
   return (
-    <div className={`bg-linear-to-br ${c.pageBg} ${c.pageText} min-h-screen overflow-x-hidden transition-colors duration-300`}>
+    <div className={`bg-linear-to-br ${c.pageBg} ${c.pageText} h-screen w-screen overflow-hidden transition-colors duration-300 flex flex-col`}>
       {/* Meta Pixel Script — ID validated to prevent XSS */}
       {/^[0-9]+$/.test(process.env.NEXT_PUBLIC_META_PIXEL_ID || '') && (
         <script
@@ -342,44 +342,44 @@ export default function SmartVCard() {
         />
       )}
 
-      <div className="flex flex-col items-center w-full px-6 pt-2 pb-6">
+      <div className="flex flex-col items-center w-full h-full overflow-y-auto px-4 py-3 gap-2">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-3 flex flex-col items-center gap-1"
+          className="text-center flex flex-col items-center gap-0.5 flex-shrink-0"
         >
-          <div className="flex items-center gap-4 justify-center">
-            <h1 className={`text-3xl md:text-4xl font-bold bg-linear-to-r ${c.titleGradient} bg-clip-text text-transparent tracking-tight`}>
+          <div className="flex items-center gap-2 justify-center">
+            <h1 className={`text-2xl md:text-3xl font-bold bg-linear-to-r ${c.titleGradient} bg-clip-text text-transparent tracking-tight`}>
               {t.title}
             </h1>
             {/* Language Selector */}
-            <div className={`flex gap-1 ${c.langBg} rounded-full px-1.5 py-1 border backdrop-blur-xl transition-colors duration-300`}>
+            <div className={`flex gap-0.5 ${c.langBg} rounded-full px-1 py-0.5 border backdrop-blur-xl transition-colors duration-300`}>
               <button
                 onClick={() => setLanguage('fr')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 ${language === 'fr' ? 'bg-orange-500/15 text-orange-400' : c.langInactive
+                className={`px-2 py-0.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 ${language === 'fr' ? 'bg-orange-500/15 text-orange-400' : c.langInactive
                   }`}
               >
                 FR
               </button>
               <button
                 onClick={() => setLanguage('en')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 ${language === 'en' ? 'bg-orange-500/15 text-orange-400' : c.langInactive
+                className={`px-2 py-0.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 ${language === 'en' ? 'bg-orange-500/15 text-orange-400' : c.langInactive
                   }`}
               >
                 EN
               </button>
               <button
                 onClick={toggleTheme}
-                className={`px-2 py-1 rounded-full transition-all duration-200 ${c.toggleBtn}`}
+                className={`px-1.5 py-0.5 rounded-full transition-all duration-200 ${c.toggleBtn}`}
                 title={isDark ? 'Mode clair' : 'Mode sombre'}
               >
                 {isDark ? <Sun size={12} /> : <Moon size={12} />}
               </button>
             </div>
           </div>
-          <p className={`text-sm ${c.subtitle} font-medium tracking-wide`}>{t.subtitle}</p>
+          <p className={`text-xs ${c.subtitle} font-medium tracking-wide`}>{t.subtitle}</p>
         </motion.div>
 
         {/* 3D Flip Card */}
@@ -621,7 +621,7 @@ export default function SmartVCard() {
           initial={{ opacity: 1, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="w-full max-w-md "
+          className="w-full max-w-sm flex-shrink-0"
         >
           <div className={`relative bg-linear-to-br ${c.formBg} rounded-3xl px-6 border backdrop-blur-2xl ${c.cardShadow} pt-5 pb-2 transition-colors duration-300`}>
             {/* Decorative Top Line */}
@@ -783,7 +783,7 @@ export default function SmartVCard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-0.2 text-center"
+          className="mt-auto pt-2 pb-1 text-center flex-shrink-0"
         >
           <p className={`${c.footerText} text-xs font-medium tracking-wider`}>
             {language === 'fr'
