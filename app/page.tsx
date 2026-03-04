@@ -250,14 +250,57 @@ export default function SmartVCard() {
   };
 
   // Download vCard / Open Contact
-  const downloadVCard = () => {
+  const downloadVCard = async () => {
     setIsSavingContact(true);
 
-    // On iOS/Android: Content-Disposition: inline will trigger Contacts app
-    // On Desktop: Browser will download the file
-    window.location.href = '/api/contact/vcf';
+    // Detect platform using userAgent (more reliable than device hook for this)
+    const userAgent = navigator.userAgent;
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+    const isAndroid = /Android/.test(userAgent);
 
-    // Reset loading state after a brief delay
+    try {
+      if (isIOS) {
+        // iOS: window.location.href with inline VCF opens Contacts directly
+        window.location.href = '/api/contact/vcf';
+      } else if (isAndroid) {
+        // Android: Download the file, user must tap notification to import
+        const response = await fetch('/api/contact/vcf');
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Contact.vcf';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        // Show feedback message for Android users
+        setFeedback({
+          type: 'success',
+          message: language === 'fr'
+            ? '📥 Fichier téléchargé ! Appuyez sur la notification pour ajouter le contact.'
+            : '📥 File downloaded! Tap the notification to add contact.',
+        });
+        setTimeout(() => setFeedback({ type: null, message: '' }), 5000);
+      } else {
+        // Desktop: simple download
+        const a = document.createElement('a');
+        a.href = '/api/contact/vcf';
+        a.download = 'Contact.vcf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    } catch (error) {
+      console.error('Error downloading vCard:', error);
+      // Fallback
+      window.location.href = '/api/contact/vcf';
+    }
+
+    // Reset loading state
     setTimeout(() => {
       setIsSavingContact(false);
     }, 500);

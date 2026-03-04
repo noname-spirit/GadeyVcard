@@ -61,9 +61,14 @@ export function generateVCF(data: ContactData): string {
   if (data.fn) lines.push(`FN:${data.fn}`);
   if (data.title) lines.push(`TITLE:${data.title}`);
   if (data.org) lines.push(`ORG:${data.org}`);
-  if (data.tel_mobile) lines.push(`TEL;TYPE=CELL:${data.tel_mobile}`);
+
+  // Support both field name variants
+  const cellPhone = data.tel_mobile || data.tel_cell;
+  if (cellPhone) lines.push(`TEL;TYPE=CELL:${cellPhone}`);
   if (data.tel_work) lines.push(`TEL;TYPE=WORK:${data.tel_work}`);
-  if (data.email_personal) lines.push(`EMAIL;TYPE=HOME:${data.email_personal}`);
+
+  const personalEmail = data.email_personal || data.email_home;
+  if (personalEmail) lines.push(`EMAIL;TYPE=HOME:${personalEmail}`);
   if (data.email_work) lines.push(`EMAIL;TYPE=WORK:${data.email_work}`);
   if (data.url) lines.push(`URL:${data.url}`);
 
