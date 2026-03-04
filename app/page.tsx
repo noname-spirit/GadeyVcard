@@ -483,7 +483,7 @@ export default function SmartVCard() {
                       transition={{ delay: 0.1, duration: 0.6 }}
                       className="relative"
                     >
-                      <div className={`${getDeviceClasses(device.screenSize, 'photoSize')} rounded-full bg-linear-to-br from-orange-400 via-orange-500 to-orange-600 p-0.75 flex items-center justify-center shadow-lg shadow-orange-500/30 relative`}>
+                      <div className={`${getDeviceClasses(device.screenSize, 'photoSize')} rounded-full                      git add . && git commit -m "fix: use text/x-vcard for better iOS compatibility" && git push bg-linear-to-br from-orange-400 via-orange-500 to-orange-600 p-0.75 flex items-center justify-center shadow-lg shadow-orange-500/30 relative`}>
                         <div className="absolute inset-0 rounded-full bg-linear-to-br from-orange-500/20 to-transparent blur-xl" />
                         <Image
                           src="/noname-spirit.jpg"
