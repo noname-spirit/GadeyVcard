@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { Download, Instagram, Youtube, Globe, Send, Check, AlertCircle, RotateCw, ScanLine, X, Phone, Mail, MessageCircle, Sun, Moon } from 'lucide-react';
@@ -68,6 +69,7 @@ export default function SmartVCard() {
   const [showScanner, setShowScanner] = useState(false);
   const [scannerReady, setScannerReady] = useState(false);
   const scannerRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const html5QrScannerRef = useRef<any>(null);
   const [isDark, setIsDark] = useState(true);
 
@@ -234,7 +236,7 @@ export default function SmartVCard() {
       }
 
       setTimeout(() => setFeedback({ type: null, message: '' }), 3000);
-    } catch (error) {
+    } catch {
       setFeedback({ type: 'error', message: t.errorMessage });
       setTimeout(() => setFeedback({ type: null, message: '' }), 3000);
     } finally {
@@ -266,16 +268,7 @@ export default function SmartVCard() {
     animate: { opacity: 1, y: 0 },
   };
 
-  const flipVariants = {
-    flipToQR: {
-      rotateY: 180,
-      transition: { duration: 0.6, ease: [0.42, 0, 0.58, 1] },
-    },
-    flipToFront: {
-      rotateY: 0,
-      transition: { duration: 0.6, ease: [0.42, 0, 0.58, 1] },
-    },
-  };
+
 
   // Theme color tokens
   const c = {
@@ -328,7 +321,7 @@ export default function SmartVCard() {
   };
 
   return (
-    <div className={`bg-gradient-to-br ${c.pageBg} ${c.pageText} min-h-screen overflow-x-hidden transition-colors duration-300`}>
+    <div className={`bg-linear-to-br ${c.pageBg} ${c.pageText} min-h-screen overflow-x-hidden transition-colors duration-300`}>
       {/* Meta Pixel Script — ID validated to prevent XSS */}
       {/^[0-9]+$/.test(process.env.NEXT_PUBLIC_META_PIXEL_ID || '') && (
         <script
@@ -358,7 +351,7 @@ export default function SmartVCard() {
           className="text-center mb-3 flex flex-col items-center gap-1"
         >
           <div className="flex items-center gap-4 justify-center">
-            <h1 className={`text-3xl md:text-4xl font-bold bg-gradient-to-r ${c.titleGradient} bg-clip-text text-transparent tracking-tight`}>
+            <h1 className={`text-3xl md:text-4xl font-bold bg-linear-to-r ${c.titleGradient} bg-clip-text text-transparent tracking-tight`}>
               {t.title}
             </h1>
             {/* Language Selector */}
@@ -413,7 +406,7 @@ export default function SmartVCard() {
                 transformStyle: 'preserve-3d',
                 transformOrigin: 'center',
               }}
-              className="w-full h-full relative [min-height:400px]"
+              className="w-full h-full relative min-h-100"
             >
               {/* Front Face - Identity */}
               <motion.div
@@ -423,9 +416,9 @@ export default function SmartVCard() {
                 }}
                 className="absolute w-full h-full"
               >
-                <div className={`w-full h-full bg-gradient-to-br ${c.cardBg} rounded-3xl px-4 pb-0 border backdrop-blur-2xl ${c.cardShadow} flex flex-col items-center justify-center transition-colors duration-300`}>
+                <div className={`w-full h-full bg-linear-to-br ${c.cardBg} rounded-3xl px-4 pb-0 border backdrop-blur-2xl ${c.cardShadow} flex flex-col items-center justify-center transition-colors  duration-300`}>
                   {/* Decorative Top Line */}
-                  <div className="absolute top-0 left-12 right-12 h-px bg-gradient-to-r from-transparent via-orange-500/20 to-transparent mt-2" />
+                  <div className="absolute top-0 left-12 right-12 h-px bg-linear-to-r from-transparent via-orange-500/20 to-transparent mt-2" />
 
                   {/* Content Wrapper with Gap */}
                   <div className="flex flex-col items-center w-full gap-5">
@@ -436,11 +429,13 @@ export default function SmartVCard() {
                       transition={{ delay: 0.1, duration: 0.6 }}
                       className="relative"
                     >
-                      <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 p-[3px] flex items-center justify-center shadow-lg shadow-orange-500/30 relative">
-                        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-500/20 to-transparent blur-xl" />
-                        <img
+                      <div className="w-32 h-32 rounded-full bg-linear-to-br from-orange-400 via-orange-500 to-orange-600 p-0.75 flex items-center justify-center shadow-lg shadow-orange-500/30 relative">
+                        <div className="absolute inset-0 rounded-full bg-linear-to-br from-orange-500/20 to-transparent blur-xl" />
+                        <Image
                           src="/noname-spirit.jpg"
                           alt="Profile"
+                          width={128}
+                          height={128}
                           className="w-full h-full rounded-full object-cover relative z-10"
                         />
                       </div>
@@ -543,7 +538,7 @@ export default function SmartVCard() {
                       onClick={downloadVCard}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-300 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 group"
+                      className="w-full py-2 bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-300 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 group"
                     >
                       <Download size={19} className="group-hover:translate-y-0.5 transition-transform" />
                       {t.saveContact}
@@ -551,7 +546,7 @@ export default function SmartVCard() {
                   </div>
 
                   {/* Decorative Bottom Line */}
-                  <div className="absolute bottom-0 left-12 right-12 h-px bg-gradient-to-r from-transparent via-orange-500/20 to-transparent mb-6" />
+                  <div className="absolute bottom-0 left-12 right-12 h-px bg-linear-to-r from-transparent via-orange-500/20 to-transparent mb-6" />
                 </div>
               </motion.div>
 
@@ -564,7 +559,7 @@ export default function SmartVCard() {
                 }}
                 className="absolute w-full h-full"
               >
-                <div className={`w-full h-full bg-gradient-to-br ${c.cardBg} rounded-3xl p-10 border backdrop-blur-2xl ${c.cardShadow} flex flex-col items-center justify-center transition-colors duration-300`}>
+                <div className={`w-full h-full bg-linear-to-br ${c.cardBg} rounded-3xl p-10 border backdrop-blur-2xl ${c.cardShadow} flex flex-col items-center justify-center transition-colors duration-300`}>
 
                   {/* QR Content Wrapper with Gap */}
                   <div className="flex flex-col items-center w-full gap-6">
@@ -628,9 +623,9 @@ export default function SmartVCard() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="w-full max-w-md "
         >
-          <div className={`relative bg-gradient-to-br ${c.formBg} rounded-3xl px-6 border backdrop-blur-2xl ${c.cardShadow} pt-5 pb-2 transition-colors duration-300`}>
+          <div className={`relative bg-linear-to-br ${c.formBg} rounded-3xl px-6 border backdrop-blur-2xl ${c.cardShadow} pt-5 pb-2 transition-colors duration-300`}>
             {/* Decorative Top Line */}
-            <div className="absolute top-0 left-12 right-12 h-px bg-gradient-to-r from-transparent via-orange-500/20 to-transparent" />
+            <div className="absolute top-0 left-12 right-12 h-px bg-linear-to-r from-transparent via-orange-500/20 to-transparent" />
 
             <motion.h3
               initial={{ opacity: 0, y: -10 }}
@@ -695,7 +690,7 @@ export default function SmartVCard() {
                   disabled={isLoading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex-1 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none group"
+                  className="flex-1 py-2 bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none group"
                 >
                   <Send size={17} className={`transition-transform duration-300 ${isLoading ? 'animate-spin' : 'group-hover:translate-x-1'}`} />
                   {isLoading ? t.loading : t.formSubmit}
@@ -772,9 +767,9 @@ export default function SmartVCard() {
                   transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
                 >
                   {feedback.type === 'success' ? (
-                    <Check size={20} className="mt-0.5 flex-shrink-0" />
+                    <Check size={20} className="mt-0.5 shrink-0" />
                   ) : (
-                    <AlertCircle size={20} className="mt-0.5 flex-shrink-0" />
+                    <AlertCircle size={20} className="mt-0.5 shrink-0" />
                   )}
                 </motion.div>
                 <span className="text-sm font-medium leading-relaxed flex-1">{feedback.message}</span>

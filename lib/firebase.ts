@@ -40,7 +40,7 @@ function getDb(): Firestore {
 export const db = new Proxy({} as Firestore, {
     get(_, prop) {
         const realDb = getDb();
-        const value = (realDb as Record<string | symbol, unknown>)[prop];
+        const value = (realDb as unknown as Record<string | symbol, unknown>)[prop];
         if (typeof value === 'function') {
             return value.bind(realDb);
         }
