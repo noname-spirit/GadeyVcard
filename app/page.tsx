@@ -599,8 +599,8 @@ export default function SmartVCard() {
                       {isSavingContact ? (language === 'fr' ? 'Ajout en cours...' : 'Adding...') : t.saveContact}
                     </motion.button>
 
-                    {/* Mobile instruction hint */}
-                    <p className={`text-center text-[10px] ${c.subtitle} mt-1`}>
+                    {/* Mobile instruction hint - hidden on desktop */}
+                    <p className={`text-center text-[10px] ${c.subtitle} mt-1 md:hidden`}>
                       {language === 'fr'
                         ? '📱 Après téléchargement, ouvrez le fichier pour ajouter le contact'
                         : '📱 After download, open the file to add contact'}
