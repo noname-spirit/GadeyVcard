@@ -9,13 +9,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Smart vCard - Lionel',
+  title: 'Nonames-spirit | Graphiste Logo & Web',
   description:
-    'Designer & Stratège Marketing - Partage élégant de coordonnées avec capture de leads',
-  keywords: ['vCard', 'contact', 'designer', 'marketing', 'thaïlande'],
+    'Graphiste Logo & Web | Branding - Partage élégant de coordonnées',
+  keywords: ['vCard', 'contact', 'graphiste', 'logo', 'branding', 'web'],
   openGraph: {
-    title: 'Smart vCard - Lionel',
-    description: 'Designer & Stratège Marketing basé en Thaïlande',
+    title: 'Nonames-spirit | Graphiste Logo & Web',
+    description: 'Graphiste Logo & Web | Branding',
     type: 'website',
   },
 };
