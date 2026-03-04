@@ -62,6 +62,7 @@ export default function SmartVCard() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [formData, setFormData] = useState({ name: '', contact: '' });
   const [isLoading, setIsLoading] = useState(false);
+  const [isSavingContact, setIsSavingContact] = useState(false);
   const [feedback, setFeedback] = useState<{
     type: 'success' | 'error' | null;
     message: string;
@@ -248,15 +249,50 @@ export default function SmartVCard() {
     }
   };
 
-  // Download vCard
-  const downloadVCard = () => {
-    // Download dynamically generated VCF from API
-    const link = document.createElement('a');
-    link.href = '/api/contact/vcf';
-    link.download = 'Contact.vcf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  // Download vCard / Open Contact
+  const downloadVCard = async () => {
+    setIsSavingContact(true);
+    const isMobile = device.type === 'iPhone' || device.type === 'Android' || device.type === 'iPad';
+
+    try {
+      if (isMobile) {
+        // On mobile: Fetch VCF and open it directly (triggers Contacts app)
+        const response = await fetch('/api/contact/vcf');
+        const vcfContent = await response.text();
+
+        // Create a blob with vCard content
+        const blob = new Blob([vcfContent], { type: 'text/vcard; charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+
+        // Open with the Contacts app - use the blob URL
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'Contact.vcf';
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+
+        // Cleanup
+        setTimeout(() => {
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }, 100);
+      } else {
+        // On desktop: Simple download
+        const link = document.createElement('a');
+        link.href = '/api/contact/vcf';
+        link.download = 'Contact.vcf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      console.error('Error downloading vCard:', error);
+      // Fallback to simple download
+      window.location.href = '/api/contact/vcf';
+    } finally {
+      setIsSavingContact(false);
+    }
 
     // Trigger Meta Pixel event
     if (window.fbq) {
@@ -543,12 +579,13 @@ export default function SmartVCard() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.35, duration: 0.5 }}
                       onClick={downloadVCard}
+                      disabled={isSavingContact}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full py-2 bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-300 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 group"
+                      className="w-full py-2 bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-300 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 group disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Download size={19} className="group-hover:translate-y-0.5 transition-transform" />
-                      {t.saveContact}
+                      <Download size={19} className={`transition-transform ${isSavingContact ? 'animate-spin' : 'group-hover:translate-y-0.5'}`} />
+                      {isSavingContact ? (language === 'fr' ? 'Ajout en cours...' : 'Adding...') : t.saveContact}
                     </motion.button>
                   </div>
 

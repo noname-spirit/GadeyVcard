@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/admin';
 import { readLocalLeads, writeLocalLeads, Lead } from '@/lib/local-storage';
 import { isFirebaseConfigured } from '@/lib/firebase';
+import { sendLeadNotificationEmail, sendLeadConfirmationEmail } from '@/lib/email';
 
 // POST - Save a new lead (public)
 export async function POST(req: NextRequest) {
@@ -43,6 +44,39 @@ export async function POST(req: NextRequest) {
         const leads = readLocalLeads();
         leads.unshift(lead);
         writeLocalLeads(leads);
+
+        // Send emails
+        const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
+        const lang = (language || 'fr') as 'fr' | 'en';
+
+        // Send notification email to admin (if configured)
+        if (adminEmail) {
+            try {
+                await sendLeadNotificationEmail({
+                    to: adminEmail,
+                    name: sanitizedName,
+                    language: lang,
+                    contactInfo: sanitizedContact,
+                });
+            } catch (error) {
+                console.error('Failed to send admin notification:', error);
+                // Don't fail the request if email fails
+            }
+        }
+
+        // Send confirmation email to lead (if it's an email)
+        if (sanitizedContact.includes('@')) {
+            try {
+                await sendLeadConfirmationEmail({
+                    to: sanitizedContact,
+                    name: sanitizedName,
+                    language: lang,
+                });
+            } catch (error) {
+                console.error('Failed to send lead confirmation:', error);
+                // Don't fail the request if email fails
+            }
+        }
 
         return NextResponse.json({ success: true });
     } catch (error) {
