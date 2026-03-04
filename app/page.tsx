@@ -250,31 +250,17 @@ export default function SmartVCard() {
   };
 
   // Download vCard / Open Contact
-  const downloadVCard = async () => {
+  const downloadVCard = () => {
     setIsSavingContact(true);
-    const isMobile = device.type === 'iPhone' || device.type === 'Android' || device.type === 'iPad';
 
-    try {
-      if (isMobile) {
-        // On mobile: Open native Contacts app with VCF
-        // Use window.location.href to trigger iOS/Android to open Contacts app
-        window.location.href = '/api/contact/vcf';
-      } else {
-        // On desktop: Download VCF file
-        const link = document.createElement('a');
-        link.href = '/api/contact/vcf';
-        link.download = 'Contact.vcf';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-    } catch (error) {
-      console.error('Error downloading vCard:', error);
-      // Fallback
-      window.location.href = '/api/contact/vcf';
-    } finally {
+    // On iOS/Android: Content-Disposition: inline will trigger Contacts app
+    // On Desktop: Browser will download the file
+    window.location.href = '/api/contact/vcf';
+
+    // Reset loading state after a brief delay
+    setTimeout(() => {
       setIsSavingContact(false);
-    }
+    }, 500);
 
     // Trigger Meta Pixel event
     if (window.fbq) {

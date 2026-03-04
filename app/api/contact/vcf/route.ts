@@ -43,7 +43,7 @@ export async function GET() {
             status: 200,
             headers: {
                 'Content-Type': 'text/vcard; charset=utf-8',
-                'Content-Disposition': `attachment; filename="${fileName}"`,
+                'Content-Disposition': `inline; filename="${fileName}"`,
             },
         });
     } catch (error) {
