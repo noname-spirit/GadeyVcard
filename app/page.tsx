@@ -60,7 +60,7 @@ const translations = {
 export default function SmartVCard() {
   const [language, setLanguage] = useState<Language>('en');
   const [isFlipped, setIsFlipped] = useState(false);
-  const [formData, setFormData] = useState({ name: '', contact: '' });
+  const [formData, setFormData] = useState({ nom: '', email: '', telephone: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [isSavingContact, setIsSavingContact] = useState(false);
   const [feedback, setFeedback] = useState<{
@@ -207,7 +207,7 @@ export default function SmartVCard() {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.contact.trim()) {
+    if (!formData.nom.trim() || !formData.email.trim() || !formData.telephone.trim()) {
       setFeedback({
         type: 'error',
         message: language === 'fr' ? 'Tous les champs sont requis.' : 'All fields are required.',
@@ -224,16 +224,17 @@ export default function SmartVCard() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: formData.name,
-          contact: formData.contact,
-          language: language,
+          nom: formData.nom,
+          email: formData.email,
+          telephone: formData.telephone,
+          source: 'formulaire',
         }),
       });
 
       if (!res.ok) throw new Error('Save failed');
 
       setFeedback({ type: 'success', message: t.successMessage });
-      setFormData({ name: '', contact: '' });
+      setFormData({ nom: '', email: '', telephone: '' });
 
       // Trigger Meta Pixel event (if configured)
       if (window.fbq) {
@@ -706,8 +707,8 @@ export default function SmartVCard() {
               {t.exchangeSubtitle}
             </motion.p>
 
-            <form onSubmit={handleSubmit} className="flex flex-col items-center gap-2">
-              {/* Name Input */}
+            <form onSubmit={handleSubmit} className="flex flex-col items-center gap-2 relative">
+              {/* Nom Input */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -715,25 +716,41 @@ export default function SmartVCard() {
               >
                 <motion.input
                   type="text"
-                  placeholder={t.formName}
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder={language === 'fr' ? 'Votre nom' : 'Your name'}
+                  value={formData.nom}
+                  onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
                   whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
                   className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
                 />
               </motion.div>
 
-              {/* Contact Input */}
+              {/* Email Input */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.45, duration: 0.5 }}
               >
                 <motion.input
-                  type="text"
-                  placeholder={t.formContact}
-                  value={formData.contact}
-                  onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
+                  type="email"
+                  placeholder={language === 'fr' ? 'Votre email' : 'Your email'}
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
+                  className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
+                />
+              </motion.div>
+
+              {/* Téléphone Input */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+              >
+                <motion.input
+                  type="tel"
+                  placeholder={language === 'fr' ? 'Votre téléphone' : 'Your phone'}
+                  value={formData.telephone}
+                  onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
                   whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
                   className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
                 />
@@ -771,6 +788,25 @@ export default function SmartVCard() {
                   <span className="hidden sm:inline text-xs">{t.scanQR}</span>
                 </motion.button>
               </motion.div>
+              {/* Confirmation visuelle */}
+              <AnimatePresence>
+                {feedback.type && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className={`absolute left-0 right-0 top-[-40px] mx-auto w-full flex items-center justify-center z-10`}
+                  >
+                    <div
+                      className={`px-4 py-2 rounded-xl font-semibold text-sm shadow-lg border transition-all duration-300
+                        ${feedback.type === 'success' ? 'bg-emerald-500/90 text-white border-emerald-600' : 'bg-red-500/90 text-white border-red-600'}`}
+                    >
+                      {feedback.type === 'success' ? <Check size={16} className="inline mr-2" /> : <AlertCircle size={16} className="inline mr-2" />}
+                      {feedback.message}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </form>
 
             {/* QR Scanner Modal */}
