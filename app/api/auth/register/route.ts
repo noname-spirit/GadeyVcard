@@ -17,27 +17,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Require admin authentication — httpOnly cookie (primary) or Bearer header (fallback)
-        let authToken = req.cookies.get('admin_token')?.value;
-        if (!authToken) {
-            const authHeader = req.headers.get('authorization');
-            if (authHeader?.startsWith('Bearer ')) {
-                authToken = authHeader.split(' ')[1];
-            }
-        }
-        if (!authToken) {
-            return NextResponse.json(
-                { error: 'Authentification requise pour créer un utilisateur' },
-                { status: 401 }
-            );
-        }
-        const payload = verifyToken(authToken);
-        if (!payload) {
-            return NextResponse.json(
-                { error: 'Token invalide ou expiré' },
-                { status: 401 }
-            );
-        }
+        // Inscription libre : aucune authentification requise
 
         // Firebase required for registration
         if (!isFirebaseConfigured()) {

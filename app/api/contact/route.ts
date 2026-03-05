@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/admin';
 import { isFirebaseConfigured } from '@/lib/firebase';
-import { readLocalContact, writeLocalContact } from '@/lib/local-storage';
+import { insertContact, getContact, updateContact } from '@/lib/db/contact';
 
 // GET - Retrieve contact data (public)
 export async function GET() {
@@ -78,16 +78,13 @@ export async function PUT(req: NextRequest) {
             }
         }
 
-        // Always save locally as backup
-        const existing = readLocalContact();
-        writeLocalContact({
-            ...existing,
-            ...fields,
-            updatedAt: new Date().toISOString(),
-            updatedBy: payload.username,
-        });
-
-        return NextResponse.json({ success: true, storage: savedToFirebase ? 'firebase+local' : 'local' });
+        // Enregistrement dans la base Postgres
+        if (fields.id) {
+            await updateContact(fields);
+        } else {
+            await insertContact(fields);
+        }
+        return NextResponse.json({ success: true, storage: 'postgres' });
     } catch (error) {
         console.error('Update contact error:', error);
         return NextResponse.json(
