@@ -10,7 +10,7 @@ import { sendLeadNotificationEmail, sendLeadConfirmationEmail } from '@/lib/emai
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { nom, email, telephone, domaine, source } = body;
+        const { nom, email, telephone, domaine, note, source } = body;
 
         if (!nom?.trim() || !email?.trim() || !telephone?.trim() || !domaine?.trim()) {
             return NextResponse.json({ error: 'Nom, email, téléphone et domaine requis' }, { status: 400 });
@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
         const sanitizedEmail = email.trim().substring(0, 100);
         const sanitizedTelephone = telephone.trim().substring(0, 30);
         const sanitizedDomaine = domaine.trim().substring(0, 50);
+        const sanitizedNote = note ? note.trim().substring(0, 1000) : undefined;
         const sanitizedSource = source?.trim().substring(0, 50) || 'formulaire';
 
         const lead: Lead = {
@@ -28,6 +29,7 @@ export async function POST(req: NextRequest) {
             email: sanitizedEmail,
             telephone: sanitizedTelephone,
             domaine: sanitizedDomaine,
+            note: sanitizedNote,
             createdAt: new Date().toISOString(),
             source: sanitizedSource,
         };

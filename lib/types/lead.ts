@@ -3,6 +3,7 @@ export interface Lead {
     email: string;
     telephone: string;
     domaine: string;
+    note?: string;
     createdAt: string; // ISO date string
     source: string;
 }
