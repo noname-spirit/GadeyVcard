@@ -36,11 +36,11 @@ export async function insertContact(contact: Contact) {
         `INSERT INTO contacts (
             fn, title, org, bday, tel_mobile, tel_work, whatsapp, email_personal, email_work, url,
             instagram, youtube, linkedin, tiktok, facebook, line_id, adr_street, adr_city, adr_region,
-            adr_postal, adr_country, note, photo_url, createdAt
+            adr_postal, adr_country, note, photo_url
         ) VALUES (
             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
             $11, $12, $13, $14, $15, $16, $17, $18, $19,
-            $20, $21, $22, $23, $24, NOW()
+            $20, $21, $22, $23
         ) RETURNING id;`,
         [
             contact.fn,
