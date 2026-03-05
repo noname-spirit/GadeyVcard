@@ -805,7 +805,7 @@ export default function SmartVCard() {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className={`absolute left-0 right-0 top-[-40px] mx-auto w-full flex items-center justify-center z-10`}
+                    className={`absolute left-0 right-0 -top-10 mx-auto w-full flex items-center justify-center z-10`}
                   >
                     <div
                       className={`px-4 py-2 rounded-xl font-semibold text-sm shadow-lg border transition-all duration-300
