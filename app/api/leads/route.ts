@@ -1,6 +1,7 @@
+"use server";
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/admin';
-import { readLocalLeads, writeLocalLeads } from '@/lib/local-storage';
+import { saveLead } from '@/lib/db/leads';
 import type { Lead } from '@/lib/types/lead';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { sendLeadNotificationEmail, sendLeadConfirmationEmail } from '@/lib/email';
@@ -29,58 +30,21 @@ export async function POST(req: NextRequest) {
             source: sanitizedSource,
         };
 
-        // Try Firebase first
-        if (isFirebaseConfigured()) {
-            try {
-                const { db } = await import('@/lib/firebase');
-                const { collection, addDoc } = await import('firebase/firestore');
-                await addDoc(collection(db, 'leads'), lead);
-            } catch {
-                // Firebase error, save locally
-            }
-        }
+        // Enregistrement dans Vercel Postgres
+        await saveLead(lead);
 
-        // Always save locally as well
-        const leads = readLocalLeads();
-        leads.unshift(lead);
-        writeLocalLeads(leads);
-
-        // Send emails
-        const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
-        const lang = (language || 'fr') as 'fr' | 'en';
-
-        // Send notification email to admin (if configured)
-        if (adminEmail) {
-            try {
-                await sendLeadNotificationEmail({
-                    to: adminEmail,
-                    name: sanitizedName,
-                    language: lang,
-                    contactInfo: sanitizedContact,
-                });
-            } catch (error) {
-                console.error('Failed to send admin notification:', error);
-                // Don't fail the request if email fails
-            }
-        }
-
-        // Send confirmation email to lead (if it's an email)
-        if (sanitizedContact.includes('@')) {
-            try {
-                await sendLeadConfirmationEmail({
-                    to: sanitizedContact,
-                    name: sanitizedName,
-                    language: lang,
-                });
-            } catch (error) {
-                console.error('Failed to send lead confirmation:', error);
-                // Don't fail the request if email fails
-            }
+        // Optionally send notification emails
+        try {
+            await sendLeadNotificationEmail(lead);
+            await sendLeadConfirmationEmail(lead);
+        } catch (emailErr) {
+            console.error('Email error:', emailErr);
+            // Ignore email errors
         }
 
         return NextResponse.json({ success: true });
-    } catch (error) {
-        console.error('Save lead error:', error);
+    } catch (err) {
+        console.error('API /api/leads error:', err);
         return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
 }
