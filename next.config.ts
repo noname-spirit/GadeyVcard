@@ -15,11 +15,6 @@ const cspHeader = `
 `;
 
 const nextConfig: NextConfig = {
-  experimental: {
-    sri: {
-      algorithm: 'sha256',
-    },
-  },
   async headers() {
     return [
       {
