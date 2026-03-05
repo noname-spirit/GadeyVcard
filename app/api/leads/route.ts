@@ -5,7 +5,6 @@ import { insertLead, getLeads, deleteLead } from '@/lib/db/leads';
 import type { Lead } from '@/lib/types/lead';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { sendLeadNotificationEmail, sendLeadConfirmationEmail } from '@/lib/email';
-import { readLocalLeads, writeLocalLeads } from '@/lib/local-storage';
 
 // POST - Save a new lead (public)
 export async function POST(req: NextRequest) {
