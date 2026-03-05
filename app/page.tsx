@@ -172,14 +172,49 @@ export default function SmartVCard() {
           setShowScanner(false);
           setScannerReady(false);
 
-          // Save scanned QR as lead
+          // Parse vCard or JSON contact if possible
+          let nom = '';
+          let email = '';
+          let telephone = '';
+          let domaine = '';
+          // Try to parse vCard
+          if (decodedText.startsWith('BEGIN:VCARD')) {
+            const lines = decodedText.split(/\r?\n/);
+            for (const line of lines) {
+              if (line.startsWith('FN:')) nom = line.replace('FN:', '').trim();
+              if (line.startsWith('EMAIL')) email = line.split(':')[1]?.trim() || '';
+              if (line.startsWith('TEL')) telephone = line.split(':')[1]?.trim() || '';
+              if (line.startsWith('ORG:')) domaine = line.replace('ORG:', '').trim();
+            }
+          } else {
+            // Try to parse as JSON
+            try {
+              const obj = JSON.parse(decodedText);
+              nom = obj.nom || obj.name || '';
+              email = obj.email || obj.contact || '';
+              telephone = obj.telephone || '';
+              domaine = obj.domaine || '';
+            } catch {
+              // fallback: store raw
+              nom = '[QR Scan]';
+              email = '';
+              telephone = '';
+              domaine = '';
+            }
+          }
+
+          // Save scanned QR as lead with source 'qd code'
           try {
             await fetch('/api/leads', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                name: '[QR Scan]',
-                contact: decodedText,
+                nom,
+                email,
+                telephone,
+                domaine,
+                source: 'qd code',
+                raw: decodedText,
                 language: language,
               }),
             });
