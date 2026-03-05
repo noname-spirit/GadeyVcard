@@ -230,7 +230,7 @@ export default function AdminPage() {
     // AUTH SCREEN
     if (checkingAuth) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-black to-zinc-950 text-white flex items-center justify-center">
+            <div className="min-h-screen bg-linear-to-br from-zinc-950 via-black to-zinc-950 text-white flex items-center justify-center">
                 <Loader2 className="animate-spin text-orange-400" size={32} />
             </div>
         );
@@ -238,14 +238,14 @@ export default function AdminPage() {
 
     if (!authenticated) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-black to-zinc-950 text-white flex items-center justify-center px-6">
+            <div className="min-h-screen bg-linear-to-br from-zinc-950 via-black to-zinc-950 text-white flex items-center justify-center px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="w-full max-w-sm"
                 >
                     <div className="text-center mb-8">
-                        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/30">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-linear-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/30">
                             <Contact size={28} />
                         </div>
                         <h1 className="text-2xl font-bold tracking-tight">Admin Panel</h1>
@@ -308,7 +308,7 @@ export default function AdminPage() {
                             <button
                                 type="submit"
                                 disabled={authLoading}
-                                className="w-full py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 mt-2"
+                                className="w-full py-3 bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 mt-2"
                             >
                                 {authLoading ? (
                                     <Loader2 size={16} className="animate-spin" />
@@ -358,12 +358,12 @@ export default function AdminPage() {
 
     // ADMIN DASHBOARD
     return (
-        <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-black to-zinc-950 text-white">
+        <div className="min-h-screen bg-linear-to-br from-zinc-950 via-black to-zinc-950 text-white">
             {/* Top Bar */}
             <div className="sticky top-0 z-50 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800/40">
                 <div className="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-linear-to-br from-orange-500 to-orange-600 flex items-center justify-center">
                             <Contact size={16} />
                         </div>
                         <div>
@@ -491,11 +491,11 @@ export default function AdminPage() {
                         </div>
 
                         {/* Save Button */}
-                        <div className="sticky bottom-0 bg-gradient-to-t from-zinc-950 via-zinc-950/95 to-transparent pt-6 pb-8 mt-6">
+                        <div className="sticky bottom-0 bg-linear-to-t from-zinc-950 via-zinc-950/95 to-transparent pt-6 pb-8 mt-6">
                             <button
                                 onClick={handleSave}
                                 disabled={saving}
-                                className="w-full py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-xl font-semibold text-sm flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-orange-500/25 disabled:opacity-50"
+                                className="w-full py-4 bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-xl font-semibold text-sm flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-orange-500/25 disabled:opacity-50"
                             >
                                 {saving ? (
                                     <Loader2 size={18} className="animate-spin" />
