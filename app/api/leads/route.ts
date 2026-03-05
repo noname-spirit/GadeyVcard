@@ -35,7 +35,12 @@ export async function POST(req: NextRequest) {
         };
 
         // Enregistrement dans Vercel Postgres
-        await insertLead(lead);
+        try {
+            await insertLead(lead);
+        } catch (dbErr) {
+            console.error('Erreur insertion lead (QR):', dbErr, lead);
+            return NextResponse.json({ error: 'Erreur lors de l’enregistrement du lead.' }, { status: 500 });
+        }
 
         // Optionally send notification emails
         try {
