@@ -231,7 +231,12 @@ export default function SmartVCard() {
         }),
       });
 
-      if (!res.ok) throw new Error('Save failed');
+      if (!res.ok) {
+        const errorData = await res.json();
+        setFeedback({ type: 'error', message: errorData.error || t.errorMessage });
+        setTimeout(() => setFeedback({ type: null, message: '' }), 3000);
+        return;
+      }
 
       setFeedback({ type: 'success', message: t.successMessage });
       setFormData({ nom: '', email: '', telephone: '' });
@@ -242,7 +247,7 @@ export default function SmartVCard() {
       }
 
       setTimeout(() => setFeedback({ type: null, message: '' }), 3000);
-    } catch {
+    } catch (err) {
       setFeedback({ type: 'error', message: t.errorMessage });
       setTimeout(() => setFeedback({ type: null, message: '' }), 3000);
     } finally {
@@ -313,7 +318,12 @@ export default function SmartVCard() {
   };
 
   // Get QR Code URL (pointing to the current domain)
-  const qrUrl = typeof window !== 'undefined' ? window.location.href : 'https://smart-vcard.vercel.app';
+  const [qrUrl, setQrUrl] = useState('');
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setQrUrl(window.location.href);
+    }
+  }, []);
 
   const cardVariants = {
     initial: { opacity: 0, y: 20 },
@@ -647,7 +657,7 @@ export default function SmartVCard() {
                       transition={{ delay: 0.3, duration: 0.5 }}
                       className="mx-auto w-11/12 flex justify-center"
                     >
-                      <QRCodeSVG value={qrUrl} size={200} level="H" />
+                      {qrUrl && <QRCodeSVG value={qrUrl} size={200} level="H" />}
                     </motion.div>
 
                     <motion.p
