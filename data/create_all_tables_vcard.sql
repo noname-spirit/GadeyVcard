@@ -4,12 +4,12 @@ CREATE TABLE IF NOT EXISTS leads (
     nom VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
     telephone VARCHAR(30) NOT NULL,
-    domaine VARCHAR(50) NOT NULL, -- AJOUTÉ
+    domaine VARCHAR(50) NOT NULL,
     createdAt TIMESTAMP NOT NULL,
     source VARCHAR(50) NOT NULL
 );
 
--- Table pour les utilisateurs/admins (si tu veux gérer des comptes admin côté base)
+-- Table pour les utilisateurs/admins
 CREATE TABLE IF NOT EXISTS admins (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS admins (
     createdAt TIMESTAMP DEFAULT NOW()
 );
 
--- Table pour les logs d’actions (optionnel, utile pour audit)
+-- Table pour les logs d’actions
 CREATE TABLE IF NOT EXISTS logs (
     id SERIAL PRIMARY KEY,
     action VARCHAR(100) NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS logs (
     user_id INTEGER REFERENCES admins(id)
 );
 
--- Table pour les contacts (si tu veux stocker les messages du formulaire de contact)
+-- Table pour les contacts (tous les champs du formulaire vCard)
 CREATE TABLE IF NOT EXISTS contacts (
     id SERIAL PRIMARY KEY,
     fn VARCHAR(100) NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS contacts (
     createdAt TIMESTAMP DEFAULT NOW()
 );
 
--- Table pour les sources de leads (optionnel, si tu veux catégoriser)
+-- Table pour les sources de leads
 CREATE TABLE IF NOT EXISTS lead_sources (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) UNIQUE NOT NULL
@@ -70,4 +70,3 @@ CREATE INDEX IF NOT EXISTS idx_leads_createdAt ON leads(createdAt);
 CREATE INDEX IF NOT EXISTS idx_contacts_email_personal ON contacts(email_personal);
 CREATE INDEX IF NOT EXISTS idx_contacts_email_work ON contacts(email_work);
 CREATE INDEX IF NOT EXISTS idx_contacts_createdAt ON contacts(createdAt);
-ALTER TABLE leads ADD COLUMN domaine VARCHAR(50) NOT NULL DEFAULT '';
