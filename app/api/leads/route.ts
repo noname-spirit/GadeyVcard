@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
         // Optionally send notification emails
         try {
             const emailOptions = {
-                to: process.env.NOTIFICATION_EMAIL || 'admin@example.com', // à adapter selon ta config
+                to: process.env.ADMIN_NOTIFICATION_EMAIL || 'admin@example.com',
                 name: lead.nom,
                 language: 'fr' as 'fr', // ou détecter dynamiquement si besoin
                 contactInfo: `${lead.email} / ${lead.telephone}`,
