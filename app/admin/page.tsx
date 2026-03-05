@@ -392,88 +392,113 @@ export default function AdminPage() {
                 {activeTab === 'contact' ? (
                     <>
                         {/* Field Groups */}
-                        <form onSubmit={handleAuth} className="flex flex-col gap-4">
-                            <div>
-                                <label className="text-xs text-zinc-400 mb-1.5 block font-medium">Nom d&apos;utilisateur</label>
-                                <input
-                                    type="text"
-                                    value={username}
-                                    onChange={e => setUsername(e.target.value)}
-                                    className="w-full px-4 py-3 bg-zinc-900/60 text-white text-sm rounded-xl border border-zinc-800/40 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all"
-                                    placeholder="admin"
-                                    required
-                                />
-                            </div>
+                        <div className="flex flex-col gap-4">
+                            {GROUPS.map(group => {
+                                const fields = VCARD_FIELDS.filter(f => f.group === group);
+                                const isExpanded = expandedGroups.has(group);
+                                const filledCount = fields.filter(f => contactData[f.key]?.trim()).length;
 
-                            <div>
-                                <label className="text-xs text-zinc-400 mb-1.5 block font-medium">Mot de passe</label>
-                                <div className="relative">
-                                    <input
-                                        type={showPassword ? 'text' : 'password'}
-                                        value={password}
-                                        onChange={e => setPassword(e.target.value)}
-                                        className="w-full px-4 py-3 pr-11 bg-zinc-900/60 text-white text-sm rounded-xl border border-zinc-800/40 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all"
-                                        placeholder="••••••••"
-                                        required
-                                        minLength={6}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                                return (
+                                    <motion.div
+                                        key={group}
+                                        layout
+                                        className="bg-zinc-900/40 rounded-2xl border border-zinc-800/30 overflow-hidden"
                                     >
-                                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                                    </button>
-                                </div>
-                            </div>
+                                        <button
+                                            onClick={() => toggleGroup(group)}
+                                            className="w-full px-5 py-4 flex items-center justify-between hover:bg-zinc-800/20 transition-colors"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-sm font-semibold text-white">{group}</span>
+                                                {filledCount > 0 && (
+                                                    <span className="px-2 py-0.5 bg-orange-500/15 text-orange-400 rounded-full text-xs font-medium">
+                                                        {filledCount}/{fields.length}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {isExpanded ? (
+                                                <ChevronUp size={16} className="text-zinc-500" />
+                                            ) : (
+                                                <ChevronDown size={16} className="text-zinc-500" />
+                                            )}
+                                        </button>
 
+                                        <AnimatePresence>
+                                            {isExpanded && (
+                                                <motion.div
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: 'auto', opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.2 }}
+                                                    className="overflow-hidden"
+                                                >
+                                                    <div className="px-5 pb-5 flex flex-col gap-4">
+                                                        {fields.map(field => (
+                                                            <div key={field.key}>
+                                                                <label className="text-xs text-zinc-400 mb-1.5 block font-medium">
+                                                                    {field.label}
+                                                                    {field.required && <span className="text-orange-400 ml-1">*</span>}
+                                                                </label>
+                                                                {field.type === 'textarea' ? (
+                                                                    <textarea
+                                                                        value={contactData[field.key] || ''}
+                                                                        onChange={e => updateField(field.key, e.target.value)}
+                                                                        rows={3}
+                                                                        className="w-full px-4 py-3 bg-zinc-900/60 text-white text-sm rounded-xl border border-zinc-800/40 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all resize-none"
+                                                                        placeholder={field.label}
+                                                                    />
+                                                                ) : (
+                                                                    <input
+                                                                        type={field.type}
+                                                                        value={contactData[field.key] || ''}
+                                                                        onChange={e => updateField(field.key, e.target.value)}
+                                                                        className="w-full px-4 py-3 bg-zinc-900/60 text-white text-sm rounded-xl border border-zinc-800/40 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all"
+                                                                        placeholder={field.label}
+                                                                    />
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Save Button */}
+                        <div className="sticky bottom-0 bg-linear-to-t from-zinc-950 via-zinc-950/95 to-transparent pt-6 pb-8 mt-6">
                             <button
-                                type="submit"
-                                disabled={authLoading}
-                                className="w-full py-3 bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 mt-2"
+                                onClick={handleSave}
+                                disabled={saving}
+                                className="w-full py-4 bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-xl font-semibold text-sm flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-orange-500/25 disabled:opacity-50"
                             >
-                                {authLoading ? (
-                                    <Loader2 size={16} className="animate-spin" />
+                                {saving ? (
+                                    <Loader2 size={18} className="animate-spin" />
                                 ) : (
-                                    <LogIn size={16} />
+                                    <Save size={18} />
                                 )}
-                                {authLoading ? 'Chargement...' : 'Se connecter'}
+                                {saving ? 'Sauvegarde en cours...' : 'Sauvegarder le contact'}
                             </button>
-                        </form>
 
-                        <AnimatePresence>
-                            {authFeedback && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    className={`mt-4 p-3 rounded-xl flex items-center gap-2 text-xs border ${authFeedback.type === 'error'
-                                        ? 'bg-red-500/10 border-red-500/30 text-red-400'
-                                        : 'bg-green-500/10 border-green-500/30 text-green-400'
-                                        }`}
-                                >
-                                    {authFeedback.type === 'error' ? <AlertCircle size={14} /> : <Check size={14} />}
-                                    {authFeedback.message}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-
-                        <AnimatePresence>
-                            {saveFeedback && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 10 }}
-                                    className={`mt-3 p-3 rounded-xl flex items-center justify-center gap-2 text-xs border ${saveFeedback.type === 'error'
-                                        ? 'bg-red-500/10 border-red-500/30 text-red-400'
-                                        : 'bg-green-500/10 border-green-500/30 text-green-400'
-                                        }`}
-                                >
-                                    {saveFeedback.type === 'error' ? <AlertCircle size={14} /> : <Check size={14} />}
-                                    {saveFeedback.message}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                            <AnimatePresence>
+                                {saveFeedback && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        className={`mt-3 p-3 rounded-xl flex items-center justify-center gap-2 text-xs border ${saveFeedback.type === 'error'
+                                            ? 'bg-red-500/10 border-red-500/30 text-red-400'
+                                            : 'bg-green-500/10 border-green-500/30 text-green-400'
+                                            }`}
+                                    >
+                                        {saveFeedback.type === 'error' ? <AlertCircle size={14} /> : <Check size={14} />}
+                                        {saveFeedback.message}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
                     </>
                 ) : (
                     /* LEADS TAB */
