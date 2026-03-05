@@ -172,11 +172,13 @@ export default function SmartVCard() {
           setShowScanner(false);
           setScannerReady(false);
 
-          // Parse vCard or JSON contact if possible
+
+          // Parse vCard, JSON, or URL
           let nom = '';
           let email = '';
           let telephone = '';
           let domaine = '';
+          let note = '';
           // Try to parse vCard
           if (decodedText.startsWith('BEGIN:VCARD')) {
             const lines = decodedText.split(/\r?\n/);
@@ -185,6 +187,7 @@ export default function SmartVCard() {
               if (line.startsWith('EMAIL')) email = line.split(':')[1]?.trim() || '';
               if (line.startsWith('TEL')) telephone = line.split(':')[1]?.trim() || '';
               if (line.startsWith('ORG:')) domaine = line.replace('ORG:', '').trim();
+              if (line.startsWith('NOTE:')) note = line.replace('NOTE:', '').trim();
             }
           } else {
             // Try to parse as JSON
@@ -194,12 +197,22 @@ export default function SmartVCard() {
               email = obj.email || obj.contact || '';
               telephone = obj.telephone || '';
               domaine = obj.domaine || '';
+              note = obj.note || '';
             } catch {
-              // fallback: store raw
+              // fallback: detect URL
               nom = '[QR Scan]';
               email = '';
               telephone = '';
               domaine = '';
+              note = '';
+              // Si le QR est une URL
+              if (/^https?:\/\//.test(decodedText)) {
+                if (!domaine) {
+                  domaine = decodedText;
+                } else {
+                  note = decodedText;
+                }
+              }
             }
           }
 
@@ -213,6 +226,7 @@ export default function SmartVCard() {
                 email,
                 telephone,
                 domaine,
+                note,
                 source: 'qd code',
                 raw: decodedText,
                 language: language,

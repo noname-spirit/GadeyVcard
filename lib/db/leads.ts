@@ -11,15 +11,15 @@ export interface Lead {
     telephone: string;
     domaine: string;
     createdAt: string;
-    source: string;
+        note?: string;
 }
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 export async function insertLead(lead: Lead) {
     const result = await pool.query(
-        'INSERT INTO leads (nom, email, telephone, domaine, createdAt, source) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;',
-        [lead.nom, lead.email, lead.telephone, lead.domaine, lead.createdAt, lead.source]
+           'INSERT INTO leads (nom, email, telephone, domaine, note, createdAt, source) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;',
+           [lead.nom, lead.email, lead.telephone, lead.domaine, lead.note, lead.createdAt, lead.source]
     );
     return result.rows[0];
 }
