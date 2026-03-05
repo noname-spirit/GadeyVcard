@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { generateVCF } from '@/lib/admin';
 import { isFirebaseConfigured } from '@/lib/firebase';
-import { readLocalContact } from '@/lib/local-storage';
 import fs from 'fs';
 import path from 'path';
 
@@ -47,13 +46,6 @@ async function getContactData(): Promise<Record<string, string> | null> {
         }
     }
 
-    // Fall back to local JSON
-    try {
-        const local = readLocalContact();
-        if (local && Object.keys(local).length > 0) return local;
-    } catch (error) {
-        console.log('Local storage error for VCF:', error);
-    }
 
     // Fallback to default contact
     return DEFAULT_CONTACT;
