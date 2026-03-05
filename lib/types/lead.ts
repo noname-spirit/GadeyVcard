@@ -1,9 +1,9 @@
 export interface Lead {
-  nom: string;
-  email: string;
-  telephone: string;
-  createdAt: string; // ISO date string
-  source: string;
+    nom: string;
+    email: string;
+    telephone: string;
+    createdAt: string; // ISO date string
+    source: string;
 }
 
 // Exemple d'utilisation :
