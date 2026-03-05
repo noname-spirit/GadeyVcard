@@ -21,8 +21,8 @@ export async function GET() {
             }
         }
 
-        // Fallback to local JSON
-        const data = readLocalContact();
+        // Fallback: utilise la base Postgres
+        const data = await getContact();
         return NextResponse.json({ data });
     } catch (error) {
         console.error('Get contact error:', error);
