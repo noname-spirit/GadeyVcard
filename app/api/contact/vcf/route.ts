@@ -31,23 +31,15 @@ function getPhotoBase64(): string | null {
     return null;
 }
 
-// Try Firebase, fall back to local JSON, then default
+// Récupère le contact depuis la base Postgres, fallback sur DEFAULT_CONTACT
 async function getContactData(): Promise<Record<string, string> | null> {
-    // Try Firebase first (only if configured)
-    if (isFirebaseConfigured()) {
-        try {
-            const { db } = await import('@/lib/firebase');
-            const { doc, getDoc } = await import('firebase/firestore');
-            const docRef = doc(db, 'contact_info', 'main_contact');
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) return docSnap.data() as Record<string, string>;
-        } catch (error) {
-            console.log('Firebase error for VCF:', error);
-        }
+    try {
+        const { getContact } = await import('@/lib/db/contact');
+        const contact = await getContact();
+        if (contact) return contact;
+    } catch (error) {
+        console.log('Postgres error for VCF:', error);
     }
-
-
-    // Fallback to default contact
     return DEFAULT_CONTACT;
 }
 
