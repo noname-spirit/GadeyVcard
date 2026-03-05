@@ -1,10 +1,11 @@
 "use server";
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/admin';
-import { saveLead } from '@/lib/db/leads';
+import { insertLead } from '@/lib/db/leads';
 import type { Lead } from '@/lib/types/lead';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { sendLeadNotificationEmail, sendLeadConfirmationEmail } from '@/lib/email';
+import { readLocalLeads, writeLocalLeads } from '@/lib/local-storage';
 
 // POST - Save a new lead (public)
 export async function POST(req: NextRequest) {
@@ -31,12 +32,22 @@ export async function POST(req: NextRequest) {
         };
 
         // Enregistrement dans Vercel Postgres
-        await saveLead(lead);
+        await insertLead(lead);
 
         // Optionally send notification emails
         try {
-            await sendLeadNotificationEmail(lead);
-            await sendLeadConfirmationEmail(lead);
+            const emailOptions = {
+                to: process.env.NOTIFICATION_EMAIL || 'admin@example.com', // à adapter selon ta config
+                name: lead.nom,
+                language: 'fr' as 'fr', // ou détecter dynamiquement si besoin
+                contactInfo: `${lead.email} / ${lead.telephone}`,
+            };
+            await sendLeadNotificationEmail(emailOptions);
+            await sendLeadConfirmationEmail({
+                to: lead.email,
+                name: lead.nom,
+                language: 'fr' as 'fr', // ou détecter dynamiquement si besoin
+            });
         } catch (emailErr) {
             console.error('Email error:', emailErr);
             // Ignore email errors

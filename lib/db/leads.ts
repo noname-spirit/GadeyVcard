@@ -1,3 +1,4 @@
+
 import { Pool } from '@neondatabase/serverless';
 
 export interface Lead {
@@ -10,14 +11,16 @@ export interface Lead {
 }
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const result = await pool.query(
-    'INSERT INTO leads (nom, email, telephone, createdAt, source) VALUES ($1, $2, $3, $4, $5) RETURNING id;',
-    [lead.nom, lead.email, lead.telephone, lead.createdAt, lead.source]
-);
-return result.rows[0];
+
+export async function insertLead(lead: Lead) {
+    const result = await pool.query(
+        'INSERT INTO leads (nom, email, telephone, createdAt, source) VALUES ($1, $2, $3, $4, $5) RETURNING id;',
+        [lead.nom, lead.email, lead.telephone, lead.createdAt, lead.source]
+    );
+    return result.rows[0];
 }
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const result = await pool.query('SELECT * FROM leads ORDER BY createdAt DESC;');
-return result.rows;
+export async function getLeads() {
+    const result = await pool.query('SELECT * FROM leads ORDER BY createdAt DESC;');
+    return result.rows;
 }
