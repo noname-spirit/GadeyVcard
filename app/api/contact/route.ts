@@ -6,22 +6,7 @@ import { insertContact, getContact, updateContact } from '@/lib/db/contact';
 // GET - Retrieve contact data (public)
 export async function GET() {
     try {
-        // Try Firebase first (only if configured)
-        if (isFirebaseConfigured()) {
-            try {
-                const { db } = await import('@/lib/firebase');
-                const { doc, getDoc } = await import('firebase/firestore');
-                const docRef = doc(db, 'contact_info', 'main_contact');
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    return NextResponse.json({ data: docSnap.data() });
-                }
-            } catch {
-                // Firebase error, use local
-            }
-        }
-
-        // Fallback: utilise la base Postgres
+        // Utilise uniquement la base Postgres
         const data = await getContact();
         return NextResponse.json({ data });
     } catch (error) {
@@ -60,25 +45,7 @@ export async function PUT(req: NextRequest) {
             );
         }
 
-        // Try Firebase first (only if configured)
-        let savedToFirebase = false;
-        if (isFirebaseConfigured()) {
-            try {
-                const { db } = await import('@/lib/firebase');
-                const { doc, setDoc } = await import('firebase/firestore');
-                const docRef = doc(db, 'contact_info', 'main_contact');
-                await setDoc(docRef, {
-                    ...fields,
-                    updatedAt: new Date().toISOString(),
-                    updatedBy: payload.username,
-                }, { merge: true });
-                savedToFirebase = true;
-            } catch {
-                // Firebase error
-            }
-        }
-
-        // Enregistrement dans la base Postgres
+        // Enregistrement uniquement dans la base Postgres
         if (fields.id) {
             await updateContact(fields);
         } else {
