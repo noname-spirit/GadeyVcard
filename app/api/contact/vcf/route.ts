@@ -68,6 +68,10 @@ export async function GET() {
                 'Cache-Control': 'no-store, no-cache, must-revalidate',
                 'Pragma': 'no-cache',
                 'Content-Length': String(new TextEncoder().encode(vcfContent).length),
+                'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'; base-uri 'none';", // vCard: rien n'est chargé
+                'X-Frame-Options': 'DENY',
+                'X-Content-Type-Options': 'nosniff',
+                'Referrer-Policy': 'no-referrer',
             },
         });
     } catch (error) {

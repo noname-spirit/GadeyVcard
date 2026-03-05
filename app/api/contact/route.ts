@@ -8,7 +8,21 @@ export async function GET() {
     try {
         // Utilise uniquement la base Postgres
         const data = await getContact();
-        return NextResponse.json({ data });
+        return new NextResponse(
+            JSON.stringify({ data }),
+            {
+                status: 200,
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Cache-Control': 'no-store, no-cache, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'; base-uri 'none';",
+                    'X-Frame-Options': 'DENY',
+                    'X-Content-Type-Options': 'nosniff',
+                    'Referrer-Policy': 'no-referrer',
+                }
+            }
+        );
     } catch (error) {
         console.error('Get contact error:', error);
         return NextResponse.json({ data: {} });

@@ -92,7 +92,21 @@ export async function GET(req: NextRequest) {
             source: l.source || '',
             createdAt: l.createdat || l.createdAt || '',
         }));
-        return NextResponse.json({ leads });
+        return new NextResponse(
+            JSON.stringify({ leads }),
+            {
+                status: 200,
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Cache-Control': 'no-store, no-cache, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'; base-uri 'none';",
+                    'X-Frame-Options': 'DENY',
+                    'X-Content-Type-Options': 'nosniff',
+                    'Referrer-Policy': 'no-referrer',
+                }
+            }
+        );
     } catch (error) {
         console.error('Get leads error:', error);
         return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
