@@ -784,53 +784,6 @@ export default function SmartVCard() {
                   />
                 </motion.div>
               </div>
-              {/* Nom Input */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4, duration: 0.5 }}
-              >
-                <motion.input
-                  type="text"
-                  placeholder={language === 'fr' ? 'Votre nom' : 'Your name'}
-                  value={formData.nom}
-                  onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
-                  whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
-                  className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
-                />
-              </motion.div>
-
-              {/* Email Input */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.45, duration: 0.5 }}
-              >
-                <motion.input
-                  type="email"
-                  placeholder={language === 'fr' ? 'Votre email' : 'Your email'}
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
-                  className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
-                />
-              </motion.div>
-
-              {/* Téléphone Input */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5, duration: 0.5 }}
-              >
-                <motion.input
-                  type="tel"
-                  placeholder={language === 'fr' ? 'Votre téléphone' : 'Your phone'}
-                  value={formData.telephone}
-                  onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
-                  whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
-                  className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
-                />
-              </motion.div>
 
               {/* Buttons Row */}
               <motion.div
