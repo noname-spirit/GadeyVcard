@@ -1,7 +1,7 @@
 "use server";
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/admin';
-import { insertLead } from '@/lib/db/leads';
+import { insertLead, getLeads, deleteLead } from '@/lib/db/leads';
 import type { Lead } from '@/lib/types/lead';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { sendLeadNotificationEmail, sendLeadConfirmationEmail } from '@/lib/email';
