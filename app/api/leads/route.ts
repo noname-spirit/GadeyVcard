@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/admin';
-import { readLocalLeads, writeLocalLeads, Lead } from '@/lib/local-storage';
+import { readLocalLeads, writeLocalLeads } from '@/lib/local-storage';
+import type { Lead } from '@/lib/types/lead';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { sendLeadNotificationEmail, sendLeadConfirmationEmail } from '@/lib/email';
 
@@ -8,33 +9,32 @@ import { sendLeadNotificationEmail, sendLeadConfirmationEmail } from '@/lib/emai
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { name, contact, language } = body;
+        const { nom, email, telephone, source } = body;
 
-        if (!name?.trim() || !contact?.trim()) {
-            return NextResponse.json({ error: 'Nom et contact requis' }, { status: 400 });
+        if (!nom?.trim() || !email?.trim() || !telephone?.trim()) {
+            return NextResponse.json({ error: 'Nom, email et téléphone requis' }, { status: 400 });
         }
 
         // Sanitize inputs
-        const sanitizedName = name.trim().substring(0, 100);
-        const sanitizedContact = contact.trim().substring(0, 200);
+        const sanitizedNom = nom.trim().substring(0, 100);
+        const sanitizedEmail = email.trim().substring(0, 100);
+        const sanitizedTelephone = telephone.trim().substring(0, 30);
+        const sanitizedSource = source?.trim().substring(0, 50) || 'formulaire';
 
         const lead: Lead = {
-            id: crypto.randomUUID(),
-            name: sanitizedName,
-            contact: sanitizedContact,
-            language: language || 'fr',
-            timestamp: new Date().toISOString(),
+            nom: sanitizedNom,
+            email: sanitizedEmail,
+            telephone: sanitizedTelephone,
+            createdAt: new Date().toISOString(),
+            source: sanitizedSource,
         };
 
         // Try Firebase first
         if (isFirebaseConfigured()) {
             try {
                 const { db } = await import('@/lib/firebase');
-                const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
-                await addDoc(collection(db, 'leads'), {
-                    ...lead,
-                    timestamp: serverTimestamp(),
-                });
+                const { collection, addDoc } = await import('firebase/firestore');
+                await addDoc(collection(db, 'leads'), lead);
             } catch {
                 // Firebase error, save locally
             }
