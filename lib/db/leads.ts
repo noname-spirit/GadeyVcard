@@ -12,6 +12,7 @@ export interface Lead {
     domaine: string;
     createdAt: string;
     note?: string;
+    source: string;
 }
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
