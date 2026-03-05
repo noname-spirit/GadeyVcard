@@ -11,22 +11,24 @@ import { readLocalLeads, writeLocalLeads } from '@/lib/local-storage';
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { nom, email, telephone, source } = body;
+        const { nom, email, telephone, domaine, source } = body;
 
-        if (!nom?.trim() || !email?.trim() || !telephone?.trim()) {
-            return NextResponse.json({ error: 'Nom, email et téléphone requis' }, { status: 400 });
+        if (!nom?.trim() || !email?.trim() || !telephone?.trim() || !domaine?.trim()) {
+            return NextResponse.json({ error: 'Nom, email, téléphone et domaine requis' }, { status: 400 });
         }
 
         // Sanitize inputs
         const sanitizedNom = nom.trim().substring(0, 100);
         const sanitizedEmail = email.trim().substring(0, 100);
         const sanitizedTelephone = telephone.trim().substring(0, 30);
+        const sanitizedDomaine = domaine.trim().substring(0, 50);
         const sanitizedSource = source?.trim().substring(0, 50) || 'formulaire';
 
         const lead: Lead = {
             nom: sanitizedNom,
             email: sanitizedEmail,
             telephone: sanitizedTelephone,
+            domaine: sanitizedDomaine,
             createdAt: new Date().toISOString(),
             source: sanitizedSource,
         };
@@ -80,7 +82,17 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'Token invalide' }, { status: 401 });
         }
 
-        const leads = readLocalLeads();
+        const dbLeads = await getLeads();
+        // Adapter la structure pour le front
+        const leads = dbLeads.map((l: any) => ({
+            id: l.id?.toString(),
+            nom: l.nom,
+            email: l.email,
+            domaine: l.domaine,
+            telephone: l.telephone,
+            source: l.source || '',
+            createdAt: l.createdat || l.createdAt || '',
+        }));
         return NextResponse.json({ leads });
     } catch (error) {
         console.error('Get leads error:', error);
@@ -112,10 +124,7 @@ export async function DELETE(req: NextRequest) {
             return NextResponse.json({ error: 'ID requis' }, { status: 400 });
         }
 
-        const leads = readLocalLeads();
-        const filtered = leads.filter(l => l.id !== id);
-        writeLocalLeads(filtered);
-
+        await deleteLead(id);
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error('Delete lead error:', error);

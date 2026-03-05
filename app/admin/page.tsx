@@ -567,20 +567,18 @@ export default function AdminPage() {
                                         className="bg-zinc-900/40 rounded-xl border border-zinc-800/30 p-4 flex items-start justify-between gap-3"
                                     >
                                         <div className="flex-1 min-w-0">
+                                            {/* Ligne 1 : nom et email */}
                                             <div className="flex items-center gap-2 mb-1">
-                                                <span className="text-sm font-semibold text-white truncate">{lead.name}</span>
-                                                <span className="px-1.5 py-0.5 bg-zinc-800/60 text-zinc-500 rounded text-[10px] uppercase font-medium">{lead.language}</span>
+                                                <span className="text-sm font-semibold text-white truncate">{lead.nom}</span>
+                                                <span className="px-1.5 py-0.5 bg-zinc-800/60 text-zinc-500 rounded text-[10px] uppercase font-medium">{lead.email}</span>
                                             </div>
-                                            <div className="flex items-center gap-1.5 text-zinc-400 text-xs">
-                                                {lead.contact.includes('@') ? (
-                                                    <Mail size={11} className="text-zinc-500 shrink-0" />
-                                                ) : (
-                                                    <Phone size={11} className="text-zinc-500 shrink-0" />
-                                                )}
-                                                <span className="truncate">{lead.contact}</span>
+                                            {/* Ligne 2 : domaine et numéro */}
+                                            <div className="flex items-center gap-2 text-zinc-400 text-xs mb-1">
+                                                <span className="font-semibold text-orange-400">{lead.domaine}</span>
+                                                <span className="truncate">{lead.telephone}</span>
                                             </div>
                                             <p className="text-zinc-600 text-[10px] mt-1.5">
-                                                {new Date(lead.timestamp).toLocaleDateString('fr-FR', {
+                                                {new Date(lead.createdAt).toLocaleDateString('fr-FR', {
                                                     day: 'numeric',
                                                     month: 'long',
                                                     year: 'numeric',

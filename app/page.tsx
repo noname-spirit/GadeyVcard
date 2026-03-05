@@ -60,7 +60,7 @@ const translations = {
 export default function SmartVCard() {
   const [language, setLanguage] = useState<Language>('en');
   const [isFlipped, setIsFlipped] = useState(false);
-  const [formData, setFormData] = useState({ nom: '', email: '', telephone: '' });
+  const [formData, setFormData] = useState({ nom: '', email: '', telephone: '', domaine: '', domaineCustom: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [isSavingContact, setIsSavingContact] = useState(false);
   const [feedback, setFeedback] = useState<{
@@ -207,7 +207,7 @@ export default function SmartVCard() {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.nom.trim() || !formData.email.trim() || !formData.telephone.trim()) {
+    if (!formData.nom.trim() || !formData.email.trim() || !formData.telephone.trim() || (!formData.domaine.trim() && !formData.domaineCustom.trim())) {
       setFeedback({
         type: 'error',
         message: language === 'fr' ? 'Tous les champs sont requis.' : 'All fields are required.',
@@ -220,6 +220,7 @@ export default function SmartVCard() {
 
     try {
       // Save lead via API
+      const domaineValue = formData.domaine === 'autre' ? formData.domaineCustom : formData.domaine;
       const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -227,6 +228,7 @@ export default function SmartVCard() {
           nom: formData.nom,
           email: formData.email,
           telephone: formData.telephone,
+          domaine: domaineValue,
           source: 'formulaire',
         }),
       });
@@ -239,7 +241,7 @@ export default function SmartVCard() {
       }
 
       setFeedback({ type: 'success', message: t.successMessage });
-      setFormData({ nom: '', email: '', telephone: '' });
+      setFormData({ nom: '', email: '', telephone: '', domaine: '', domaineCustom: '' });
 
       // Trigger Meta Pixel event (if configured)
       if (window.fbq) {
@@ -718,6 +720,70 @@ export default function SmartVCard() {
             </motion.p>
 
             <form onSubmit={handleSubmit} className="flex flex-col items-center gap-2 relative">
+              {/* Ligne 1 : nom et email */}
+              <div className="flex gap-2 w-full">
+                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4, duration: 0.5 }} className="flex-1">
+                  <motion.input
+                    type="text"
+                    placeholder={language === 'fr' ? 'Votre nom' : 'Your name'}
+                    value={formData.nom}
+                    onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+                    whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
+                    className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
+                  />
+                </motion.div>
+                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.45, duration: 0.5 }} className="flex-1">
+                  <motion.input
+                    type="email"
+                    placeholder={language === 'fr' ? 'Votre email' : 'Your email'}
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
+                    className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
+                  />
+                </motion.div>
+              </div>
+              {/* Ligne 2 : domaine et téléphone */}
+              <div className="flex gap-2 w-full">
+                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5, duration: 0.5 }} className="flex-1">
+                  <select
+                    value={formData.domaine}
+                    onChange={e => setFormData({ ...formData, domaine: e.target.value })}
+                    className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
+                  >
+                    <option value="">{language === 'fr' ? 'Sélectionnez un domaine' : 'Select a domain'}</option>
+                    <option value="Informatique">Informatique</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Santé">Santé</option>
+                    <option value="Éducation">Éducation</option>
+                    <option value="Immobilier">Immobilier</option>
+                    <option value="Art">Art</option>
+                    <option value="Tourisme">Tourisme</option>
+                    <option value="Commerce">Commerce</option>
+                    <option value="Autre">Autre</option>
+                  </select>
+                  {formData.domaine === 'Autre' && (
+                    <input
+                      type="text"
+                      placeholder={language === 'fr' ? 'Votre domaine' : 'Your domain'}
+                      value={formData.domaineCustom}
+                      onChange={e => setFormData({ ...formData, domaineCustom: e.target.value })}
+                      className={`mt-2 w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
+                    />
+                  )}
+                </motion.div>
+                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.55, duration: 0.5 }} className="flex-1">
+                  <motion.input
+                    type="tel"
+                    placeholder={language === 'fr' ? 'Votre téléphone' : 'Your phone'}
+                    value={formData.telephone}
+                    onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
+                    whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
+                    className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
+                  />
+                </motion.div>
+              </div>
               {/* Nom Input */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
