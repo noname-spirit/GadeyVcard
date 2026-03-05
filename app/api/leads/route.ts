@@ -10,6 +10,7 @@ import { sendLeadNotificationEmail, sendLeadConfirmationEmail } from '@/lib/emai
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
+        console.log('API /api/leads POST body:', body);
         const { nom, email, telephone, domaine, note, source } = body;
 
         // Pour les leads QR, seuls nom et domaine sont requis
@@ -43,7 +44,8 @@ export async function POST(req: NextRequest) {
 
         // Enregistrement dans Vercel Postgres
         try {
-            await insertLead(lead);
+            const result = await insertLead(lead);
+            console.log('Résultat insertLead:', result);
         } catch (dbErr) {
             console.error('Erreur insertion lead (QR):', dbErr, lead);
             return NextResponse.json({ error: 'Erreur lors de l’enregistrement du lead.' }, { status: 500 });
