@@ -129,9 +129,9 @@ export default function AdminPage() {
 
     const exportLeadsCSV = () => {
         if (leads.length === 0) return;
-        const header = 'Nom,Contact,Langue,Date';
+        const header = 'Nom,Email,Domaine,Téléphone,Source,Date';
         const rows = leads.map(l =>
-            `"${l.name.replace(/"/g, '""')}","${l.contact.replace(/"/g, '""')}","${l.language}","${new Date(l.timestamp).toLocaleString('fr-FR')}"`
+            `"${l.nom.replace(/"/g, '""')}","${l.email.replace(/"/g, '""')}","${l.domaine.replace(/"/g, '""')}","${l.telephone.replace(/"/g, '""')}","${l.source.replace(/"/g, '""')}","${new Date(l.createdAt).toLocaleString('fr-FR')}"`
         );
         const csv = [header, ...rows].join('\n');
         const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });

@@ -2,6 +2,7 @@ export interface Lead {
     nom: string;
     email: string;
     telephone: string;
+    domaine: string;
     createdAt: string; // ISO date string
     source: string;
 }
