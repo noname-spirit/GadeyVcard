@@ -1,3 +1,13 @@
+declare global {
+    namespace NodeJS {
+        interface ProcessEnv {
+            ADMIN_USER_1?: string;
+            ADMIN_PASS_HASH_1?: string;
+            ADMIN_USER_2?: string;
+            ADMIN_PASS_HASH_2?: string;
+        }
+    }
+}
 import { NextRequest, NextResponse } from 'next/server';
 import { generateToken } from '@/lib/admin';
 import bcrypt from 'bcryptjs';

@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { Pool } from '@neondatabase/serverless';
 
 export interface Lead {
     id?: string;
@@ -9,16 +9,15 @@ export interface Lead {
     source: string;
 }
 
-export async function saveLead(lead: Lead) {
-    const result = await sql`
-    INSERT INTO leads (nom, email, telephone, createdAt, source)
-    VALUES (${lead.nom}, ${lead.email}, ${lead.telephone}, ${lead.createdAt}, ${lead.source})
-    RETURNING id;
-  `;
-    return result.rows[0];
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const result = await pool.query(
+    'INSERT INTO leads (nom, email, telephone, createdAt, source) VALUES ($1, $2, $3, $4, $5) RETURNING id;',
+    [lead.nom, lead.email, lead.telephone, lead.createdAt, lead.source]
+);
+return result.rows[0];
 }
 
-export async function getLeads() {
-    const result = await sql`SELECT * FROM leads ORDER BY createdAt DESC;`;
-    return result.rows;
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const result = await pool.query('SELECT * FROM leads ORDER BY createdAt DESC;');
+return result.rows;
 }
