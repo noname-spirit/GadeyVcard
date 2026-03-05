@@ -36,10 +36,12 @@ type Feedback = { type: 'success' | 'error'; message: string } | null;
 
 interface Lead {
     id: string;
-    name: string;
-    contact: string;
-    language: string;
-    timestamp: string;
+    nom: string;
+    email: string;
+    domaine: string;
+    telephone: string;
+    source: string;
+    createdAt: string;
 }
 
 type AdminTab = 'contact' | 'leads';
