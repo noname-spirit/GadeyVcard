@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const LEADS_FILE = path.join(DATA_DIR, 'leads.json');
