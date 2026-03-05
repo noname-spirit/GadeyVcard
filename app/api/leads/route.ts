@@ -12,8 +12,15 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { nom, email, telephone, domaine, note, source } = body;
 
-        if (!nom?.trim() || !email?.trim() || !telephone?.trim() || !domaine?.trim()) {
-            return NextResponse.json({ error: 'Nom, email, téléphone et domaine requis' }, { status: 400 });
+        // Pour les leads QR, seuls nom et domaine sont requis
+        if (source === 'qd code') {
+            if (!nom?.trim() || !domaine?.trim()) {
+                return NextResponse.json({ error: 'Nom et domaine requis pour QR.' }, { status: 400 });
+            }
+        } else {
+            if (!nom?.trim() || !email?.trim() || !telephone?.trim() || !domaine?.trim()) {
+                return NextResponse.json({ error: 'Nom, email, téléphone et domaine requis.' }, { status: 400 });
+            }
         }
 
         // Sanitize inputs
