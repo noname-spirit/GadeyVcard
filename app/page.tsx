@@ -653,7 +653,7 @@ export default function SmartVCard() {
                     </motion.div>
 
                     {/* Quick Action Buttons */}
-                    {(contactData.tel_mobile || contactData.email_personal || contactData.email_work || contactData.whatsapp || contactData.lineLink) && (
+                    {(contactData.tel_mobile || contactData.email_personal || contactData.email_work || contactData.whatsapp || contactData.lineLink || contactData.linelink) && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -689,9 +689,9 @@ export default function SmartVCard() {
                             {t.whatsapp}
                           </a>
                         )}
-                        {contactData.lineLink && (
+                        {(contactData.lineLink || contactData.linelink) && (
                           <a
-                            href={contactData.lineLink}
+                            href={contactData.lineLink || contactData.linelink}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-green-500/10 border border-green-500/30 text-xs font-medium text-green-700 hover:bg-green-500/20 transition-all duration-300`}
