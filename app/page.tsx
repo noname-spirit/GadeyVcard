@@ -14,47 +14,63 @@ declare global {
   }
 }
 
-type Language = 'fr' | 'en';
+type Language = 'fr' | 'en' | 'th';
 
 const translations = {
   fr: {
-    title: 'Smart vCard',
-    subtitle: 'Partager mes coordonnées élégamment',
-    viewQR: 'Voir QR Code',
-    saveContact: 'Enregistrer le contact',
-    exchangeTitle: 'Échangeons nos contacts',
-    exchangeSubtitle: 'Restez connecté',
-    formName: 'Votre nom',
-    formContact: 'Email ou Line ID',
-    formSubmit: 'Envoyer',
-    scanQR: 'Scanner un QR',
-    scanTitle: 'Scanner le QR Code',
-    scanHint: 'Placez le QR code devant la caméra',
-    scanSuccess: 'QR détecté ! Contact enregistré.',
-    scanError: 'Impossible d\'accéder à la caméra',
-    successMessage: 'Merci ! Vos informations ont été enregistrées.',
-    errorMessage: 'Une erreur est survenue. Veuillez réessayer.',
-    loading: 'Envoi en cours...',
+    title: "Smart vCard",
+    subtitle: "Partager mes coordonnées élégamment",
+    jobTitle: "GRAPHISTE LOGO & WEB | BRANDING",
+    call: "Appeler",
+    email: "E-mail",
+    whatsapp: "WhatsApp",
+    save: "Enregistrer Contact",
+    qrCode: "Voir QR Code",
+    formTitle: "Échangeons nos contacts",
+    formSub: "Restons connectés",
+    placeholderName: "Votre nom",
+    placeholderEmail: "Votre e-mail",
+    placeholderPhone: "Votre téléphone",
+    selectDomain: "Sélectionnez un domaine",
+    send: "Envoyer",
+    scan: "Scanner QR"
   },
   en: {
-    title: 'Smart vCard',
-    subtitle: 'Share my contact information elegantly',
-    viewQR: 'See QR Code',
-    saveContact: 'Save Contact',
-    exchangeTitle: "Let's Connect",
-    exchangeSubtitle: 'Stay connected',
-    formName: 'Your Name',
-    formContact: 'Email or Line ID',
-    formSubmit: 'Send',
-    scanQR: 'Scan a QR',
-    scanTitle: 'Scan QR Code',
-    scanHint: 'Place the QR code in front of the camera',
-    scanSuccess: 'QR detected! Contact saved.',
-    scanError: 'Unable to access camera',
-    successMessage: 'Thank you! Your information has been saved.',
-    errorMessage: 'An error occurred. Please try again.',
-    loading: 'Sending...',
+    title: "Smart vCard",
+    subtitle: "Share my contact information elegantly",
+    jobTitle: "LOGO & WEB DESIGNER | BRANDING",
+    call: "Call",
+    email: "Email",
+    whatsapp: "WhatsApp",
+    save: "Save Contact",
+    qrCode: "Show QR Code",
+    formTitle: "Exchange Contacts",
+    formSub: "Let's connect",
+    placeholderName: "Your name",
+    placeholderEmail: "Your email",
+    placeholderPhone: "Your phone",
+    selectDomain: "Select a domain",
+    send: "Send",
+    scan: "Scan QR"
   },
+  th: {
+    title: "สมาร์ทวีการ์ด",
+    subtitle: "แชร์ข้อมูลติดต่อของฉันอย่างมีสไตล์",
+    jobTitle: "นักออกแบบโลโก้และเว็บไซต์ | สร้างแบรนด์",
+    call: "โทร",
+    email: "อีเมล",
+    whatsapp: "วอทส์แอปป์",
+    save: "บันทึกข้อมูลติดต่อ",
+    qrCode: "ดู QR โค้ด",
+    formTitle: "แลกเปลี่ยนข้อมูลติดต่อ",
+    formSub: "เชื่อมต่อกัน",
+    placeholderName: "ชื่อของคุณ",
+    placeholderEmail: "อีเมลของคุณ",
+    placeholderPhone: "เบอร์โทรศัพท์ของคุณ",
+    selectDomain: "เลือกประเภทธุรกิจ",
+    send: "ส่ง",
+    scan: "สแกน QR"
+  }
 };
 
 export default function SmartVCard() {
@@ -469,20 +485,16 @@ export default function SmartVCard() {
             </h1>
             {/* Language Selector */}
             <div className={`flex gap-1 ${c.langBg} rounded-full px-1.5 py-1 border backdrop-blur-xl transition-colors duration-300`}>
-              <button
-                onClick={() => setLanguage('fr')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 ${language === 'fr' ? 'bg-orange-500/15 text-orange-400' : c.langInactive
-                  }`}
+              <select
+                value={language}
+                onChange={e => setLanguage(e.target.value as Language)}
+                className="px-3 py-1 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 bg-transparent border-none outline-none"
+                style={{ minWidth: 60 }}
               >
-                FR
-              </button>
-              <button
-                onClick={() => setLanguage('en')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 ${language === 'en' ? 'bg-orange-500/15 text-orange-400' : c.langInactive
-                  }`}
-              >
-                EN
-              </button>
+                <option value="fr">FR</option>
+                <option value="en">EN</option>
+                <option value="th">TH</option>
+              </select>
               <button
                 onClick={toggleTheme}
                 className={`px-2 py-1 rounded-full transition-all duration-200 ${c.toggleBtn}`}
@@ -577,7 +589,7 @@ export default function SmartVCard() {
                       transition={{ delay: 0.25, duration: 0.5 }}
                       className="text-center text-orange-400/80 font-medium text-xs tracking-widest uppercase"
                     >
-                      {contactData.title || (language === 'fr' ? 'Titre / Poste non spécifié' : 'Title / Position not specified')}
+                      {t.jobTitle}
                     </motion.p>
 
                     {/* Social Icons */}
@@ -620,7 +632,7 @@ export default function SmartVCard() {
                             className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl ${c.actionCall} border transition-all duration-300 text-xs font-medium`}
                           >
                             <Phone size={14} />
-                            {language === 'fr' ? 'Appeler' : 'Call'}
+                            {t.call}
                           </a>
                         )}
                         {(contactData.email_personal || contactData.email_work) && (
@@ -629,7 +641,7 @@ export default function SmartVCard() {
                             className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl ${c.actionMail} border transition-all duration-300 text-xs font-medium`}
                           >
                             <Mail size={14} />
-                            Email
+                            {t.email}
                           </a>
                         )}
                         {contactData.whatsapp && (
@@ -640,7 +652,7 @@ export default function SmartVCard() {
                             className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl ${c.actionWhatsapp} border transition-all duration-300 text-xs font-medium`}
                           >
                             <MessageCircle size={14} />
-                            WhatsApp
+                            {t.whatsapp}
                           </a>
                         )}
                       </motion.div>
@@ -658,7 +670,7 @@ export default function SmartVCard() {
                       className="w-full py-2 bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-300 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 group disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Download size={19} className={`transition-transform ${isSavingContact ? 'animate-spin' : 'group-hover:translate-y-0.5'}`} />
-                      {isSavingContact ? (language === 'fr' ? 'Ajout en cours...' : 'Adding...') : t.saveContact}
+                      {isSavingContact ? (language === 'fr' ? 'Ajout en cours...' : 'Adding...') : t.save}
                     </motion.button>
 
                     {/* Mobile instruction hint - hidden on desktop */}
@@ -694,10 +706,7 @@ export default function SmartVCard() {
                       className="text-center"
                     >
                       <p className={`${c.qrText} font-medium text-sm mb-1`}>
-                        {language === 'fr' ? '📱 Scannez avec votre appareil' : '📱 Scan with your device'}
-                      </p>
-                      <p className={`${c.qrSubtext} text-xs`}>
-                        {language === 'fr' ? 'Accès instantané au profil' : 'Instant profile access'}
+                        {t.scan}
                       </p>
                     </motion.div>
 
@@ -757,7 +766,7 @@ export default function SmartVCard() {
               transition={{ delay: 0.3, duration: 0.5 }}
               className={`${getDeviceClasses(device.screenSize, 'formTitle')} font-bold text-center ${c.formTitle} tracking-tight transition-all`}
             >
-              {t.exchangeTitle}
+              {t.formTitle}
             </motion.h3>
             <motion.p
               initial={{ opacity: 0 }}
@@ -765,7 +774,7 @@ export default function SmartVCard() {
               transition={{ delay: 0.35, duration: 0.5 }}
               className={`text-center ${c.formSubtitle} mb-4 text-xs tracking-wide`}
             >
-              {t.exchangeSubtitle}
+              {t.formSub}
             </motion.p>
 
             <form onSubmit={handleSubmit} className="flex flex-col items-center gap-2 relative">
@@ -774,7 +783,7 @@ export default function SmartVCard() {
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4, duration: 0.5 }} className="flex-1">
                   <motion.input
                     type="text"
-                    placeholder={language === 'fr' ? 'Votre nom' : 'Your name'}
+                    placeholder={t.placeholderName}
                     value={formData.nom}
                     onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
                     whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
@@ -784,7 +793,7 @@ export default function SmartVCard() {
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.45, duration: 0.5 }} className="flex-1">
                   <motion.input
                     type="email"
-                    placeholder={language === 'fr' ? 'Votre email' : 'Your email'}
+                    placeholder={t.placeholderEmail}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
@@ -800,7 +809,7 @@ export default function SmartVCard() {
                     onChange={e => setFormData({ ...formData, domaine: e.target.value })}
                     className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
                   >
-                    <option value="">{language === 'fr' ? 'Sélectionnez un domaine' : 'Select a domain'}</option>
+                    <option value="">{t.selectDomain}</option>
                     <option value="Informatique">Informatique</option>
                     <option value="Marketing">Marketing</option>
                     <option value="Finance">Finance</option>
@@ -815,7 +824,7 @@ export default function SmartVCard() {
                   {formData.domaine === 'Autre' && (
                     <input
                       type="text"
-                      placeholder={language === 'fr' ? 'Votre domaine' : 'Your domain'}
+                      placeholder={t.selectDomain}
                       value={formData.domaineCustom}
                       onChange={e => setFormData({ ...formData, domaineCustom: e.target.value })}
                       className={`mt-2 w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
@@ -825,7 +834,7 @@ export default function SmartVCard() {
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.55, duration: 0.5 }} className="flex-1">
                   <motion.input
                     type="tel"
-                    placeholder={language === 'fr' ? 'Votre téléphone' : 'Your phone'}
+                    placeholder={t.placeholderPhone}
                     value={formData.telephone}
                     onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
                     whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
