@@ -887,16 +887,6 @@ export default function SmartVCard() {
                     className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
                   />
                 </motion.div>
-                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.56, duration: 0.5 }} className="flex-1">
-                  <motion.input
-                    type="url"
-                    placeholder={language === 'fr' ? 'Lien Line (optionnel)' : language === 'en' ? 'Line link (optional)' : 'ลิงก์ไลน์ (ไม่บังคับ)'}
-                    value={formData.lineLink}
-                    onChange={(e) => setFormData({ ...formData, lineLink: e.target.value })}
-                    whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
-                    className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
-                  />
-                </motion.div>
               </div>
 
               {/* Buttons Row */}
