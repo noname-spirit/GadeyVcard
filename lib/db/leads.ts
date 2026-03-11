@@ -12,6 +12,7 @@ export interface Lead {
     domaine: string;
     createdAt: string;
     note?: string;
+    lineLink?: string;
     source: string;
 }
 
@@ -19,8 +20,8 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 export async function insertLead(lead: Lead) {
     const result = await pool.query(
-        'INSERT INTO leads (nom, email, telephone, domaine, note, createdAt, source) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;',
-        [lead.nom, lead.email, lead.telephone, lead.domaine, lead.note, lead.createdAt, lead.source]
+        'INSERT INTO leads (nom, email, telephone, domaine, note, lineLink, createdAt, source) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;',
+        [lead.nom, lead.email, lead.telephone, lead.domaine, lead.note, lead.lineLink, lead.createdAt, lead.source]
     );
     return result.rows[0];
 }

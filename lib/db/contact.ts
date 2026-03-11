@@ -19,6 +19,7 @@ export interface Contact {
     tiktok?: string;
     facebook?: string;
     line_id?: string;
+    lineLink?: string;
     adr_street?: string;
     adr_city?: string;
     adr_region?: string;
@@ -35,12 +36,12 @@ export async function insertContact(contact: Contact) {
     const result = await pool.query(
         `INSERT INTO contacts (
             fn, title, org, bday, tel_mobile, tel_work, whatsapp, email_personal, email_work, url,
-            instagram, youtube, linkedin, tiktok, facebook, line_id, adr_street, adr_city, adr_region,
+            instagram, youtube, linkedin, tiktok, facebook, line_id, lineLink, adr_street, adr_city, adr_region,
             adr_postal, adr_country, note, photo_url
         ) VALUES (
             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
             $11, $12, $13, $14, $15, $16, $17, $18, $19,
-            $20, $21, $22, $23
+            $20, $21, $22, $23, $24
         ) RETURNING id;`,
         [
             contact.fn,
@@ -59,6 +60,7 @@ export async function insertContact(contact: Contact) {
             contact.tiktok,
             contact.facebook,
             contact.line_id,
+            contact.lineLink,
             contact.adr_street,
             contact.adr_city,
             contact.adr_region,
@@ -95,14 +97,15 @@ export async function updateContact(contact: Contact) {
             tiktok = $14,
             facebook = $15,
             line_id = $16,
-            adr_street = $17,
-            adr_city = $18,
-            adr_region = $19,
-            adr_postal = $20,
-            adr_country = $21,
-            note = $22,
-            photo_url = $23
-        WHERE id = $24;`,
+            lineLink = $17,
+            adr_street = $18,
+            adr_city = $19,
+            adr_region = $20,
+            adr_postal = $21,
+            adr_country = $22,
+            note = $23,
+            photo_url = $24
+        WHERE id = $25;`,
         [
             contact.fn,
             contact.title,
@@ -120,6 +123,7 @@ export async function updateContact(contact: Contact) {
             contact.tiktok,
             contact.facebook,
             contact.line_id,
+            contact.lineLink,
             contact.adr_street,
             contact.adr_city,
             contact.adr_region,
