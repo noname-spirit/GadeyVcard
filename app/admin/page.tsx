@@ -21,6 +21,7 @@ const VCARD_FIELDS = [
     { key: 'tiktok', label: 'TikTok URL', type: 'url', required: false, group: 'Web & Réseaux' },
     { key: 'facebook', label: 'Facebook URL', type: 'url', required: false, group: 'Web & Réseaux' },
     { key: 'line_id', label: 'Line ID', type: 'text', required: false, group: 'Web & Réseaux' },
+    { key: 'lineLink', label: 'Line URL', type: 'url', required: false, group: 'Web & Réseaux' },
     { key: 'adr_street', label: 'Rue', type: 'text', required: false, group: 'Adresse' },
     { key: 'adr_city', label: 'Ville', type: 'text', required: false, group: 'Adresse' },
     { key: 'adr_region', label: 'Région / Province', type: 'text', required: false, group: 'Adresse' },
