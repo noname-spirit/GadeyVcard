@@ -4,6 +4,7 @@ export interface Lead {
     telephone: string;
     domaine: string;
     note?: string;
+    lineLink?: string;
     createdAt: string; // ISO date string
     source: string;
 }

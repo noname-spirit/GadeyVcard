@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         console.log('API /api/leads POST body:', body);
-        const { nom, email, telephone, domaine, note, source } = body;
+        const { nom, email, telephone, domaine, note, lineLink, source } = body;
 
         // Pour les leads QR, seuls nom et domaine sont requis
         if (source === 'qd code') {
@@ -38,8 +38,9 @@ export async function POST(req: NextRequest) {
             telephone: sanitizedTelephone,
             domaine: sanitizedDomaine,
             note: sanitizedNote,
+            lineLink: lineLink ? lineLink.trim().substring(0, 200) : undefined,
             createdAt: new Date().toISOString(),
-            source: sanitizedSource,
+            source: sanitizedSource
         };
 
         // Enregistrement dans Vercel Postgres

@@ -60,6 +60,10 @@ export async function PUT(req: NextRequest) {
         }
 
         // Enregistrement uniquement dans la base Postgres
+        // Ajout du champ lineLink si présent
+        if (fields.lineLink) {
+            fields.lineLink = fields.lineLink;
+        }
         if (fields.id) {
             await updateContact(fields);
         } else {

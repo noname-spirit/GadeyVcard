@@ -24,6 +24,7 @@ const translations = {
     call: "Appeler",
     email: "E-mail",
     whatsapp: "WhatsApp",
+    line: "Line",
     save: "Enregistrer Contact",
     qrCode: "Voir QR Code",
     formTitle: "Échangeons nos contacts",
@@ -52,6 +53,7 @@ const translations = {
     call: "Call",
     email: "Email",
     whatsapp: "WhatsApp",
+    line: "Line",
     save: "Save Contact",
     qrCode: "Show QR Code",
     formTitle: "Exchange Contacts",
@@ -80,6 +82,7 @@ const translations = {
     call: "โทร",
     email: "อีเมล",
     whatsapp: "วอทส์แอปป์",
+    line: "ไลน์",
     save: "บันทึกข้อมูลติดต่อ",
     qrCode: "ดู QR โค้ด",
     formTitle: "แลกเปลี่ยนข้อมูลติดต่อ",
@@ -106,7 +109,7 @@ const translations = {
 export default function SmartVCard() {
   const [language, setLanguage] = useState<Language>('en');
   const [isFlipped, setIsFlipped] = useState(false);
-  const [formData, setFormData] = useState({ nom: '', email: '', telephone: '', domaine: '', domaineCustom: '' });
+  const [formData, setFormData] = useState({ nom: '', email: '', telephone: '', domaine: '', domaineCustom: '', lineLink: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [isSavingContact, setIsSavingContact] = useState(false);
   const [feedback, setFeedback] = useState<{
@@ -324,6 +327,7 @@ export default function SmartVCard() {
           email: formData.email,
           telephone: formData.telephone,
           domaine: domaineValue,
+          lineLink: formData.lineLink,
           source: 'formulaire',
         }),
       });
@@ -336,7 +340,7 @@ export default function SmartVCard() {
       }
 
       setFeedback({ type: 'success', message: t.successMessage });
-      setFormData({ nom: '', email: '', telephone: '', domaine: '', domaineCustom: '' });
+      setFormData({ nom: '', email: '', telephone: '', domaine: '', domaineCustom: '', lineLink: '' });
 
       // Trigger Meta Pixel event (if configured)
       if (window.fbq) {
@@ -649,7 +653,7 @@ export default function SmartVCard() {
                     </motion.div>
 
                     {/* Quick Action Buttons */}
-                    {(contactData.tel_mobile || contactData.email_personal || contactData.email_work || contactData.whatsapp) && (
+                    {(contactData.tel_mobile || contactData.email_personal || contactData.email_work || contactData.whatsapp || contactData.lineLink) && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -683,6 +687,18 @@ export default function SmartVCard() {
                           >
                             <MessageCircle size={14} />
                             {t.whatsapp}
+                          </a>
+                        )}
+                        {contactData.lineLink && (
+                          <a
+                            href={contactData.lineLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-green-500/10 border border-green-500/30 text-xs font-medium text-green-700 hover:bg-green-500/20 transition-all duration-300`}
+                          >
+                            {/* Line icon SVG */}
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#06C755" /><path d="M12 6C8.13 6 5 8.61 5 11.77c0 1.47 1.02 2.77 2.62 3.67-.09.34-.54 2.04-.56 2.13-.09.36.14.36.29.33.12-.03 2.06-.66 2.87-.94.41.12.84.18 1.29.18 3.87 0 7-2.61 7-5.77S15.87 6 12 6zm-2.19 5.13c.19 0 .34.15.34.34v2.04c0 .19-.15.34-.34.34-.19 0-.34-.15-.34-.34v-2.04c0-.19.15-.34.34-.34zm1.13 0c.19 0 .34.15.34.34v2.04c0 .19-.15.34-.34.34-.19 0-.34-.15-.34-.34v-2.04c0-.19.15-.34.34-.34zm1.13 0c.19 0 .34.15.34.34v2.04c0 .19-.15.34-.34.34-.19 0-.34-.15-.34-.34v-2.04c0-.19.15-.34.34-.34zm1.13 0c.19 0 .34.15.34.34v2.04c0 .19-.15.34-.34.34-.19 0-.34-.15-.34-.34v-2.04c0-.19.15-.34.34-.34z" fill="#fff" /></svg>
+                            {t.line}
                           </a>
                         )}
                       </motion.div>
@@ -867,6 +883,16 @@ export default function SmartVCard() {
                     placeholder={t.placeholderPhone}
                     value={formData.telephone}
                     onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
+                    whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
+                    className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
+                  />
+                </motion.div>
+                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.56, duration: 0.5 }} className="flex-1">
+                  <motion.input
+                    type="url"
+                    placeholder={language === 'fr' ? 'Lien Line (optionnel)' : language === 'en' ? 'Line link (optional)' : 'ลิงก์ไลน์ (ไม่บังคับ)'}
+                    value={formData.lineLink}
+                    onChange={(e) => setFormData({ ...formData, lineLink: e.target.value })}
                     whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
                     className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
                   />
