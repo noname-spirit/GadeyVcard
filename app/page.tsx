@@ -33,7 +33,17 @@ const translations = {
     placeholderPhone: "Votre téléphone",
     selectDomain: "Sélectionnez un domaine",
     send: "Envoyer",
-    scan: "Scanner QR"
+    scan: "Scanner QR",
+    scanSuccess: "Contact scanné avec succès !",
+    successMessage: "Formulaire envoyé avec succès !",
+    errorMessage: "Une erreur est survenue.",
+    scanError: "Erreur lors du scan.",
+    viewQR: "Voir QR Code",
+    loading: "Chargement...",
+    formSubmit: "Envoyer",
+    scanQR: "Scanner QR",
+    scanTitle: "Scanner de QR Code",
+    scanHint: "Placez le QR code devant la caméra."
   },
   en: {
     title: "Smart vCard",
@@ -51,7 +61,17 @@ const translations = {
     placeholderPhone: "Your phone",
     selectDomain: "Select a domain",
     send: "Send",
-    scan: "Scan QR"
+    scan: "Scan QR",
+    scanSuccess: "Contact scanned successfully!",
+    successMessage: "Form submitted successfully!",
+    errorMessage: "An error occurred.",
+    scanError: "Scan error.",
+    viewQR: "Show QR Code",
+    loading: "Loading...",
+    formSubmit: "Send",
+    scanQR: "Scan QR",
+    scanTitle: "QR Code Scanner",
+    scanHint: "Place the QR code in front of the camera."
   },
   th: {
     title: "สมาร์ทวีการ์ด",
@@ -69,7 +89,17 @@ const translations = {
     placeholderPhone: "เบอร์โทรศัพท์ของคุณ",
     selectDomain: "เลือกประเภทธุรกิจ",
     send: "ส่ง",
-    scan: "สแกน QR"
+    scan: "สแกน QR",
+    scanSuccess: "สแกนข้อมูลติดต่อสำเร็จ!",
+    successMessage: "ส่งแบบฟอร์มสำเร็จ!",
+    errorMessage: "เกิดข้อผิดพลาด.",
+    scanError: "เกิดข้อผิดพลาดในการสแกน.",
+    viewQR: "ดู QR โค้ด",
+    loading: "กำลังโหลด...",
+    formSubmit: "ส่ง",
+    scanQR: "สแกน QR",
+    scanTitle: "สแกนเนอร์ QR โค้ด",
+    scanHint: "วาง QR โค้ดไว้หน้ากล้อง"
   }
 };
 
