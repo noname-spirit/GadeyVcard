@@ -537,7 +537,7 @@ export default function SmartVCard() {
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
                 }}
-                className="absolute w-full h-full"
+                className="absolute w-full h-full backface-hidden"
               >
                 <div className={`w-full h-full bg-linear-to-br ${c.cardBg} rounded-3xl px-2 sm:px-4 py-2 sm:pb-0 border backdrop-blur-2xl ${c.cardShadow} flex flex-col items-center justify-center transition-colors duration-300`}>
                   {/* Decorative Top Line */}
@@ -702,7 +702,7 @@ export default function SmartVCard() {
                   WebkitBackfaceVisibility: 'hidden',
                   transform: 'rotateY(180deg)',
                 }}
-                className="absolute w-full h-full"
+                className="absolute w-full h-full backface-hidden rotate-y-180"
               >
                 <div className={`w-full h-full bg-linear-to-br ${c.cardBg} rounded-3xl p-10 border backdrop-blur-2xl ${c.cardShadow} flex flex-col items-center justify-center transition-colors duration-300`}>
 
