@@ -448,7 +448,7 @@ export default function SmartVCard() {
   };
 
   return (
-    <div className={`bg-linear-to-br ${c.pageBg} ${c.pageText} h-screen w-screen overflow-hidden transition-colors duration-300 flex flex-col`}>
+    <div className={`bg-linear-to-br ${c.pageBg} ${c.pageText} h-screen w-screen transition-colors duration-300 flex flex-col`}>
       {/* Meta Pixel Script — ID validated to prevent XSS */}
       {/^[0-9]+$/.test(process.env.NEXT_PUBLIC_META_PIXEL_ID || '') && (
         <script
@@ -536,6 +536,7 @@ export default function SmartVCard() {
                 style={{
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
+                  transform: 'translateZ(1px)',
                 }}
                 className="absolute w-full h-full backface-hidden"
               >
@@ -700,7 +701,7 @@ export default function SmartVCard() {
                 style={{
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
-                  transform: 'rotateY(180deg)',
+                  transform: 'rotateY(180deg) translateZ(1px)',
                 }}
                 className="absolute w-full h-full backface-hidden rotate-y-180"
               >
