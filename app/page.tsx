@@ -18,91 +18,49 @@ type Language = 'fr' | 'en' | 'th';
 
 const translations = {
   fr: {
-    title: "Smart vCard",
-    subtitle: "Partager mes coordonnées élégamment",
     jobTitle: "GRAPHISTE LOGO & WEB | BRANDING",
-    call: "Appeler",
-    email: "E-mail",
-    whatsapp: "WhatsApp",
-    line: "Line",
     save: "Enregistrer Contact",
     qrCode: "Voir QR Code",
-    formTitle: "Échangeons nos contacts",
-    formSub: "Restons connectés",
+    formTitle: "Audit de Marque Gratuit",
+    formSub: "3 conseils stratégiques offerts sous 24h",
     placeholderName: "Votre nom",
-    placeholderEmail: "Votre e-mail",
-    placeholderPhone: "Votre téléphone",
-    selectDomain: "Sélectionnez un domaine",
-    send: "Envoyer",
-    scan: "Scanner QR",
-    scanSuccess: "Contact scanné avec succès !",
-    successMessage: "Formulaire envoyé avec succès !",
-    errorMessage: "Une erreur est survenue.",
-    scanError: "Erreur lors du scan.",
-    viewQR: "Voir QR Code",
-    loading: "Chargement...",
-    formSubmit: "Envoyer",
-    scanQR: "Scanner QR",
-    scanTitle: "Scanner de QR Code",
-    scanHint: "Placez le QR code devant la caméra."
+    placeholderContact: "WhatsApp, LINE ou Email",
+    placeholderDomain: "Votre secteur (ex: Café, Villa...)",
+    send: "Recevoir mon audit",
+    success: "C'est envoyé ! Je vous contacte très vite.",
+    line: "LINE",
+    email: "Email",
+    whatsapp: "WhatsApp"
   },
   en: {
-    title: "Smart vCard",
-    subtitle: "Share my contact information elegantly",
     jobTitle: "LOGO & WEB DESIGNER | BRANDING",
-    call: "Call",
-    email: "Email",
-    whatsapp: "WhatsApp",
-    line: "Line",
     save: "Save Contact",
     qrCode: "Show QR Code",
-    formTitle: "Exchange Contacts",
-    formSub: "Let's connect",
+    formTitle: "Free Brand Audit",
+    formSub: "3 strategic tips delivered within 24h",
     placeholderName: "Your name",
-    placeholderEmail: "Your email",
-    placeholderPhone: "Your phone",
-    selectDomain: "Select a domain",
-    send: "Send",
-    scan: "Scan QR",
-    scanSuccess: "Contact scanned successfully!",
-    successMessage: "Form submitted successfully!",
-    errorMessage: "An error occurred.",
-    scanError: "Scan error.",
-    viewQR: "Show QR Code",
-    loading: "Loading...",
-    formSubmit: "Send",
-    scanQR: "Scan QR",
-    scanTitle: "QR Code Scanner",
-    scanHint: "Place the QR code in front of the camera."
+    placeholderContact: "WhatsApp, LINE or Email",
+    placeholderDomain: "Your industry (ex: Cafe, Villa...)",
+    send: "Get my audit",
+    success: "Sent! I'll get back to you shortly.",
+    line: "LINE",
+    email: "Email",
+    whatsapp: "WhatsApp"
   },
   th: {
-    title: "สมาร์ทวีการ์ด",
-    subtitle: "แชร์ข้อมูลติดต่อของฉันอย่างมีสไตล์",
     jobTitle: "นักออกแบบโลโก้และเว็บไซต์ | สร้างแบรนด์",
-    call: "โทร",
-    email: "อีเมล",
-    whatsapp: "วอทส์แอปป์",
-    line: "ไลน์",
     save: "บันทึกข้อมูลติดต่อ",
     qrCode: "ดู QR โค้ด",
-    formTitle: "แลกเปลี่ยนข้อมูลติดต่อ",
-    formSub: "เชื่อมต่อกัน",
+    formTitle: "ปรึกษาเรื่องแบรนด์ฟรี",
+    formSub: "คำแนะนำ 3 ข้อสำหรับธุรกิจคุณภายใน 24 ชม.",
     placeholderName: "ชื่อของคุณ",
-    placeholderEmail: "อีเมลของคุณ",
-    placeholderPhone: "เบอร์โทรศัพท์ของคุณ",
-    selectDomain: "เลือกประเภทธุรกิจ",
-    send: "ส่ง",
-    scan: "สแกน QR",
-    scanSuccess: "สแกนข้อมูลติดต่อสำเร็จ!",
-    successMessage: "ส่งแบบฟอร์มสำเร็จ!",
-    errorMessage: "เกิดข้อผิดพลาด.",
-    scanError: "เกิดข้อผิดพลาดในการสแกน.",
-    viewQR: "ดู QR โค้ด",
-    loading: "กำลังโหลด...",
-    formSubmit: "ส่ง",
-    scanQR: "สแกน QR",
-    scanTitle: "สแกนเนอร์ QR โค้ด",
-    scanHint: "วาง QR โค้ดไว้หน้ากล้อง"
+    placeholderContact: "ช่องทางติดต่อ (WhatsApp, LINE หรือ อีเมล)",
+    placeholderDomain: "ประเภทธุรกิจ (เช่น คาเฟ่, วิลล่า...)",
+    send: "ขอรับคำปรึกษาฟรี",
+    success: "ได้รับข้อมูลแล้ว! ผมจะติดต่อกลับโดยเร็วที่สุด",
+    line: "ไลน์ (LINE)",
+    email: "อีเมล",
+    whatsapp: "วอทส์แอปป์"
   }
 };
 
@@ -281,9 +239,9 @@ export default function SmartVCard() {
                 language: language,
               }),
             });
-            setFeedback({ type: 'success', message: t.scanSuccess });
+            setFeedback({ type: 'success', message: t.success });
           } catch {
-            setFeedback({ type: 'error', message: t.errorMessage });
+            setFeedback({ type: 'error', message: 'Une erreur est survenue.' });
           }
           setTimeout(() => setFeedback({ type: null, message: '' }), 4000);
         },
@@ -291,7 +249,7 @@ export default function SmartVCard() {
       );
       setScannerReady(true);
     } catch {
-      setFeedback({ type: 'error', message: t.scanError });
+      setFeedback({ type: 'error', message: 'Erreur lors du scan.' });
       setShowScanner(false);
       setTimeout(() => setFeedback({ type: null, message: '' }), 3000);
     }
@@ -334,12 +292,12 @@ export default function SmartVCard() {
 
       if (!res.ok) {
         const errorData = await res.json();
-        setFeedback({ type: 'error', message: errorData.error || t.errorMessage });
+        setFeedback({ type: 'error', message: errorData.error || 'Une erreur est survenue.' });
         setTimeout(() => setFeedback({ type: null, message: '' }), 3000);
         return;
       }
 
-      setFeedback({ type: 'success', message: t.successMessage });
+      setFeedback({ type: 'success', message: t.success });
       setFormData({ nom: '', email: '', telephone: '', domaine: '', domaineCustom: '', lineLink: '' });
 
       // Trigger Meta Pixel event (if configured)
@@ -349,7 +307,7 @@ export default function SmartVCard() {
 
       setTimeout(() => setFeedback({ type: null, message: '' }), 3000);
     } catch (err) {
-      setFeedback({ type: 'error', message: t.errorMessage });
+      setFeedback({ type: 'error', message: 'Une erreur est survenue.' });
       setTimeout(() => setFeedback({ type: null, message: '' }), 3000);
     } finally {
       setIsLoading(false);
@@ -515,7 +473,7 @@ export default function SmartVCard() {
         >
           <div className="flex items-center gap-2 sm:gap-4 justify-center">
             <h1 className={`${getDeviceClasses(device.screenSize, 'titleSize')} font-bold bg-linear-to-r ${c.titleGradient} bg-clip-text text-transparent tracking-tight transition-all`}>
-              {t.title}
+              {t.jobTitle}
             </h1>
             {/* Language Selector */}
             <div className={`flex gap-1 ${c.langBg} rounded-full px-1.5 py-1 border backdrop-blur-xl transition-colors duration-300`}>
@@ -538,7 +496,7 @@ export default function SmartVCard() {
               </button>
             </div>
           </div>
-          <p className={`text-sm ${c.subtitle} font-medium tracking-wide`}>{t.subtitle}</p>
+          <p className={`text-sm ${c.subtitle} font-medium tracking-wide`}>{t.formSub}</p>
         </motion.div>
 
         {/* 3D Flip Card */}
@@ -639,7 +597,6 @@ export default function SmartVCard() {
                         { href: contactData.url || '#', icon: Globe, label: 'Website' },
                       ].filter(s => s.href && s.href !== '#').map((social, index) => (
                         <motion.a
-                          key={index}
                           href={social.href}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -666,7 +623,7 @@ export default function SmartVCard() {
                             className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl ${c.actionCall} border transition-all duration-300 text-xs font-medium`}
                           >
                             <Phone size={14} />
-                            {t.call}
+                            {language === 'fr' ? 'Téléphone' : language === 'en' ? 'Phone' : 'โทรศัพท์'}
                           </a>
                         )}
                         {(contactData.email_personal || contactData.email_work) && (
@@ -697,7 +654,7 @@ export default function SmartVCard() {
                             className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-green-500/10 border border-green-500/30 text-xs font-medium text-green-700 hover:bg-green-500/20 transition-all duration-300`}
                           >
                             {/* Line icon SVG */}
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#06C755" /><path d="M12 6C8.13 6 5 8.61 5 11.77c0 1.47 1.02 2.77 2.62 3.67-.09.34-.54 2.04-.56 2.13-.09.36.14.36.29.33.12-.03 2.06-.66 2.87-.94.41.12.84.18 1.29.18 3.87 0 7-2.61 7-5.77S15.87 6 12 6zm-2.19 5.13c.19 0 .34.15.34.34v2.04c0 .19-.15.34-.34.34-.19 0-.34-.15-.34-.34v-2.04c0-.19.15-.34.34-.34zm1.13 0c.19 0 .34.15.34.34v2.04c0 .19-.15.34-.34.34-.19 0-.34-.15-.34-.34v-2.04c0-.19.15-.34.34-.34zm1.13 0c.19 0 .34.15.34.34v2.04c0 .19-.15.34-.34.34-.19 0-.34-.15-.34-.34v-2.04c0-.19.15-.34.34-.34zm1.13 0c.19 0 .34.15.34.34v2.04c0 .19-.15.34-.34.34-.19 0-.34-.15-.34-.34v-2.04c0-.19.15-.34.34-.34z" fill="#fff" /></svg>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#06C755" /><path d="M12 6C8.13 6 5 8.61 5 11.77c0 1.47 1.02 2.77 2.62 3.67-.09.34-.54 2.04-.56 2.13-.09.36.14.36.29.33.12-.03 2.06-.66 2.87-.94.41.12.84.18 1.29.18 3.87 0 7-2.61 7-5.77S15.87 6 12 6zm-2.19 5.13c.19 0 .34.15.34.34v2.04c0 .19-.15.34-.34.34-.19 0-.34-.15-.34-.34v-2.04c0-.19.15-.34.34-.34zm1.13 0c.19 0 .34.15.34.34v2.04c0 .19-.15.34-.34.34-.19 0-.34-.15-.34-.34v-2.04c0-.19.15-.34.34-.34zm1.13 0c.19 0 .34.15.34.34v2.04c0 .19-.15.34-.34.34-.19 0-.34-.15-.34-.34v-2.04c0-.19.15-.34.34-.34z" fill="#fff" /></svg>
                             {t.line}
                           </a>
                         )}
@@ -752,7 +709,7 @@ export default function SmartVCard() {
                       className="text-center"
                     >
                       <p className={`${c.qrText} font-medium text-sm mb-1`}>
-                        {t.scan}
+                        {language === 'fr' ? 'Scanner QR' : language === 'en' ? 'Scan QR' : 'สแกน QR'}
                       </p>
                     </motion.div>
 
@@ -791,7 +748,7 @@ export default function SmartVCard() {
             className={`w-full py-1 rounded-2xl font-medium text-sm ${c.flipBtn} transition-all duration-300 flex items-center justify-center gap-2 border`}
           >
             <RotateCw size={18} className={`transition-transform duration-500 ${isFlipped ? 'rotate-180' : ''}`} />
-            {isFlipped ? (language === 'fr' ? 'Retour au profil' : 'Back to Profile') : t.viewQR}
+            {isFlipped ? (language === 'fr' ? 'Retour au profil' : 'Back to Profile') : t.qrCode}
           </motion.button>
         </motion.div>
 
@@ -824,7 +781,7 @@ export default function SmartVCard() {
             </motion.p>
 
             <form onSubmit={handleSubmit} className="flex flex-col items-center gap-2 relative">
-              {/* Ligne 1 : nom et email */}
+              {/* Ligne 1 : nom et contact */}
               <div className="flex gap-2 w-full">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4, duration: 0.5 }} className="flex-1">
                   <motion.input
@@ -838,8 +795,8 @@ export default function SmartVCard() {
                 </motion.div>
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.45, duration: 0.5 }} className="flex-1">
                   <motion.input
-                    type="email"
-                    placeholder={t.placeholderEmail}
+                    type="text"
+                    placeholder={t.placeholderContact}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
@@ -855,7 +812,10 @@ export default function SmartVCard() {
                     onChange={e => setFormData({ ...formData, domaine: e.target.value })}
                     className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
                   >
-                    <option value="">{t.selectDomain}</option>
+                    <option value="">{t.placeholderDomain}</option>
+                    <option value="Café">Café</option>
+                    <option value="Villa">Villa</option>
+                    <option value="E-commerce">E-commerce</option>
                     <option value="Informatique">Informatique</option>
                     <option value="Marketing">Marketing</option>
                     <option value="Finance">Finance</option>
@@ -870,7 +830,7 @@ export default function SmartVCard() {
                   {formData.domaine === 'Autre' && (
                     <input
                       type="text"
-                      placeholder={t.selectDomain}
+                      placeholder={t.placeholderDomain}
                       value={formData.domaineCustom}
                       onChange={e => setFormData({ ...formData, domaineCustom: e.target.value })}
                       className={`mt-2 w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
@@ -880,7 +840,7 @@ export default function SmartVCard() {
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.55, duration: 0.5 }} className="flex-1">
                   <motion.input
                     type="tel"
-                    placeholder={t.placeholderPhone}
+                    placeholder={language === 'fr' ? 'Téléphone' : language === 'en' ? 'Phone' : 'โทรศัพท์'}
                     value={formData.telephone}
                     onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
                     whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
@@ -888,6 +848,17 @@ export default function SmartVCard() {
                   />
                 </motion.div>
               </div>
+              {/* Ajout champ LINE ID */}
+              <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6, duration: 0.5 }} className="w-full">
+                <motion.input
+                  type="text"
+                  placeholder={t.line}
+                  value={formData.lineLink}
+                  onChange={(e) => setFormData({ ...formData, lineLink: e.target.value })}
+                  whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
+                  className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
+                />
+              </motion.div>
 
               {/* Buttons Row */}
               <motion.div
@@ -905,7 +876,7 @@ export default function SmartVCard() {
                   className="flex-1 py-2 bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none group"
                 >
                   <Send size={17} className={`transition-transform duration-300 ${isLoading ? 'animate-spin' : 'group-hover:translate-x-1'}`} />
-                  {isLoading ? t.loading : t.formSubmit}
+                  {isLoading ? (language === 'fr' ? 'Chargement...' : language === 'en' ? 'Loading...' : 'กำลังโหลด...') : t.send}
                 </motion.button>
 
                 {/* Scan QR Button */}
@@ -915,10 +886,10 @@ export default function SmartVCard() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className={`py-2 px-3 ${c.scanBtn} border rounded-xl font-medium text-sm flex items-center justify-center gap-1.5 transition-all duration-300`}
-                  title={t.scanQR}
+                  title={language === 'fr' ? 'Scanner QR' : language === 'en' ? 'Scan QR' : 'สแกน QR'}
                 >
                   <ScanLine size={17} />
-                  <span className="hidden sm:inline text-xs">{t.scanQR}</span>
+                  <span className="hidden sm:inline text-xs">{language === 'fr' ? 'Scanner QR' : language === 'en' ? 'Scan QR' : 'สแกน QR'}</span>
                 </motion.button>
               </motion.div>
               {/* Confirmation visuelle */}
@@ -960,7 +931,7 @@ export default function SmartVCard() {
                     className={`${c.scanModal} rounded-2xl border p-5 w-full max-w-sm`}
                   >
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className={`text-sm font-bold ${c.scanTitle}`}>{t.scanTitle}</h3>
+                      <h3 className={`text-sm font-bold ${c.scanTitle}`}>{language === 'fr' ? 'Scanner QR' : language === 'en' ? 'Scan QR' : 'สแกน QR'}</h3>
                       <button
                         onClick={closeScanner}
                         className={`p-1 rounded-lg ${c.scanClose} transition-all`}
@@ -974,7 +945,9 @@ export default function SmartVCard() {
                       className="w-full rounded-xl overflow-hidden bg-black"
                     />
                     <p className={`${c.scanHint} text-xs text-center mt-3`}>
-                      {scannerReady ? t.scanHint : (language === 'fr' ? 'Chargement de la caméra...' : 'Loading camera...')}
+                      {scannerReady
+                        ? (language === 'fr' ? 'Placez le QR code devant la caméra' : language === 'en' ? 'Place the QR code in front of the camera' : 'วาง QR โค้ดไว้หน้ากล้อง')
+                        : (language === 'fr' ? 'Chargement de la caméra...' : language === 'en' ? 'Loading camera...' : 'กำลังโหลดกล้อง...')}
                     </p>
                   </motion.div>
                 </motion.div>
