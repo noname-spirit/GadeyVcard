@@ -18,6 +18,8 @@ type Language = 'fr' | 'en' | 'th';
 
 const translations = {
   fr: {
+    title: "Smart vCard",
+    subtitle: "Partager mes coordonnées élégamment",
     jobTitle: "GRAPHISTE LOGO & WEB | BRANDING",
     save: "Enregistrer Contact",
     qrCode: "Voir QR Code",
@@ -33,6 +35,8 @@ const translations = {
     whatsapp: "WhatsApp"
   },
   en: {
+    title: "Smart vCard",
+    subtitle: "Share my contact information elegantly",
     jobTitle: "LOGO & WEB DESIGNER | BRANDING",
     save: "Save Contact",
     qrCode: "Show QR Code",
@@ -48,6 +52,8 @@ const translations = {
     whatsapp: "WhatsApp"
   },
   th: {
+    title: "สมาร์ทวีการ์ด",
+    subtitle: "แชร์ข้อมูลติดต่อของฉันอย่างมีสไตล์",
     jobTitle: "นักออกแบบโลโก้และเว็บไซต์ | สร้างแบรนด์",
     save: "บันทึกข้อมูลติดต่อ",
     qrCode: "ดู QR โค้ด",
@@ -473,7 +479,7 @@ export default function SmartVCard() {
         >
           <div className="flex items-center gap-2 sm:gap-4 justify-center">
             <h1 className={`${getDeviceClasses(device.screenSize, 'titleSize')} font-bold bg-linear-to-r ${c.titleGradient} bg-clip-text text-transparent tracking-tight transition-all`}>
-              {t.jobTitle}
+              {t.title}
             </h1>
             {/* Language Selector */}
             <div className={`flex gap-1 ${c.langBg} rounded-full px-1.5 py-1 border backdrop-blur-xl transition-colors duration-300`}>
@@ -777,7 +783,7 @@ export default function SmartVCard() {
               transition={{ delay: 0.35, duration: 0.5 }}
               className={`text-center ${c.formSubtitle} mb-4 text-xs tracking-wide`}
             >
-              {t.formSub}
+              {t.subtitle}
             </motion.p>
 
             <form onSubmit={handleSubmit} className="flex flex-col items-center gap-2 relative">
@@ -848,17 +854,6 @@ export default function SmartVCard() {
                   />
                 </motion.div>
               </div>
-              {/* Ajout champ LINE ID */}
-              <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6, duration: 0.5 }} className="w-full">
-                <motion.input
-                  type="text"
-                  placeholder={t.line}
-                  value={formData.lineLink}
-                  onChange={(e) => setFormData({ ...formData, lineLink: e.target.value })}
-                  whileFocus={{ scale: 1.02, boxShadow: '0 0 20px rgba(234, 88, 12, 0.2)' }}
-                  className={`w-full px-5 py-1 ${c.inputBg} text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/30 transition-all duration-300 font-medium`}
-                />
-              </motion.div>
 
               {/* Buttons Row */}
               <motion.div
