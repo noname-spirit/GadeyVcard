@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Nonames-spirit | Graphiste Logo & Web',
+  title: 'Nonames-spirit | Graphiste Logo & Web', //testemabite
   description:
     'Graphiste Logo & Web | Branding - Partage élégant de coordonnées',
   keywords: ['vCard', 'contact', 'graphiste', 'logo', 'branding', 'web'],
