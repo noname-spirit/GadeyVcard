@@ -1,4 +1,4 @@
-# 🎨 Generateur - Landing Page Premium
+# 🎨 Vcard - Landing Page Premium
 
 Une Landing Page mobile-first ultra-moderne pour partager vos coordonnées de manière élégante et capturer les informations des personnes que vous rencontrez.
 
