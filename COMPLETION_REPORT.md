@@ -99,7 +99,7 @@ Votre **Smart vCard Landing Page** est complètement développée, testée et do
 ## 📁 Project Structure
 
 ```
-/Users/user/Documents/messite/
+/Users/username/Documents/messite/
 │
 ├── 📱 app/
 │   ├── page.tsx              (440 lines) - Main component

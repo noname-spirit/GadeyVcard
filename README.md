@@ -50,7 +50,7 @@ Une Landing Page mobile-first ultra-moderne pour partager vos coordonnées de ma
 
 ```bash
 # Cloner ou télécharger le projet
-cd /Users/user/Documents/messite
+cd /Users/username/Documents/messite
 
 # Installer les dépendances
 npm install
