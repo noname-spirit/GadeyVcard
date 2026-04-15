@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { Download, Instagram, Youtube, Globe, Send, Check, AlertCircle, RotateCw, ScanLine, X, Phone, Mail, MessageCircle, Sun, Moon } from 'lucide-react';
-import { useDeviceDetection, getDeviceClasses, getImageSize } from '@/lib/useDeviceDetection';
+import { useDeviceDetection, getDeviceClasses, getImageSize } from '@/hooks/useDeviceDetection';
 
 // Type declaration for Meta Pixel
 declare global {
