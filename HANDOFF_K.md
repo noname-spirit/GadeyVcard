@@ -1,6 +1,6 @@
 # HANDOFF — K (Kevin)
 
-## Session du 16/04/2026
+## Session du 16/04/2026 (suite — Phase 1)
 
 ### Fait
 - Création des branches : `dev`, `K/phase0`, `G/phase0`
@@ -13,12 +13,22 @@
 - Build propre ✓
 - Commit pushé sur `K/phase0`
 
-### En cours / bloqué
-- Design system à faire (tokens couleurs, typo, composants de base)
-- Attente accès Supabase et Stripe (G ne peut pas démarrer sans)
+### Fait (Phase 0)
+- Nettoyage Firebase/Neon, migration src/, build propre ✓
+- Design system : tokens CSS + tokens.ts + Button/Card/Input ✓
 
-### À savoir pour l'autre (G)
-- `src/app/page.tsx` = blueprint visuel de référence — la vCard finale attendue
-- `data/contact.json` + `data/leads.json` = structure de données de référence
-- Stack propre, prêt pour Supabase + Prisma
-- Quand les accès Supabase/Stripe arrivent → G démarre sur `G/phase0`
+### Fait (Phase 1)
+- `src/types/card.ts` : CardData, CardSocials, CardContact, CardTheme, CardLanguage
+- `src/components/card/` : VCard (flip 3D), CardFront, CardBack — tous prop-driven
+- `src/components/onboarding/OnboardingWizard.tsx` : 5 étapes, progress bar, transitions
+- `src/components/dashboard/` : StatCard, LeadsTable (search, CSV, delete)
+
+### En cours / bloqué
+- Attente accès Supabase et Stripe pour que G puisse démarrer
+- Pas de routes API encore (tout est UI statique pour l'instant)
+
+### À savoir pour G
+- Les composants card acceptent `CardData` comme props → brancher sur l'API Supabase quand prêt
+- `OnboardingWizard` retourne `OnboardingData` via `onComplete(data)` → à connecter à la route POST /api/cards
+- `LeadsTable` attend `LeadRow[]` → à brancher sur GET /api/leads
+- `src/app/page.tsx` = démo vCard de Kevin, conservée comme référence visuelle
