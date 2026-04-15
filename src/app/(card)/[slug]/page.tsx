@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { VCard } from '@/components/card';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 
-// Données mock — remplacées par un fetch Supabase quand G est prêt
-const MOCK_CARD: CardData = {
+const BASE_CARD: CardData = {
   id: 'demo',
   slug: 'demo',
   name: 'Noname Spirit',
@@ -30,10 +29,40 @@ const MOCK_CARD: CardData = {
 const LANGUAGES: CardLanguage[] = ['fr', 'en', 'th'];
 
 export default function CardPage() {
+  const [card, setCard] = useState<CardData>(BASE_CARD);
   const [theme, setTheme] = useState<CardTheme>('dark');
   const [language, setLanguage] = useState<CardLanguage>('en');
   const [isSaving, setIsSaving] = useState(false);
   const dark = theme === 'dark';
+
+  // Lire les settings sauvegardés depuis localStorage
+  // Remplacé par fetch Supabase quand G est prêt
+  useEffect(() => {
+    const saved = localStorage.getItem('vcard_settings');
+    if (!saved) return;
+    try {
+      const s = JSON.parse(saved);
+      setCard((c) => ({
+        ...c,
+        name: s.name || c.name,
+        title: s.title || c.title,
+        slug: s.slug || c.slug,
+        accentColor: s.accent || c.accentColor,
+        template: s.template || c.template,
+        contact: {
+          phone: s.phone || c.contact.phone,
+          email: s.email || c.contact.email,
+          whatsapp: s.whatsapp || c.contact.whatsapp,
+        },
+        socials: {
+          ...c.socials,
+          instagram: s.instagram || c.socials.instagram,
+          website: s.website || c.socials.website,
+        },
+      }));
+      if (s.template === 'light') setTheme('light');
+    } catch { /* ignore */ }
+  }, []);
 
   const handleSaveContact = async () => {
     setIsSaving(true);
@@ -58,7 +87,6 @@ export default function CardPage() {
           <h1 className={`text-xl font-bold bg-linear-to-r ${titleGradient} bg-clip-text text-transparent tracking-tight`}>
             Smart vCard
           </h1>
-
           <div className={`flex gap-1 ${langBg} rounded-full px-1.5 py-1 border backdrop-blur-xl transition-colors duration-300`}>
             <select
               value={language}
@@ -82,9 +110,8 @@ export default function CardPage() {
           3 strategic tips delivered within 24h
         </p>
 
-        {/* VCard */}
         <VCard
-          card={MOCK_CARD}
+          card={card}
           theme={theme}
           language={language}
           onSaveContact={handleSaveContact}

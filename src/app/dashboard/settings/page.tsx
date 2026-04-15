@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Save, ExternalLink, Palette, User, Link2, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -70,9 +70,32 @@ export default function SettingsPage() {
   const [notifLead, setNotifLead] = useState(true);
   const [notifView, setNotifView] = useState(false);
 
+  // Charger les settings sauvegardés depuis localStorage au montage
+  useEffect(() => {
+    const saved = localStorage.getItem('vcard_settings');
+    if (!saved) return;
+    try {
+      const s = JSON.parse(saved);
+      if (s.name) setName(s.name);
+      if (s.title) setTitle(s.title);
+      if (s.slug) setSlug(s.slug);
+      if (s.phone) setPhone(s.phone);
+      if (s.email) setEmail(s.email);
+      if (s.whatsapp) setWhatsapp(s.whatsapp);
+      if (s.instagram) setInstagram(s.instagram);
+      if (s.website) setWebsite(s.website);
+      if (s.template) setTemplate(s.template);
+      if (s.accent) setAccent(s.accent);
+    } catch { /* ignore */ }
+  }, []);
+
   const handleSave = async () => {
     setSaving(true);
-    setTimeout(() => { setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2500); }, 900);
+    // Persistance temporaire localStorage — remplacé par PATCH /api/cards quand G est prêt
+    localStorage.setItem('vcard_settings', JSON.stringify({
+      name, title, slug, phone, email, whatsapp, instagram, website, template, accent,
+    }));
+    setTimeout(() => { setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2500); }, 500);
   };
 
   return (
