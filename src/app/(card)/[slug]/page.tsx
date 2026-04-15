@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { VCard } from '@/components/card';
+import { Watermark } from '@/components/card/Watermark';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 
 const BASE_CARD: CardData = {
@@ -117,6 +118,9 @@ export default function CardPage() {
           onSaveContact={handleSaveContact}
           isSaving={isSaving}
         />
+
+        {/* Watermark — visible plan Free uniquement */}
+        <Watermark plan={card.template === 'dark' ? 'free' : 'pro'} />
       </div>
     </div>
   );
