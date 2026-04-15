@@ -52,8 +52,8 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl border border-zinc-800/60 overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="rounded-2xl border border-zinc-800/60 overflow-x-auto">
+        <table className="w-full text-sm min-w-150">
           <thead>
             <tr className="border-b border-zinc-800/60 bg-zinc-900/60">
               {['Nom', 'Email', 'Domaine', 'Source', 'Date', ''].map((h) => (
