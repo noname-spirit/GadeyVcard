@@ -1,91 +1,91 @@
 [
   {
     "nom": "xefzerger",
-    "email": "contact@noname-spirit.com",
+    "email": "contact@[BRAND].com",
     "telephone": "0938263728",
     "createdAt": "2026-03-05T09:09:15.313Z",
     "source": "formulaire"
   },
   {
     "nom": "xefzerger",
-    "email": "contact@noname-spirit.com",
+    "email": "contact@[BRAND].com",
     "telephone": "0938263728",
     "createdAt": "2026-03-05T09:09:10.826Z",
     "source": "formulaire"
   },
   {
     "nom": "nczbkd",
-    "email": "contact@noname-spirit.com",
+    "email": "contact@[BRAND].com",
     "telephone": "08273826",
     "createdAt": "2026-03-05T09:04:31.676Z",
     "source": "formulaire"
   },
   {
     "nom": "nczbkd",
-    "email": "contact@noname-spirit.com",
+    "email": "contact@[BRAND].com",
     "telephone": "08273826",
     "createdAt": "2026-03-05T09:04:22.440Z",
     "source": "formulaire"
   },
   {
     "nom": "nczbkd",
-    "email": "contact@noname-spirit.com",
+    "email": "contact@[BRAND].com",
     "telephone": "08273826",
     "createdAt": "2026-03-05T09:04:10.070Z",
     "source": "formulaire"
   },
   {
     "nom": "canjnjhk",
-    "email": "contact@noname-spirit.com",
+    "email": "contact@[BRAND].com",
     "telephone": "0892364536",
     "createdAt": "2026-03-05T09:02:38.074Z",
     "source": "formulaire"
   },
   {
     "nom": "canjnjhk",
-    "email": "contact@noname-spirit.com",
+    "email": "contact@[BRAND].com",
     "telephone": "0892364536",
     "createdAt": "2026-03-05T09:02:33.860Z",
     "source": "formulaire"
   },
   {
     "nom": "canjnjhk",
-    "email": "contact@noname-spirit.com",
+    "email": "contact@[BRAND].com",
     "telephone": "0892364536",
     "createdAt": "2026-03-05T09:02:29.465Z",
     "source": "formulaire"
   },
   {
     "nom": "canjnjhk",
-    "email": "contact@noname-spirit.com",
+    "email": "contact@[BRAND].com",
     "telephone": "0892364536",
     "createdAt": "2026-03-05T09:02:24.301Z",
     "source": "formulaire"
   },
   {
     "nom": "canjnjhk",
-    "email": "contact@noname-spirit.com",
+    "email": "contact@[BRAND].com",
     "telephone": "0892364536",
     "createdAt": "2026-03-05T09:02:22.657Z",
     "source": "formulaire"
   },
   {
     "nom": "ca",
-    "email": "contact@noname-spirit.com",
+    "email": "contact@[BRAND].com",
     "telephone": "0892364536",
     "createdAt": "2026-03-05T09:02:19.986Z",
     "source": "formulaire"
   },
   {
     "nom": "ca",
-    "email": "contact@noname-spirit.com",
+    "email": "contact@[BRAND].com",
     "telephone": "0892364536",
     "createdAt": "2026-03-05T09:02:19.140Z",
     "source": "formulaire"
   },
   {
     "nom": "ca",
-    "email": "contact@noname-spirit.com",
+    "email": "contact@[BRAND].com",
     "telephone": "0892364536",
     "createdAt": "2026-03-05T09:02:14.706Z",
     "source": "formulaire"
@@ -93,7 +93,7 @@
   {
     "id": "3c77c776-4406-4ca7-b858-40b6b879cb5e",
     "name": "Julie Martin",
-    "contact": "julie.m@company.fr",
+    "contact": "contact@[GENERIC].com",
     "language": "en",
     "timestamp": "2026-03-03T20:03:48.228Z"
   },
@@ -107,7 +107,7 @@
   {
     "id": "60735aff-49da-457c-90e8-3f4c76701d91",
     "name": "Marie Dupont",
-    "contact": "marie@email.com",
+    "contact": "contact@[GENERIC].com",
     "language": "fr",
     "timestamp": "2026-03-03T20:03:39.451Z"
   }
