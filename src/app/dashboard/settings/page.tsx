@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Save, ExternalLink, Palette, User, Link2, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
+import { VCard } from '@/components/card';
 
 const TABS = [
   { id: 'profile', label: 'Profil', icon: User },
@@ -152,33 +153,59 @@ export default function SettingsPage() {
           )}
 
           {tab === 'design' && (
-            <>
-              <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
-                <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Template</h3>
-                <div className="flex gap-3">
-                  {TEMPLATES.map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => setTemplate(t.id)}
-                      className={[
-                        `flex-1 h-16 rounded-xl bg-linear-to-br ${t.bg} border-2 transition-all flex items-end p-2`,
-                        template === t.id ? 'border-orange-500 scale-105' : 'border-transparent opacity-60 hover:opacity-90',
-                      ].join(' ')}
-                    >
-                      <span className={`text-xs font-semibold ${t.text}`}>{t.label}</span>
-                    </button>
-                  ))}
+            <div className="flex flex-col lg:flex-row gap-6 items-start">
+              {/* Contrôles */}
+              <div className="flex flex-col gap-5 flex-1">
+                <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
+                  <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Template</h3>
+                  <div className="flex gap-3">
+                    {TEMPLATES.map((t) => (
+                      <button
+                        key={t.id}
+                        onClick={() => setTemplate(t.id)}
+                        className={[
+                          `flex-1 h-16 rounded-xl bg-linear-to-br ${t.bg} border-2 transition-all flex items-end p-2`,
+                          template === t.id ? 'border-orange-500 scale-105' : 'border-transparent opacity-60 hover:opacity-90',
+                        ].join(' ')}
+                      >
+                        <span className={`text-xs font-semibold ${t.text}`}>{t.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-3">
+                  <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Couleur d'accent</h3>
+                  <div className="flex items-center gap-3">
+                    <input type="color" value={accent} onChange={(e) => setAccent(e.target.value)} className="w-10 h-10 rounded-lg border border-zinc-700/40 bg-zinc-800 cursor-pointer" />
+                    <span className="text-zinc-400 text-sm font-mono">{accent}</span>
+                    <button onClick={() => setAccent('#f97316')} className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">Reset</button>
+                  </div>
                 </div>
               </div>
-              <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-3">
-                <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Couleur d'accent</h3>
-                <div className="flex items-center gap-3">
-                  <input type="color" value={accent} onChange={(e) => setAccent(e.target.value)} className="w-10 h-10 rounded-lg border border-zinc-700/40 bg-zinc-800 cursor-pointer" />
-                  <span className="text-zinc-400 text-sm font-mono">{accent}</span>
-                  <button onClick={() => setAccent('#f97316')} className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">Reset</button>
+
+              {/* Preview live */}
+              <div className="flex flex-col gap-2 lg:w-72 w-full">
+                <p className="text-xs text-zinc-500 uppercase tracking-wide font-medium">Aperçu en direct</p>
+                <div className="scale-90 origin-top">
+                  <VCard
+                    card={{
+                      id: 'preview',
+                      slug: 'preview',
+                      name,
+                      title,
+                      photo: '/noname-spirit.jpg',
+                      socials: { instagram: instagram || undefined, website: website || undefined },
+                      contact: { phone: phone || undefined, email: email || undefined },
+                      accentColor: accent,
+                      template,
+                    }}
+                    theme={template === 'light' ? 'light' : 'dark'}
+                    language="fr"
+                    onSaveContact={() => {}}
+                  />
                 </div>
               </div>
-            </>
+            </div>
           )}
 
           {tab === 'notifications' && (

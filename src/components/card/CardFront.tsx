@@ -34,11 +34,13 @@ export function CardFront({ card, theme, language, isSaving, freshnessBadge, onS
   const cardBg = dark
     ? 'from-zinc-900 via-zinc-900/95 to-black border-zinc-800/60'
     : 'from-white via-zinc-50 to-zinc-100 border-zinc-200/80';
-  const cardShadow = dark ? 'shadow-2xl shadow-orange-500/5' : 'shadow-xl shadow-zinc-300/40';
+  const cardShadow = dark ? 'shadow-2xl' : 'shadow-xl shadow-zinc-300/40';
+
+  // Hover states via CSS classes referencing --accent (injected by VCard wrapper)
   const socialBtn = dark
-    ? 'bg-zinc-800/50 hover:bg-orange-500/15 border-zinc-700/30 hover:border-orange-500/40'
-    : 'bg-zinc-100 hover:bg-orange-500/10 border-zinc-200 hover:border-orange-500/40';
-  const socialIcon = dark ? 'text-zinc-300 hover:text-orange-400' : 'text-zinc-500 hover:text-orange-500';
+    ? 'bg-zinc-800/50 card-social-btn border-zinc-700/30'
+    : 'bg-zinc-100 card-social-btn border-zinc-200';
+  const socialIcon = dark ? 'text-zinc-300 card-social-icon' : 'text-zinc-500 card-social-icon';
   const actionCall = dark
     ? 'bg-zinc-800/50 hover:bg-emerald-500/15 border-zinc-700/30 hover:border-emerald-500/40 text-zinc-300 hover:text-emerald-400'
     : 'bg-zinc-100 hover:bg-emerald-500/10 border-zinc-200 hover:border-emerald-500/40 text-zinc-600 hover:text-emerald-500';
@@ -61,19 +63,35 @@ export function CardFront({ card, theme, language, isSaving, freshnessBadge, onS
 
   return (
     <div className={`w-full h-full bg-linear-to-br ${cardBg} rounded-3xl px-4 py-6 border backdrop-blur-2xl ${cardShadow} flex flex-col items-center justify-center gap-5 transition-colors duration-300 relative`}>
-      {/* Decorative lines */}
-      <div className="absolute top-0 left-12 right-12 h-px bg-linear-to-r from-transparent via-orange-500/20 to-transparent" />
-      <div className="absolute bottom-0 left-12 right-12 h-px bg-linear-to-r from-transparent via-orange-500/20 to-transparent" />
 
-      {/* Photo */}
+      {/* Decorative lines — accent dynamique */}
+      <div
+        className="absolute top-0 left-12 right-12 h-px"
+        style={{ background: 'linear-gradient(to right, transparent, color-mix(in srgb, var(--accent) 30%, transparent), transparent)' }}
+      />
+      <div
+        className="absolute bottom-0 left-12 right-12 h-px"
+        style={{ background: 'linear-gradient(to right, transparent, color-mix(in srgb, var(--accent) 30%, transparent), transparent)' }}
+      />
+
+      {/* Photo — ring accent dynamique */}
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.1, duration: 0.6 }}
         className="relative"
       >
-        <div className="w-24 h-24 rounded-full bg-linear-to-br from-orange-400 via-orange-500 to-orange-600 p-0.5 shadow-lg shadow-orange-500/30 relative">
-          <div className="absolute inset-0 rounded-full bg-linear-to-br from-orange-500/20 to-transparent blur-xl" />
+        <div
+          className="w-24 h-24 rounded-full p-0.5 relative"
+          style={{
+            background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--accent) 70%, white), var(--accent), color-mix(in srgb, var(--accent) 70%, black))',
+            boxShadow: '0 10px 30px color-mix(in srgb, var(--accent) 30%, transparent)',
+          }}
+        >
+          <div
+            className="absolute inset-0 rounded-full blur-xl"
+            style={{ background: 'color-mix(in srgb, var(--accent) 20%, transparent)' }}
+          />
           <Image
             src={card.photo}
             alt={card.name}
@@ -99,7 +117,13 @@ export function CardFront({ card, theme, language, isSaving, freshnessBadge, onS
             </span>
           )}
         </div>
-        <p className="text-orange-400/80 font-medium text-xs tracking-widest uppercase">{card.title}</p>
+        {/* Titre — couleur accent dynamique */}
+        <p
+          className="font-medium text-xs tracking-widest uppercase"
+          style={{ color: 'color-mix(in srgb, var(--accent) 80%, transparent)' }}
+        >
+          {card.title}
+        </p>
       </motion.div>
 
       {/* Socials */}
@@ -161,7 +185,7 @@ export function CardFront({ card, theme, language, isSaving, freshnessBadge, onS
         </motion.div>
       )}
 
-      {/* Save contact */}
+      {/* Save contact — bouton accent dynamique */}
       <motion.button
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -170,7 +194,11 @@ export function CardFront({ card, theme, language, isSaving, freshnessBadge, onS
         disabled={isSaving}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className="w-full py-2.5 bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 rounded-2xl font-semibold text-sm text-white flex items-center justify-center gap-2 transition-all duration-300 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 group disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full py-2.5 rounded-2xl font-semibold text-sm text-white flex items-center justify-center gap-2 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
+        style={{
+          background: 'linear-gradient(to right, var(--accent), color-mix(in srgb, var(--accent) 80%, black))',
+          boxShadow: '0 10px 30px color-mix(in srgb, var(--accent) 25%, transparent)',
+        }}
       >
         <Download size={16} className={`transition-transform ${isSaving ? 'animate-spin' : 'group-hover:translate-y-0.5'}`} />
         {isSaving ? l.adding : l.save}
