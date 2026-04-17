@@ -67,8 +67,21 @@ export default function CardPage() {
 
   const handleSaveContact = async () => {
     setIsSaving(true);
-    // TODO : fetch /api/cards/[slug]/vcf quand G a créé la route
-    setTimeout(() => setIsSaving(false), 800);
+    try {
+      const res = await fetch(`/api/cards/${card.slug}/vcf`);
+      if (!res.ok) throw new Error('VCF non disponible');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${card.slug}.vcf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      // silencieux — l'utilisateur verra que le téléchargement n'a pas eu lieu
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const pageBg = dark ? 'from-zinc-950 via-black to-zinc-950' : 'from-zinc-50 via-white to-zinc-50';
