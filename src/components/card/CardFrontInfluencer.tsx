@@ -123,7 +123,7 @@ export function CardFrontInfluencer({ card, theme, language, isSaving, onSaveCon
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.5 }}
-          className="flex items-end gap-3 -mt-10"
+          className="flex items-end gap-3 -mt-10 relative z-10"
         >
           {/* Photo avec ring neutre — contraste avec la cover */}
           <div className="w-20 h-20 rounded-2xl p-0.5 shrink-0 shadow-xl bg-zinc-950/80">
