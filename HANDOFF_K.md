@@ -1,5 +1,5 @@
 # HANDOFF — K (Kevin)
-# Dernière mise à jour : 16/04/2026 — Session finale Phase 0 → 96% UI
+# Dernière mise à jour : 17/04/2026 — Auth Supabase + VCF + Schema + Fix Influencer
 
 ---
 
@@ -149,10 +149,37 @@ G/phase0      → travail backend de G
 
 ---
 
-## Ce qui reste à faire (4%)
+## Ce qui a été fait en session 17/04/2026
 
+### Auth Supabase (100% côté K)
+- `src/lib/supabase/client.ts` — client browser
+- `src/lib/supabase/server.ts` — client server (RSC/API routes)
+- `middleware.ts` — protection auto `/dashboard`, `/admin`, `/onboarding`
+- `src/app/auth/callback/route.ts` — échange code OAuth → session
+- `/login` et `/register` branchés sur `signInWithPassword`, `signUp`, `signInWithOAuth` (Google)
+- `.env.local.example` — template des variables d'env
+
+### VCF côté serveur
+- `src/app/api/cards/[slug]/vcf/route.ts` — génère `.vcf` propre, TODO Supabase marqué
+- Bouton "Sauvegarder le contact" sur `/[slug]` appelle la vraie route
+
+### Supabase Schema
+- `supabase/schema.sql` — tables `profiles`, `cards`, `leads`, `menu_items`
+- Triggers `updated_at` + `handle_new_user` (profil auto à l'inscription)
+- RLS complet sur toutes les tables
+
+### Fix template Influenceur
+- Stats labels localisés (FR/EN/TH)
+- Grid stats dynamique (s'adapte au nombre de stats disponibles)
+- Fix z-index photo : `relative z-10` sur le bloc — ne passe plus derrière la cover après animation
+- Ring photo neutre (`bg-zinc-950/80`) qui contraste avec la cover colorée
+
+## Ce qui reste à faire
+
+- [ ] Créer le projet Supabase + coller `supabase/schema.sql` dans SQL Editor
+- [ ] Activer Google OAuth dans Supabase → Authentication → Providers
+- [ ] Remplir `.env.local` avec les vraies clés Supabase
 - [ ] Brancher les vraies routes API (G)
 - [ ] Tester l'intégration end-to-end
 - [ ] Configurer les variables d'environnement Vercel (Supabase URL/key, Stripe key)
-- [ ] Générer les fichiers VCF côté serveur
 - [ ] Supabase Realtime sur le toggle épuisé restaurant
