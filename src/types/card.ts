@@ -23,7 +23,7 @@ export interface CardData {
   socials: CardSocials;
   contact: CardContact;
   accentColor?: string;   // couleur brand personnalisée (hex)
-  template?: 'dark' | 'light' | 'color';
+  template?: 'dark' | 'light' | 'color' | 'influencer';
   updatedAt?: string;
 }
 
