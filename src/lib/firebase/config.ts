@@ -8,7 +8,6 @@ const firebaseConfig = {
   storageBucket: 'generateur-vcard.firebasestorage.app',
   messagingSenderId: '187676946208',
   appId: '1:187676946208:web:2db51f14d09d8649687145',
-  measurementId: 'G-T3C5CH4DGY',
 };
 
 // Prevent re-initialization in Next.js hot reload

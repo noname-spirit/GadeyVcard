@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-// TODO : remplacer par un fetch Supabase quand G a créé la table cards
-// Pour l'instant : retourne un VCF basé sur les données mock du slug
+// TODO : remplacer par un fetch Firestore quand la table cards est créée
 interface VcfData {
   name: string;
   title?: string;
@@ -57,12 +56,7 @@ export async function GET(
     return NextResponse.json({ error: 'Slug invalide' }, { status: 400 });
   }
 
-  // TODO : remplacer par :
-  // const supabase = await createClient();
-  // const { data: card } = await supabase.from('cards').select('*').eq('slug', slug).single();
-  // if (!card) return NextResponse.json({ error: 'Carte introuvable' }, { status: 404 });
-
-  // Mock temporaire — sera remplacé par Supabase
+  // TODO : remplacer par un fetch Firestore une fois les cartes en base
   const mockCard: VcfData = {
     name: 'Smart vCard User',
     title: '',
