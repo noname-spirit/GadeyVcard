@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, ExternalLink, Settings, Users, Menu, X, Zap, CreditCard, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { createClient } from '@/lib/supabase/client';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase/auth';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 const BASE_NAV = [
   { label: 'Aperçu', icon: Eye, href: '/dashboard' },
@@ -104,12 +106,12 @@ export function DashboardLayout({ children, active }: DashboardLayoutProps) {
   }, []);
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await signOut(auth);
     router.push('/');
   };
 
   return (
+    <ProtectedRoute>
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex">
 
       {/* Desktop sidebar */}
@@ -165,5 +167,6 @@ export function DashboardLayout({ children, active }: DashboardLayoutProps) {
         </div>
       </main>
     </div>
+    </ProtectedRoute>
   );
 }
