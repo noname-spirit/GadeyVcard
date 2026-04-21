@@ -27,7 +27,7 @@ export default function RegisterPage() {
   const strengthLabel = ['', 'Faible', 'Moyen', 'Fort'];
   const strengthColor = ['', 'bg-rose-500', 'bg-orange-400', 'bg-emerald-400'];
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
+  const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault();
     setError('');
 
@@ -245,18 +245,18 @@ export default function RegisterPage() {
 
             <p className="text-xs text-zinc-600 text-center">
               En créant un compte, vous acceptez nos{' '}
-              <Link href="/terms" className="text-zinc-500 hover:text-zinc-300 transition-colors underline">CGU</Link>
+              <a href="/terms" className="text-zinc-500 hover:text-zinc-300 transition-colors underline">CGU</a>
               {' '}et notre{' '}
-              <Link href="/privacy" className="text-zinc-500 hover:text-zinc-300 transition-colors underline">politique de confidentialité</Link>.
+              <a href="/privacy" className="text-zinc-500 hover:text-zinc-300 transition-colors underline">politique de confidentialité</a>.
             </p>
           </form>
         </div>
 
         <p className="text-sm text-zinc-600">
           Déjà un compte ?{' '}
-          <Link href="/login" className="text-orange-500 hover:text-orange-400 transition-colors font-medium">
+          <a href="/login" className="text-orange-500 hover:text-orange-400 transition-colors font-medium">
             Se connecter
-          </Link>
+          </a>
         </p>
       </motion.div>
     </div>
