@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, ExternalLink, Settings, Users, Menu, X, Zap, CreditCard } from 'lucide-react';
+import { Eye, ExternalLink, Settings, Users, Menu, X, Zap, CreditCard, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { createClient } from '@/lib/supabase/client';
 
-const NAV = [
+const BASE_NAV = [
   { label: 'Aperçu', icon: Eye, href: '/dashboard' },
-  { label: 'Ma carte', icon: ExternalLink, href: '/demo' },
   { label: 'Leads', icon: Users, href: '/dashboard' },
   { label: 'Paramètres', icon: Settings, href: '/dashboard/settings' },
 ];
@@ -17,7 +18,13 @@ interface DashboardLayoutProps {
   active?: string;
 }
 
-function Sidebar({ active, onClose }: { active?: string; onClose?: () => void }) {
+function Sidebar({ active, slug, onClose, onLogout }: { active?: string; slug: string; onClose?: () => void; onLogout: () => void }) {
+  const nav = [
+    ...BASE_NAV.slice(0, 1),
+    { label: 'Ma carte', icon: ExternalLink, href: `/${slug}` },
+    ...BASE_NAV.slice(1),
+  ];
+
   return (
     <div className="flex flex-col h-full p-4 gap-6">
       <div className="flex items-center justify-between pt-2">
@@ -35,7 +42,7 @@ function Sidebar({ active, onClose }: { active?: string; onClose?: () => void })
       </div>
 
       <nav className="flex flex-col gap-1">
-        {NAV.map((item) => (
+        {nav.map((item) => (
           <a
             key={item.label}
             href={item.href}
@@ -68,6 +75,14 @@ function Sidebar({ active, onClose }: { active?: string; onClose?: () => void })
             </Button>
           </a>
         </div>
+
+        <button
+          onClick={onLogout}
+          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all w-full"
+        >
+          <LogOut size={16} />
+          Se déconnecter
+        </button>
       </div>
     </div>
   );
@@ -75,13 +90,31 @@ function Sidebar({ active, onClose }: { active?: string; onClose?: () => void })
 
 export function DashboardLayout({ children, active }: DashboardLayoutProps) {
   const [open, setOpen] = useState(false);
+  const [slug, setSlug] = useState('demo');
+  const router = useRouter();
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('vcard_settings');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.slug) setSlug(parsed.slug);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/');
+  };
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex">
 
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex w-60 min-h-screen bg-zinc-900 border-r border-zinc-800/60 flex-col fixed top-0 left-0">
-        <Sidebar active={active} />
+        <Sidebar active={active} slug={slug} onLogout={handleLogout} />
       </aside>
 
       {/* Mobile overlay */}
@@ -102,7 +135,7 @@ export function DashboardLayout({ children, active }: DashboardLayoutProps) {
               transition={{ type: 'spring', stiffness: 400, damping: 40 }}
               className="fixed top-0 left-0 w-64 h-full bg-zinc-900 border-r border-zinc-800/60 z-50 lg:hidden"
             >
-              <Sidebar active={active} onClose={() => setOpen(false)} />
+              <Sidebar active={active} slug={slug} onClose={() => setOpen(false)} onLogout={handleLogout} />
             </motion.aside>
           </>
         )}

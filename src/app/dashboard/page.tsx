@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Eye, MousePointer, Users, TrendingUp, ExternalLink, Settings } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { LeadsTable } from '@/components/dashboard/LeadsTable';
@@ -21,6 +23,19 @@ const MOCK_LEADS: LeadRow[] = [
 ];
 
 export default function DashboardPage() {
+  const [slug] = useState(() => {
+    if (typeof window === 'undefined') return 'demo';
+    try {
+      const stored = localStorage.getItem('vcard_settings');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return parsed.slug || 'demo';
+      }
+    } catch { /* ignore */ }
+    return 'demo';
+  });
+
+  const router = useRouter();
   const handleDelete = (id: string) => console.log('Delete lead:', id);
 
   const handleExport = () => {
@@ -45,11 +60,11 @@ export default function DashboardPage() {
             <p className="text-zinc-500 text-sm mt-0.5">Bienvenue, Noname Spirit</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => window.open(`/${slug}`, '_blank')}>
               <ExternalLink size={14} />
               Ma carte
             </Button>
-            <Button size="sm" className="flex items-center gap-2">
+            <Button size="sm" className="flex items-center gap-2" onClick={() => router.push('/dashboard/settings')}>
               <Settings size={14} />
               Modifier
             </Button>
