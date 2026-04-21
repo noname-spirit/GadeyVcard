@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
 import type { OnboardingData } from '@/components/onboarding/OnboardingWizard';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -15,24 +16,26 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-zinc-950 via-black to-zinc-950 flex flex-col items-center justify-center px-4 py-12">
-      <div className="mb-10 text-center">
-        <h1 className="text-2xl font-bold bg-linear-to-r from-white to-zinc-400 bg-clip-text text-transparent">
-          Smart vCard
-        </h1>
-        <p className="text-zinc-500 text-sm mt-1">Créez votre carte digitale en 2 minutes</p>
-      </div>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-linear-to-br from-zinc-950 via-black to-zinc-950 flex flex-col items-center justify-center px-4 py-12">
+        <div className="mb-10 text-center">
+          <h1 className="text-2xl font-bold bg-linear-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+            Smart vCard
+          </h1>
+          <p className="text-zinc-500 text-sm mt-1">Créez votre carte digitale en 2 minutes</p>
+        </div>
 
-      <div className="w-full max-w-lg bg-zinc-900 border border-zinc-800/60 rounded-3xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
-        <OnboardingWizard onComplete={handleComplete} />
-      </div>
+        <div className="w-full max-w-lg bg-zinc-900 border border-zinc-800/60 rounded-3xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
+          <OnboardingWizard onComplete={handleComplete} />
+        </div>
 
-      <p className="mt-8 text-xs text-zinc-600">
-        Déjà un compte ?{' '}
-        <Link href="/login" className="text-orange-500 hover:text-orange-400 transition-colors">
-          Se connecter
-        </Link>
-      </p>
-    </div>
+        <p className="mt-8 text-xs text-zinc-600">
+          Déjà un compte ?{' '}
+          <Link href="/login" className="text-orange-500 hover:text-orange-400 transition-colors">
+            Se connecter
+          </Link>
+        </p>
+      </div>
+    </ProtectedRoute>
   );
 }

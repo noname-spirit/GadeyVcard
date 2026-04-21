@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { createUserWithEmailAndPassword, signInWithPopup, updateProfile } from 'firebase/auth';
 import { auth, googleProvider, getFirebaseAuthError } from '@/lib/firebase/auth';
 import Link from 'next/link';
+import { addUser } from '../../../firebase/add-user';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -49,6 +50,7 @@ export default function RegisterPage() {
     try {
       const { user } = await createUserWithEmailAndPassword(auth, email.trim(), password);
       await updateProfile(user, { displayName: name.trim() });
+      await addUser(user.uid, { displayName: name.trim(), email: user.email ?? undefined });
       setSuccess(true);
     } catch (err) {
       setError(getFirebaseAuthError(err));

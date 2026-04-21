@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/Button';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { VCard } from '@/components/card';
 import { CardFrontInfluencer } from '@/components/card/CardFrontInfluencer';
-import { createClient } from '@/lib/supabase/client';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase/auth';
 
 const TABS = [
   { id: 'profile', label: 'Profil', icon: User },
@@ -64,8 +65,7 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await signOut(auth);
     router.push('/');
   };
 

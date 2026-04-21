@@ -166,7 +166,7 @@ export default function TemplatesPage() {
             {active === 'restaurant' && (
               <>
                 <p className="text-sm text-zinc-300">Photo hero · Menu par catégorie · Badge épuisé temps réel · Horaires · Adresse</p>
-                <p className="text-xs text-zinc-600">Statut épuisé mis à jour via Supabase Realtime (Phase 2 — G)</p>
+                <p className="text-xs text-zinc-600">Statut épuisé mis à jour en temps réel (Phase 2 — G)</p>
               </>
             )}
             {active === 'influencer' && (

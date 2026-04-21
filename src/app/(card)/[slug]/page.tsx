@@ -37,7 +37,7 @@ export default function CardPage() {
   const dark = theme === 'dark';
 
   // Lire les settings sauvegardés depuis localStorage
-  // Remplacé par fetch Supabase quand G est prêt
+  // Remplacé par fetch Firestore quand la route /api/cards/[slug] est prête
   useEffect(() => {
     const saved = localStorage.getItem('vcard_settings');
     if (!saved) return;
