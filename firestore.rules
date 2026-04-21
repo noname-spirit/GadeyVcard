@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Un user connecté peut lire/écrire uniquement son propre document
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Un user connecté peut lire/écrire uniquement ses propres cartes
+    match /cards/{cardId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == resource.data.uid;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
+    }
+
+    // Leads — lecture/écriture par le propriétaire de la carte
+    match /leads/{leadId} {
+      allow create: if true;
+      allow read, delete: if request.auth != null && request.auth.uid == resource.data.ownerUid;
+    }
+  }
+}
