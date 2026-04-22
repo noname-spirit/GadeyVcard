@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Zap, ArrowLeft, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { StripeModal } from '@/components/payment/StripeModal';
 
 type Billing = 'monthly' | 'yearly';
 
@@ -32,15 +33,12 @@ const PLANS = [
 export default function UpgradePage() {
   const [billing, setBilling] = useState<Billing>('monthly');
   const [selected, setSelected] = useState('pro');
-  const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const selectedPlan = PLANS.find((p) => p.id === selected)!;
-
-  const handleCheckout = async () => {
-    setLoading(true);
-    // TODO : Stripe Checkout via /api/stripe/checkout
-    setTimeout(() => setLoading(false), 1000);
-  };
+  const amount = billing === 'yearly'
+    ? selectedPlan.price.yearly * 12
+    : selectedPlan.price.monthly;
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center px-4 py-12">
@@ -148,7 +146,7 @@ export default function UpgradePage() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <Button onClick={handleCheckout} loading={loading} className="w-full flex items-center justify-center gap-2">
+            <Button onClick={() => setShowModal(true)} className="w-full flex items-center justify-center gap-2">
               <CreditCard size={15} />
               Payer avec Stripe
             </Button>
@@ -159,6 +157,14 @@ export default function UpgradePage() {
         </div>
 
       </div>
+
+      <StripeModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        planName={selectedPlan.name}
+        amount={amount}
+        billing={billing}
+      />
     </div>
   );
 }

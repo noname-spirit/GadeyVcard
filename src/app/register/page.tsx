@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { createUserWithEmailAndPassword, signInWithPopup, updateProfile } from 'firebase/auth';
 import { auth, googleProvider, getFirebaseAuthError } from '@/lib/firebase/auth';
 import Link from 'next/link';
-import { addUser } from '../../../firebase/add-user';
+import { addUser } from '@/lib/firebase/add-user';
 
 export default function RegisterPage() {
   const router = useRouter();

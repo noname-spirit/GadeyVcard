@@ -3,9 +3,9 @@ import type { NextConfig } from "next";
 const isDev = process.env.NODE_ENV === 'development';
 const cspHeader = `
   default-src 'self';
-  script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://apis.google.com https://accounts.google.com;
+  script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://apis.google.com https://accounts.google.com https://js.stripe.com;
   style-src 'self' 'unsafe-inline';
-  img-src 'self' blob: data: https://*.googleusercontent.com;
+  img-src 'self' blob: data: https:;
   font-src 'self';
   object-src 'none';
   base-uri 'self';
@@ -15,13 +15,20 @@ const cspHeader = `
     https://securetoken.googleapis.com
     https://accounts.google.com
     https://*.firebaseio.com
-    https://firestore.googleapis.com;
-  frame-src https://accounts.google.com https://*.firebaseapp.com;
+    https://firestore.googleapis.com
+    https://api.stripe.com;
+  frame-src https://accounts.google.com https://*.firebaseapp.com https://js.stripe.com https://hooks.stripe.com;
   frame-ancestors 'none';
   upgrade-insecure-requests;
 `;
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: '**' },
+      { protocol: 'http', hostname: '**' },
+    ],
+  },
   async headers() {
     return [
       {
