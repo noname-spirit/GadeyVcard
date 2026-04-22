@@ -1,10 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { Sun, Moon } from 'lucide-react';
 import { VCard } from '@/components/card';
 import { Watermark } from '@/components/card/Watermark';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
+import { useAuth } from '@/lib/firebase/AuthProvider';
+import { getCardsByUid } from '@/lib/firebase/get-cards';
 
 const BASE_CARD: CardData = {
   id: 'demo',
@@ -30,40 +33,45 @@ const BASE_CARD: CardData = {
 const LANGUAGES: CardLanguage[] = ['fr', 'en', 'th'];
 
 export default function CardPage() {
+  const { slug } = useParams<{ slug: string }>();
+  const { uid } = useAuth();
   const [card, setCard] = useState<CardData>(BASE_CARD);
   const [theme, setTheme] = useState<CardTheme>('dark');
   const [language, setLanguage] = useState<CardLanguage>('en');
   const [isSaving, setIsSaving] = useState(false);
   const dark = theme === 'dark';
 
-  // Lire les settings sauvegardés depuis localStorage
-  // Remplacé par fetch Firestore quand la route /api/cards/[slug] est prête
   useEffect(() => {
-    const saved = localStorage.getItem('vcard_settings');
-    if (!saved) return;
-    try {
-      const s = JSON.parse(saved);
-      setCard((c) => ({
-        ...c,
-        name: s.name || c.name,
-        title: s.title || c.title,
-        slug: s.slug || c.slug,
-        accentColor: s.accent || c.accentColor,
-        template: s.template || c.template,
+    if (!uid) return;
+    getCardsByUid(uid).then((cards) => {
+      const match = cards.find((c) => c.slug === slug) ?? cards[0];
+      if (!match) return;
+
+      setCard({
+        id: match.slug,
+        slug: match.slug,
+        name: match.name ?? '',
+        title: match.title ?? '',
+        photo: match.photo ?? '',
         contact: {
-          phone: s.phone || c.contact.phone,
-          email: s.email || c.contact.email,
-          whatsapp: s.whatsapp || c.contact.whatsapp,
+          phone: match.contact?.phone ?? undefined,
+          email: match.contact?.email ?? undefined,
+          whatsapp: match.contact?.whatsapp ?? undefined,
+          line: match.contact?.line ?? undefined,
         },
         socials: {
-          ...c.socials,
-          instagram: s.instagram || c.socials.instagram,
-          website: s.website || c.socials.website,
+          instagram: match.socials?.instagram ?? undefined,
+          youtube: match.socials?.youtube ?? undefined,
+          linkedin: match.socials?.linkedin ?? undefined,
+          website: match.socials?.website ?? undefined,
         },
-      }));
-      if (s.template === 'light') setTheme('light');
-    } catch { /* ignore */ }
-  }, []);
+        accentColor: match.accentColor ?? '#f97316',
+        template: (match.template as CardData['template']) ?? 'dark',
+      });
+
+      if (match.template === 'light') setTheme('light');
+    }).catch(() => {});
+  }, [uid, slug]);
 
   const handleSaveContact = async () => {
     setIsSaving(true);
@@ -78,7 +86,7 @@ export default function CardPage() {
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      // silencieux — l'utilisateur verra que le téléchargement n'a pas eu lieu
+      // silencieux
     } finally {
       setIsSaving(false);
     }
@@ -96,7 +104,6 @@ export default function CardPage() {
     <div className={`bg-linear-to-br ${pageBg} min-h-screen w-full transition-colors duration-300 flex flex-col items-center`}>
       <div className="flex flex-col items-center w-full max-w-md px-4 py-8 gap-6">
 
-        {/* Header */}
         <div className="flex items-center gap-3 justify-center w-full">
           <h1 className={`text-xl font-bold bg-linear-to-r ${titleGradient} bg-clip-text text-transparent tracking-tight`}>
             Smart vCard
@@ -132,7 +139,6 @@ export default function CardPage() {
           isSaving={isSaving}
         />
 
-        {/* Watermark — visible plan Free uniquement */}
         <Watermark plan={card.template === 'dark' ? 'free' : 'pro'} />
       </div>
     </div>

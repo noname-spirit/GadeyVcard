@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { createUserWithEmailAndPassword, signInWithPopup, updateProfile } from 'firebase/auth';
 import { auth, googleProvider, getFirebaseAuthError } from '@/lib/firebase/auth';
 import Link from 'next/link';
-import { addUser } from '../../../firebase/add-user';
+import { addUser } from '@/lib/firebase/add-user';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -247,18 +247,18 @@ export default function RegisterPage() {
 
             <p className="text-xs text-zinc-600 text-center">
               En créant un compte, vous acceptez nos{' '}
-              <a href="/terms" className="text-zinc-500 hover:text-zinc-300 transition-colors underline">CGU</a>
+              <Link href="/terms" className="text-zinc-500 hover:text-zinc-300 transition-colors underline">CGU</Link>
               {' '}et notre{' '}
-              <a href="/privacy" className="text-zinc-500 hover:text-zinc-300 transition-colors underline">politique de confidentialité</a>.
+              <Link href="/privacy" className="text-zinc-500 hover:text-zinc-300 transition-colors underline">politique de confidentialité</Link>.
             </p>
           </form>
         </div>
 
         <p className="text-sm text-zinc-600">
           Déjà un compte ?{' '}
-          <a href="/login" className="text-orange-500 hover:text-orange-400 transition-colors font-medium">
+          <Link href="/login" className="text-orange-500 hover:text-orange-400 transition-colors font-medium">
             Se connecter
-          </a>
+          </Link>
         </p>
       </motion.div>
     </div>
