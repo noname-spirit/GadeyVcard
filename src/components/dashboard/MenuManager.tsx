@@ -1,9 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, GripVertical, ChevronDown } from 'lucide-react';
+import { Plus, Trash2, GripVertical, ChevronDown, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase/auth';
 import type { MenuItem } from '@/components/card/CardFrontRestaurant';
 
 const CATEGORIES = ['Entrées', 'Plats', 'Desserts', 'Boissons'];
@@ -151,6 +154,13 @@ function AddItemForm({ category, onAdd }: { category: string; onAdd: (item: Menu
 }
 
 export function MenuManager({ items, onChange }: MenuManagerProps) {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push('/');
+  };
+
   const toggle = (id: string) => {
     onChange(items.map((i) => i.id === id ? { ...i, available: !i.available } : i));
   };
@@ -179,9 +189,18 @@ export function MenuManager({ items, onChange }: MenuManagerProps) {
             Les toggles se reflètent en temps réel sur votre carte
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-zinc-500">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          Temps réel actif
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 text-xs text-zinc-500">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            Temps réel actif
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1.5 text-xs text-zinc-600 hover:text-red-400 transition-colors"
+          >
+            <LogOut size={13} />
+            Se déconnecter
+          </button>
         </div>
       </div>
 
