@@ -7,11 +7,11 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
 
-    // Un user connecté peut lire/écrire uniquement ses propres cartes
+    // Cartes — lecture publique, écriture/création par le propriétaire uniquement
     match /cards/{cardId} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == resource.data.uid;
       allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.uid;
     }
 
     // Leads — lecture/écriture par le propriétaire de la carte

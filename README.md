@@ -33,6 +33,13 @@
 - `next.config.ts` — ajout de `https://apis.google.com` et `https://accounts.google.com` dans `script-src` (popup Google Sign-in)
 - Suppression de `measurementId` dans les configs Firebase (évite l'erreur Analytics en SSR)
 
+#### Onboarding → Firestore
+- Création de `firebase/add-onboarding.js` — envoie les données du wizard dans la collection `cards`
+  - **`slugify(name)`** : génère un slug URL-safe depuis un nom (accents supprimés, espaces → tirets)
+  - **`addOnboarding(uid, data)`** : crée le document `cards/{slug}` avec toutes les données OnboardingData structurées (`contact`, `socials`, `template`, `accentColor`, timestamps)
+- `src/app/onboarding/page.tsx` — `handleComplete` appelle `addOnboarding(uid, data)` puis redirige vers `/dashboard`
+- `firestore.rules` — règle `cards` mise à jour : création autorisée si `request.auth.uid == request.resource.data.uid`
+
 ---
 
 Une Landing Page mobile-first ultra-moderne pour partager vos coordonnées de manière élégante et capturer les informations des personnes que vous rencontrez.
