@@ -157,11 +157,20 @@ export default function CardPage() {
             isSaving={isSaving}
           />
 
-          {card.plan === 'pro' && card.template === 'influencer' && (
-            <LeadCaptureFormInfluencer card={card} theme={theme} language={language} />
-          )}
-          {card.plan === 'pro' && card.template !== 'influencer' && (
-            <LeadCaptureForm card={card} theme={theme} language={language} />
+          {card.template === 'influencer' ? (
+            <LeadCaptureFormInfluencer
+              card={card}
+              theme={theme}
+              language={language}
+              locked={!card.plan}
+            />
+          ) : (
+            <LeadCaptureForm
+              card={card}
+              theme={theme}
+              language={language}
+              locked={!card.plan}
+            />
           )}
         </div>
 

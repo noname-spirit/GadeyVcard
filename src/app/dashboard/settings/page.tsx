@@ -19,6 +19,8 @@ import { Button } from "@/components/ui/Button";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { VCard } from "@/components/card";
 import { CardFrontInfluencer } from "@/components/card/CardFrontInfluencer";
+import { LeadCaptureForm } from "@/components/card/LeadCaptureForm";
+import { LeadCaptureFormInfluencer } from "@/components/card/LeadCaptureFormInfluencer";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase/auth";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
@@ -470,7 +472,7 @@ export default function SettingsPage() {
       <div className="xl:w-80 w-full flex flex-col gap-3 xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto xl:pb-4">
         <p className="text-xs text-zinc-500 uppercase tracking-wide font-medium">Aperçu en direct</p>
         {template === 'influencer' ? (
-          <div style={{ '--accent': accent } as React.CSSProperties}>
+          <div style={{ '--accent': accent } as React.CSSProperties} className="flex flex-col gap-2">
             <CardFrontInfluencer
               card={{
                 id: 'preview',
@@ -487,14 +489,28 @@ export default function SettingsPage() {
               language="fr"
               onSaveContact={() => {}}
             />
+            <LeadCaptureFormInfluencer
+              card={{ ...previewCard, template: 'influencer' }}
+              theme="dark"
+              language="fr"
+              locked
+            />
           </div>
         ) : (
-          <VCard
-            card={previewCard}
-            theme={template === 'light' ? 'light' : 'dark'}
-            language="fr"
-            onSaveContact={() => {}}
-          />
+          <div className="flex flex-col gap-2">
+            <VCard
+              card={previewCard}
+              theme={template === 'light' ? 'light' : 'dark'}
+              language="fr"
+              onSaveContact={() => {}}
+            />
+            <LeadCaptureForm
+              card={previewCard}
+              theme={template === 'light' ? 'light' : 'dark'}
+              language="fr"
+              locked
+            />
+          </div>
         )}
         <a
           href={`/${slug}`}
