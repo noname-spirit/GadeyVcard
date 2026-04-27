@@ -28,7 +28,7 @@ export default function RegisterPage() {
   const strengthLabel = ['', 'Faible', 'Moyen', 'Fort'];
   const strengthColor = ['', 'bg-rose-500', 'bg-orange-400', 'bg-emerald-400'];
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
