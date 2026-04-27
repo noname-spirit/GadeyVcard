@@ -70,13 +70,13 @@ export function VCard({ card, theme, language, onSaveContact, isSaving }: VCardP
       `}</style>
 
       <div className={`vcard-${card.id}`}>
-        {/* Flip container */}
-        <div className="relative w-full min-h-96">
+        {/* Flip container — min-h assez grand pour tout le contenu CardFront */}
+        <div className="relative w-full min-h-107.5">
           <motion.div
             animate={{ rotateY: isFlipped ? 180 : 0 }}
             transition={{ duration: 0.6, ease: 'easeInOut' }}
             style={{ transformStyle: 'preserve-3d', transformOrigin: 'center' }}
-            className="w-full h-full relative min-h-96"
+            className="w-full h-full relative min-h-107.5"
           >
             {/* Front */}
             <motion.div

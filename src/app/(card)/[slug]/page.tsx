@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { VCard } from '@/components/card';
 import { Watermark } from '@/components/card/Watermark';
+import { LeadCaptureForm } from '@/components/card/LeadCaptureForm';
+import { LeadCaptureFormInfluencer } from '@/components/card/LeadCaptureFormInfluencer';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 
 const BASE_CARD: CardData = {
@@ -21,13 +23,26 @@ const BASE_CARD: CardData = {
     phone: '+33 6 00 00 00 00',
     email: 'hello@noname-spirit.com',
     whatsapp: '+33600000000',
+    line: 'https://line.me/ti/p/~noname-spirit',
   },
   accentColor: '#f97316',
   template: 'dark',
   updatedAt: new Date().toISOString(),
+  plan: 'pro',
+  captureForm: {
+    title: 'Travaillons ensemble',
+    subtitle: 'Laissez vos coordonnées — je vous recontacte sous 24h',
+    ctaLabel: 'Envoyer mes coordonnées',
+  },
 };
 
 const LANGUAGES: CardLanguage[] = ['fr', 'en', 'th'];
+
+const PAGE_SUBTITLE: Record<CardLanguage, string> = {
+  fr: 'Scannez, enregistrez, restez en contact',
+  en: 'Scan, save, stay connected',
+  th: 'สแกน บันทึก และติดต่อกันได้เลย',
+};
 
 export default function CardPage() {
   const [card, setCard] = useState<CardData>(BASE_CARD);
@@ -105,7 +120,7 @@ export default function CardPage() {
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value as CardLanguage)}
-              className="px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-transparent border-none outline-none text-inherit"
+              className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide border-none outline-none ${dark ? 'bg-zinc-900 text-zinc-200' : 'bg-zinc-100 text-zinc-700'}`}
             >
               {LANGUAGES.map((l) => (
                 <option key={l} value={l}>{l.toUpperCase()}</option>
@@ -121,16 +136,26 @@ export default function CardPage() {
         </div>
 
         <p className={`text-sm ${subtitle} font-medium tracking-wide`}>
-          3 strategic tips delivered within 24h
+          {PAGE_SUBTITLE[language]}
         </p>
 
-        <VCard
-          card={card}
-          theme={theme}
-          language={language}
-          onSaveContact={handleSaveContact}
-          isSaving={isSaving}
-        />
+        {/* VCard + formulaire groupés avec le même écart que le bouton interne (mt-2) */}
+        <div className="flex flex-col w-full max-w-md gap-2">
+          <VCard
+            card={card}
+            theme={theme}
+            language={language}
+            onSaveContact={handleSaveContact}
+            isSaving={isSaving}
+          />
+
+          {card.plan === 'pro' && card.template === 'influencer' && (
+            <LeadCaptureFormInfluencer card={card} theme={theme} language={language} />
+          )}
+          {card.plan === 'pro' && card.template !== 'influencer' && (
+            <LeadCaptureForm card={card} theme={theme} language={language} />
+          )}
+        </div>
 
         {/* Watermark — visible plan Free uniquement */}
         <Watermark plan={card.template === 'dark' ? 'free' : 'pro'} />

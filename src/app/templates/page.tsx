@@ -74,8 +74,8 @@ const TEMPLATES = [
   { id: 'freelance-dark', label: 'Freelance — Dark', badge: 'Défaut', badgeColor: 'text-orange-400 bg-orange-500/10 border-orange-500/20' },
   { id: 'freelance-light', label: 'Freelance — Light', badge: 'Light', badgeColor: 'text-zinc-400 bg-zinc-800 border-zinc-700/40' },
   { id: 'freelance-color', label: 'Freelance — Color', badge: 'Accent perso', badgeColor: 'text-pink-400 bg-pink-500/10 border-pink-500/20' },
-  { id: 'restaurant', label: 'Restaurant', badge: 'Phase 2', badgeColor: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
-  { id: 'influencer', label: 'Influenceur', badge: 'Phase 4', badgeColor: 'text-purple-400 bg-purple-500/10 border-purple-500/20' },
+  { id: 'restaurant', label: 'Restaurant', badge: 'Pro', badgeColor: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
+  { id: 'influencer', label: 'Influenceur', badge: 'Pro', badgeColor: 'text-purple-400 bg-purple-500/10 border-purple-500/20' },
 ];
 
 export default function TemplatesPage() {
@@ -94,7 +94,7 @@ export default function TemplatesPage() {
         <a href="/" className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors">← Accueil</a>
       </div>
 
-      <div className="flex flex-1 flex-col lg:flex-row">
+      <div className="flex flex-1 min-h-0 flex-col lg:flex-row">
 
         {/* Sidebar — liste des templates */}
         <aside className="lg:w-72 border-b lg:border-b-0 lg:border-r border-zinc-800/60 p-4 flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible">
@@ -118,7 +118,7 @@ export default function TemplatesPage() {
         </aside>
 
         {/* Preview */}
-        <main className="flex-1 flex flex-col items-center justify-start p-8 gap-6 bg-zinc-950">
+        <main className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center justify-start p-6 gap-4 bg-zinc-950">
           <div className="flex items-center gap-3 self-start">
             <h2 className="text-lg font-semibold text-white">{current.label}</h2>
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${current.badgeColor}`}>
@@ -126,32 +126,40 @@ export default function TemplatesPage() {
             </span>
           </div>
 
-          <div className="w-full max-w-sm">
-            {active === 'freelance-dark' && (
-              <VCard card={FREELANCE_DARK} theme="dark" language="fr" onSaveContact={() => {}} />
-            )}
-            {active === 'freelance-light' && (
-              <VCard card={FREELANCE_LIGHT} theme="light" language="fr" onSaveContact={() => {}} />
-            )}
-            {active === 'freelance-color' && (
-              <VCard card={FREELANCE_COLOR} theme="dark" language="fr" onSaveContact={() => {}} />
-            )}
-            {active === 'restaurant' && (
-              <div
-                style={{ '--accent': RESTAURANT.accentColor || '#22c55e' } as React.CSSProperties}
-                className="w-full"
-              >
-                <CardFrontRestaurant card={RESTAURANT} theme="dark" language="fr" onSaveContact={() => {}} />
-              </div>
-            )}
-            {active === 'influencer' && (
-              <div
-                style={{ '--accent': INFLUENCER.accentColor || '#a855f7' } as React.CSSProperties}
-                className="w-full"
-              >
-                <CardFrontInfluencer card={INFLUENCER} theme="dark" language="fr" onSaveContact={() => {}} />
-              </div>
-            )}
+          {/* Wrapper reproduisant le contexte exact de /demo */}
+          <div className={[
+            'w-full rounded-2xl overflow-hidden py-8 flex flex-col items-center transition-colors duration-300',
+            active === 'freelance-light'
+              ? 'bg-linear-to-br from-zinc-50 via-white to-zinc-50'
+              : 'bg-linear-to-br from-zinc-950 via-black to-zinc-950',
+          ].join(' ')}>
+            <div className="w-full max-w-md px-4 flex flex-col items-center gap-2">
+              {active === 'freelance-dark' && (
+                <VCard card={FREELANCE_DARK} theme="dark" language="fr" onSaveContact={() => {}} />
+              )}
+              {active === 'freelance-light' && (
+                <VCard card={FREELANCE_LIGHT} theme="light" language="fr" onSaveContact={() => {}} />
+              )}
+              {active === 'freelance-color' && (
+                <VCard card={FREELANCE_COLOR} theme="dark" language="fr" onSaveContact={() => {}} />
+              )}
+              {active === 'restaurant' && (
+                <div
+                  style={{ '--accent': RESTAURANT.accentColor || '#22c55e' } as React.CSSProperties}
+                  className="w-full"
+                >
+                  <CardFrontRestaurant card={RESTAURANT} theme="dark" language="fr" onSaveContact={() => {}} />
+                </div>
+              )}
+              {active === 'influencer' && (
+                <div
+                  style={{ '--accent': INFLUENCER.accentColor || '#a855f7' } as React.CSSProperties}
+                  className="w-full"
+                >
+                  <CardFrontInfluencer card={INFLUENCER} theme="dark" language="fr" onSaveContact={() => {}} />
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Infos du template */}
@@ -166,13 +174,13 @@ export default function TemplatesPage() {
             {active === 'restaurant' && (
               <>
                 <p className="text-sm text-zinc-300">Photo hero · Menu par catégorie · Badge épuisé temps réel · Horaires · Adresse</p>
-                <p className="text-xs text-zinc-600">Statut épuisé mis à jour via Supabase Realtime (Phase 2 — G)</p>
+                <p className="text-xs text-zinc-600">Statut épuisé mis à jour en temps réel · Plan Pro</p>
               </>
             )}
             {active === 'influencer' && (
               <>
                 <p className="text-sm text-zinc-300">Cover photo · Stats (followers, engagement, collabs) · Liens réseaux · Media Kit PDF</p>
-                <p className="text-xs text-zinc-600">Phase 4 — Press kit et brand kit à connecter</p>
+                <p className="text-xs text-zinc-600">Press kit et brand kit · Plan Pro</p>
               </>
             )}
           </div>
