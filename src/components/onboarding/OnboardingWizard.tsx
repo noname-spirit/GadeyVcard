@@ -92,7 +92,7 @@ function Step1({ data, onChange }: { data: OnboardingData; onChange: (d: Partial
 function Step2({ data, onChange }: { data: OnboardingData; onChange: (d: Partial<OnboardingData>) => void }) {
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-zinc-400 text-sm">Boutons d'action sur votre carte. Laissez vide ce que vous ne souhaitez pas afficher.</p>
+      <p className="text-zinc-400 text-sm">Boutons d&apos;action sur votre carte. Laissez vide ce que vous ne souhaitez pas afficher.</p>
       <Field label="Téléphone" value={data.phone} onChange={(v) => onChange({ phone: v })} placeholder="+33 6 12 34 56 78" type="tel" />
       <Field label="Email" value={data.email} onChange={(v) => onChange({ email: v })} placeholder="vous@domaine.com" type="email" />
       <Field label="WhatsApp" value={data.whatsapp} onChange={(v) => onChange({ whatsapp: v })} placeholder="+33 6 12 34 56 78" />
@@ -143,7 +143,7 @@ function Step4({ data, onChange }: { data: OnboardingData; onChange: (d: Partial
       </div>
 
       <div className="flex flex-col gap-2">
-        <p className="text-sm text-zinc-400 font-medium">Couleur d'accent</p>
+        <p className="text-sm text-zinc-400 font-medium">Couleur d&apos;accent</p>
         <div className="flex items-center gap-3">
           <input
             type="color"

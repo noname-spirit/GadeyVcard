@@ -23,7 +23,7 @@ export default function PrivacyPage() {
             <p>
               Nous collectons uniquement les informations nécessaires au fonctionnement du service : adresse email,
               nom, et les informations que vous renseignez sur votre carte de visite. Ces données sont stockées
-              de manière sécurisée via Supabase.
+              de manière sécurisée.
             </p>
           </section>
 
