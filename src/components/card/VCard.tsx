@@ -1,6 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+
+const NOW_MS = Date.now();
+
 import { motion } from 'framer-motion';
 import { RotateCw } from 'lucide-react';
 import { CardFront } from './CardFront';
@@ -23,24 +26,23 @@ interface VCardProps {
 
 export function VCard({ card, theme, language, onSaveContact, isSaving }: VCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
-  const [qrUrl, setQrUrl] = useState('');
   const dark = theme === 'dark';
   const l = flipLabels[language];
   const accent = card.accentColor || '#f97316';
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setQrUrl(`${window.location.origin}/${card.slug}`);
-    }
-  }, [card.slug]);
+  const [qrUrl, setQrUrl] = useState('');
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setQrUrl(`${window.location.origin}/${card.slug}`); }, [card.slug]);
 
-  const freshnessBadge = (() => {
+  const freshnessBadge = useMemo(() => {
     if (!card.updatedAt) return null;
-    const days = Math.floor((Date.now() - new Date(card.updatedAt).getTime()) / (1000 * 60 * 60 * 24));
+    const d = new Date(card.updatedAt);
+    if (isNaN(d.getTime())) return null;
+    const days = Math.floor((NOW_MS - d.getTime()) / (1000 * 60 * 60 * 24));
     if (days <= 7) return { label: language === 'fr' ? 'à jour' : 'up to date', color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' };
     if (days <= 30) return { label: language === 'fr' ? 'récent' : 'recent', color: 'bg-orange-500/15 text-orange-400 border-orange-500/30' };
     return { label: language === 'fr' ? 'obsolète' : 'outdated', color: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30' };
-  })();
+  }, [card.updatedAt, language]);
 
   const flipBtn = dark
     ? 'text-zinc-400 hover:text-white border-zinc-800/40 hover:border-zinc-700/60 hover:bg-zinc-900/30'

@@ -1,5 +1,47 @@
 # 🎨 Vcard - Landing Page Premium
 
+---
+
+## 📋 Changelog
+
+### 22/04/2026
+
+#### Migration complète Supabase → Firebase Auth
+- Suppression de `src/lib/supabase/` (client.ts, server.ts) et retrait de toutes les références Supabase dans le code
+- Création de `src/lib/firebase/config.ts` — initialisation Firebase avec guard anti-re-init Next.js
+- Création de `src/lib/firebase/auth.ts` — instance Auth, GoogleAuthProvider, messages d'erreur en français
+- `/login` — connexion email/password + Google Sign-in (Firebase)
+- `/register` — création de compte + `updateProfile` + Google Sign-in (Firebase)
+- `/forgot-password` — réinitialisation mot de passe via `sendPasswordResetEmail`
+- `DashboardLayout` + `settings` — déconnexion via `signOut` Firebase
+- `middleware.ts` — nettoyé (code Supabase commenté supprimé)
+- `src/app/auth/callback/route.ts` — simplifié (redirect `/dashboard`)
+
+#### Système d'authentification global
+- Création de `src/lib/firebase/AuthProvider.tsx` — Context React avec `onAuthStateChanged`, exporte `useAuth()` donnant `{ user, uid, loading }`
+- Création de `src/components/ProtectedRoute.tsx` — redirige vers `/` si non connecté, spinner pendant le chargement
+- `src/app/layout.tsx` — `AuthProvider` enveloppe toute l'app (UID accessible partout)
+- Pages protégées : `DashboardLayout`, `/onboarding`, `/admin` enveloppés dans `ProtectedRoute`
+- Redirection post-login vers `/onboarding`
+
+#### Firestore — ajout utilisateur
+- Création de `firebase/add-user.js` — fonction `addUser(uid, { displayName, email })` qui crée/met à jour le document `users/{uid}` dans Firestore
+- `/register` — appel `addUser` après création de compte (email/password)
+- Création de `firestore.rules` — règles de sécurité : users lisent/écrivent leur propre doc, cards publiques en lecture, leads créables par tous
+
+#### Corrections CSP & Firebase
+- `next.config.ts` — ajout de `https://apis.google.com` et `https://accounts.google.com` dans `script-src` (popup Google Sign-in)
+- Suppression de `measurementId` dans les configs Firebase (évite l'erreur Analytics en SSR)
+
+#### Onboarding → Firestore
+- Création de `firebase/add-onboarding.js` — envoie les données du wizard dans la collection `cards`
+  - **`slugify(name)`** : génère un slug URL-safe depuis un nom (accents supprimés, espaces → tirets)
+  - **`addOnboarding(uid, data)`** : crée le document `cards/{slug}` avec toutes les données OnboardingData structurées (`contact`, `socials`, `template`, `accentColor`, timestamps)
+- `src/app/onboarding/page.tsx` — `handleComplete` appelle `addOnboarding(uid, data)` puis redirige vers `/dashboard`
+- `firestore.rules` — règle `cards` mise à jour : création autorisée si `request.auth.uid == request.resource.data.uid`
+
+---
+
 Une Landing Page mobile-first ultra-moderne pour partager vos coordonnées de manière élégante et capturer les informations des personnes que vous rencontrez.
 
 **Créée pour :** Designer & Stratège Marketing basé en Thaïlande  

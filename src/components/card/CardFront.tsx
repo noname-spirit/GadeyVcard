@@ -92,13 +92,20 @@ export function CardFront({ card, theme, language, isSaving, freshnessBadge, onS
             className="absolute inset-0 rounded-full blur-xl"
             style={{ background: 'color-mix(in srgb, var(--accent) 20%, transparent)' }}
           />
-          <Image
-            src={card.photo}
-            alt={card.name}
-            width={96}
-            height={96}
-            className="w-full h-full rounded-full object-cover relative z-10"
-          />
+          {card.photo ? (
+            <Image
+              src={card.photo}
+              alt={card.name}
+              width={96}
+              height={96}
+              unoptimized
+              className="w-full h-full rounded-full object-cover relative z-10"
+            />
+          ) : (
+            <div className="w-full h-full rounded-full relative z-10 flex items-center justify-center bg-zinc-800 text-white text-2xl font-bold">
+              {card.name.charAt(0).toUpperCase()}
+            </div>
+          )}
         </div>
       </motion.div>
 

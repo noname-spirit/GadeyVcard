@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Users, CreditCard, TrendingUp, Activity, Search, MoreHorizontal, Shield, Ban, Eye } from 'lucide-react';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { StatCard } from '@/components/dashboard/StatCard';
 
 const MOCK_STATS = [
@@ -39,6 +40,7 @@ export default function AdminPage() {
   );
 
   return (
+    <ProtectedRoute>
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex">
 
       {/* Sidebar */}
@@ -91,7 +93,7 @@ export default function AdminPage() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-white">Dashboard global</h2>
-            <p className="text-zinc-500 text-sm mt-0.5">Vue d'ensemble du SaaS</p>
+            <p className="text-zinc-500 text-sm mt-0.5">Vue d&apos;ensemble du SaaS</p>
           </div>
           <div className="flex items-center gap-2 text-xs text-zinc-500 bg-zinc-900 border border-zinc-800/60 rounded-xl px-3 py-2">
             <Activity size={12} className="text-emerald-400 animate-pulse" />
@@ -218,5 +220,6 @@ export default function AdminPage() {
 
       </main>
     </div>
+    </ProtectedRoute>
   );
 }

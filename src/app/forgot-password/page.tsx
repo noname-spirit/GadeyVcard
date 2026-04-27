@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { createClient } from '@/lib/supabase/client';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth, getFirebaseAuthError } from '@/lib/firebase/auth';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -11,19 +12,17 @@ export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    const supabase = createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard/settings`,
-    });
-    setLoading(false);
-    if (error) {
-      setError(error.message);
-    } else {
+    try {
+      await sendPasswordResetEmail(auth, email);
       setSent(true);
+    } catch (err) {
+      setError(getFirebaseAuthError(err));
+    } finally {
+      setLoading(false);
     }
   };
 

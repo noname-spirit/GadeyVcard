@@ -1,5 +1,5 @@
 # HANDOFF — K (Kevin)
-# Dernière mise à jour : 17/04/2026 — Auth Supabase + VCF + Schema + Fix Influencer
+# Dernière mise à jour : 22/04/2026 — Migration Firebase Auth complète
 
 ---
 
@@ -11,8 +11,8 @@
 
 ### Infrastructure
 - Branches créées : `main`, `dev`, `K/phase0`, `G/phase0`
-- Nettoyage complet : suppression Firebase, Neon, Vercel Postgres, JWT custom
 - Migration vers `src/` (app, components, hooks, lib, types, styles)
+- Auth Firebase : `src/lib/firebase/config.ts` + `src/lib/firebase/auth.ts`
 - 0 vulnérabilité npm — build propre ✓
 
 ### Design system
@@ -46,18 +46,29 @@
 | `/dashboard/settings` | 4 tabs : Profil, Liens, Design (preview live), Notifs |
 | `/dashboard/upgrade` | Plans + Stripe checkout summary |
 | `/pricing` | Page pricing publique |
-| `/login` | Auth Google + email/password |
-| `/register` | Inscription + barre force mot de passe |
+| `/login` | Auth Google + email/password (Firebase) |
+| `/register` | Inscription + barre force mot de passe (Firebase) |
+| `/forgot-password` | Réinitialisation mot de passe (Firebase) |
 | `/onboarding` | Wizard 5 étapes → slug, design, contact |
 | `/admin` | Super admin — MRR, plans, users table |
 | `/templates` | Showcase de tous les templates |
+
+### Auth Firebase (100% côté K)
+- `src/lib/firebase/config.ts` — initialisation app Firebase (guard re-init)
+- `src/lib/firebase/auth.ts` — instance auth, GoogleProvider, messages d'erreur FR
+- `/login` — email/password + Google Sign-in
+- `/register` — création compte + updateProfile + Google Sign-in
+- `/forgot-password` — sendPasswordResetEmail
+- `DashboardLayout` + `settings` — signOut Firebase
+- `middleware.ts` — pass-through (auth gérée côté client Firebase)
+- `src/app/auth/callback/route.ts` — redirect /dashboard (placeholder)
 
 ### Couleur accent dynamique
 - Injectée via `style={{ '--accent': card.accentColor }}` sur le wrapper VCard
 - Tous les éléments colorés utilisent `color-mix(in srgb, var(--accent) X%, ...)` en inline style
 - Les hover states utilisent un `<style>` scoped par `.vcard-${card.id}`
 
-### Bridge localStorage (temporaire, remplacer par Supabase)
+### Bridge localStorage (temporaire, remplacer par Firestore)
 - `dashboard/settings/page.tsx` → sauvegarde dans `localStorage('vcard_settings')` au clic "Sauvegarder"
 - `(card)/[slug]/page.tsx` → lit `localStorage('vcard_settings')` au mount
 
@@ -68,7 +79,7 @@
 ### 1. Route GET /api/cards/[slug]
 ```ts
 // Remplace le BASE_CARD mock dans src/app/(card)/[slug]/page.tsx
-// Retourne CardData depuis Supabase
+// Retourne CardData depuis Firestore
 ```
 
 ### 2. Route POST /api/cards
@@ -90,29 +101,22 @@
 ### 5. Route GET /api/cards/[slug]/vcf
 ```ts
 // handleSaveContact dans (card)/[slug]/page.tsx appelle cette route
-// Doit retourner un fichier .vcf
+// Doit retourner un fichier .vcf avec les vraies données Firestore
 ```
 
-### 6. Supabase Realtime — statut épuisé
+### 6. Realtime — statut épuisé
 ```ts
-// MenuManager.tsx a un toggle épuisé → doit mettre à jour la colonne menu_items.available
+// MenuManager.tsx a un toggle épuisé → doit mettre à jour menu_items.available
 // CardFrontRestaurant lit card.menu[] → doit se subscribre aux changements realtime
 ```
 
-### 7. Auth Supabase
-```ts
-// /login et /register sont UI-only pour l'instant
-// Brancher sur supabase.auth.signInWithOAuth({ provider: 'google' })
-// et supabase.auth.signInWithPassword()
-```
-
-### 8. Stripe
+### 7. Stripe
 ```ts
 // /dashboard/upgrade a le checkout summary UI
 // Brancher sur stripe.checkout.sessions.create()
 ```
 
-### 9. Supprimer le bridge localStorage
+### 8. Supprimer le bridge localStorage
 ```ts
 // Une fois GET /api/cards/[slug] opérationnel, supprimer le useEffect localStorage
 // dans src/app/(card)/[slug]/page.tsx
@@ -120,14 +124,13 @@
 
 ---
 
-## Stack attendue côté G
+## Stack
 
-- **DB** : Supabase (PostgreSQL)
-- **ORM** : Prisma
-- **Auth** : Supabase Auth (Google OAuth + email)
+- **Auth** : Firebase Auth (Google OAuth + email/password)
+- **DB** : Firebase Firestore (ou PostgreSQL — à confirmer avec G)
 - **Paiement** : Stripe
-- **Realtime** : Supabase Realtime (statut épuisé restaurant)
 - **VCF** : génération côté serveur Node.js
+- **Schema SQL** : `schema.sql` à la racine (référence structure tables)
 
 ---
 
@@ -149,37 +152,10 @@ G/phase0      → travail backend de G
 
 ---
 
-## Ce qui a été fait en session 17/04/2026
-
-### Auth Supabase (100% côté K)
-- `src/lib/supabase/client.ts` — client browser
-- `src/lib/supabase/server.ts` — client server (RSC/API routes)
-- `middleware.ts` — protection auto `/dashboard`, `/admin`, `/onboarding`
-- `src/app/auth/callback/route.ts` — échange code OAuth → session
-- `/login` et `/register` branchés sur `signInWithPassword`, `signUp`, `signInWithOAuth` (Google)
-- `.env.local.example` — template des variables d'env
-
-### VCF côté serveur
-- `src/app/api/cards/[slug]/vcf/route.ts` — génère `.vcf` propre, TODO Supabase marqué
-- Bouton "Sauvegarder le contact" sur `/[slug]` appelle la vraie route
-
-### Supabase Schema
-- `supabase/schema.sql` — tables `profiles`, `cards`, `leads`, `menu_items`
-- Triggers `updated_at` + `handle_new_user` (profil auto à l'inscription)
-- RLS complet sur toutes les tables
-
-### Fix template Influenceur
-- Stats labels localisés (FR/EN/TH)
-- Grid stats dynamique (s'adapte au nombre de stats disponibles)
-- Fix z-index photo : `relative z-10` sur le bloc — ne passe plus derrière la cover après animation
-- Ring photo neutre (`bg-zinc-950/80`) qui contraste avec la cover colorée
-
 ## Ce qui reste à faire
 
-- [ ] Créer le projet Supabase + coller `supabase/schema.sql` dans SQL Editor
-- [ ] Activer Google OAuth dans Supabase → Authentication → Providers
-- [ ] Remplir `.env.local` avec les vraies clés Supabase
+- [ ] Activer Email/Password et Google dans Firebase Console → Authentication → Sign-in methods
 - [ ] Brancher les vraies routes API (G)
 - [ ] Tester l'intégration end-to-end
-- [ ] Configurer les variables d'environnement Vercel (Supabase URL/key, Stripe key)
-- [ ] Supabase Realtime sur le toggle épuisé restaurant
+- [ ] Configurer les variables d'environnement Vercel (Firebase keys, Stripe key)
+- [ ] Realtime sur le toggle épuisé restaurant
