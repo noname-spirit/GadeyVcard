@@ -140,7 +140,12 @@ export default function SettingsPage() {
   const [accent, setAccent] = useState("#f97316");
   const [notifLead, setNotifLead] = useState(true);
   const [notifView, setNotifView] = useState(false);
- const [photo, setphoto] = useState("");
+  const [photo, setphoto] = useState("");
+
+  useEffect(() => {
+    const current = JSON.parse(localStorage.getItem('vcard_settings') || '{}');
+    localStorage.setItem('vcard_settings', JSON.stringify({ ...current, template, accent }));
+  }, [template, accent]);
   useEffect(() => {
     if (!uid) return;
     getCardsByUid(uid).then((cards) => {
@@ -190,9 +195,24 @@ export default function SettingsPage() {
     }
   };
 
+  const previewCard = {
+    id: 'preview',
+    slug: 'preview',
+    name,
+    title,
+    photo: '/noname-spirit.jpg',
+    socials: { instagram: instagram || undefined, website: website || undefined },
+    contact: { phone: phone || undefined, email: email || undefined, whatsapp: whatsapp || undefined },
+    accentColor: accent,
+    template,
+  };
+
   return (
     <DashboardLayout active="Paramètres">
-      <div className="max-w-2xl flex flex-col gap-6">
+      <div className="flex flex-col xl:flex-row gap-8 items-start">
+
+      {/* Colonne formulaire */}
+      <div className="flex-1 min-w-0 flex flex-col gap-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex flex-col gap-1">
@@ -359,128 +379,38 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {tab === "design" && (
-            <div className="flex flex-col lg:flex-row gap-6 items-start">
-              {/* Contrôles */}
-              <div className="flex flex-col gap-5 flex-1">
-                <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
-                  <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">
-                    Template
-                  </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {TEMPLATES.map((t) => (
-                      <button
-                        key={t.id}
-                        onClick={() =>
-                          t.pro
-                            ? router.push("/dashboard/upgrade")
-                            : setTemplate(t.id as typeof template)
-                        }
-                        className={[
-                          `relative h-20 rounded-xl bg-linear-to-br ${t.bg} border-2 transition-all flex flex-col items-start justify-end p-2.5 overflow-hidden`,
-                          !t.pro && template === t.id
-                            ? "border-orange-500 scale-105"
-                            : "border-transparent opacity-70 hover:opacity-100",
-                          t.pro ? "cursor-pointer" : "",
-                        ].join(" ")}
-                      >
-                        <span
-                          className={`text-xs font-semibold ${t.text} leading-tight`}
-                        >
-                          {t.label}
-                        </span>
-                        {t.pro && (
-                          <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-full px-2 py-0.5">
-                            <Lock size={9} className="text-amber-400" />
-                            <span className="text-[10px] font-bold text-amber-400">
-                              Pro
-                            </span>
-                          </div>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-3">
-                  <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">
-                    Couleur d&apos;accent
-                  </h3>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="color"
-                      value={accent}
-                      onChange={(e) => setAccent(e.target.value)}
-                      className="w-10 h-10 rounded-lg border border-zinc-700/40 bg-zinc-800 cursor-pointer"
-                    />
-                    <span className="text-zinc-400 text-sm font-mono">
-                      {accent}
-                    </span>
+          {tab === 'design' && (
+            <div className="flex flex-col gap-5">
+              <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
+                <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Template</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {TEMPLATES.map((t) => (
                     <button
-                      onClick={() => setAccent("#f97316")}
-                      className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+                      key={t.id}
+                      onClick={() => t.pro ? router.push('/dashboard/upgrade') : setTemplate(t.id as typeof template)}
+                      className={[
+                        `relative h-20 rounded-xl bg-linear-to-br ${t.bg} border-2 transition-all flex flex-col items-start justify-end p-2.5 overflow-hidden`,
+                        !t.pro && template === t.id ? 'border-orange-500 scale-105' : 'border-transparent opacity-70 hover:opacity-100',
+                        t.pro ? 'cursor-pointer' : '',
+                      ].join(' ')}
                     >
-                      Reset
+                      <span className={`text-xs font-semibold ${t.text} leading-tight`}>{t.label}</span>
+                      {t.pro && (
+                        <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-full px-2 py-0.5">
+                          <Lock size={9} className="text-amber-400" />
+                          <span className="text-[10px] font-bold text-amber-400">Pro</span>
+                        </div>
+                      )}
                     </button>
-                  </div>
+                  ))}
                 </div>
               </div>
-
-              {/* Preview live */}
-              <div className="flex flex-col gap-2 lg:w-72 w-full">
-                <p className="text-xs text-zinc-500 uppercase tracking-wide font-medium">
-                  Aperçu en direct
-                </p>
-                <div className="scale-90 origin-top">
-                  {template === "influencer" ? (
-                    <div style={{ "--accent": accent } as React.CSSProperties}>
-                      <CardFrontInfluencer
-                        card={{
-                          id: "preview",
-                          slug: "preview",
-                          name,
-                          handle: `@${slug || "votre-pseudo"}`,
-                          niche: title || "Votre niche · Lifestyle · Créatif",
-                          photo: "/noname-spirit.jpg",
-                          stats: {
-                            followers: "—",
-                            engagement: "—",
-                            collab: "—",
-                          },
-                          links: {
-                            instagram: instagram || undefined,
-                            website: website || undefined,
-                          },
-                          accentColor: accent,
-                        }}
-                        theme="dark"
-                        language="fr"
-                        onSaveContact={() => {}}
-                      />
-                    </div>
-                  ) : (
-                    <VCard
-                      card={{
-                        id: "preview",
-                        slug: "preview",
-                        name,
-                        title,
-                        photo: "/noname-spirit.jpg",
-                        socials: {
-                          instagram: instagram || undefined,
-                          website: website || undefined,
-                        },
-                        contact: {
-                          phone: phone || undefined,
-                          email: email || undefined,
-                        },
-                        accentColor: accent,
-                        template,
-                      }}
-                      theme={template === "light" ? "light" : "dark"}
-                      language="fr"
-                      onSaveContact={() => {}}
-                    />
-                  )}
+              <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-3">
+                <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Couleur d&apos;accent</h3>
+                <div className="flex items-center gap-3">
+                  <input type="color" value={accent} onChange={(e) => setAccent(e.target.value)} className="w-10 h-10 rounded-lg border border-zinc-700/40 bg-zinc-800 cursor-pointer" />
+                  <span className="text-zinc-400 text-sm font-mono">{accent}</span>
+                  <button onClick={() => setAccent('#f97316')} className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">Reset</button>
                 </div>
               </div>
             </div>
@@ -534,7 +464,49 @@ export default function SettingsPage() {
             </div>
           )}
         </motion.div>
+      </div>{/* fin colonne formulaire */}
+
+      {/* Colonne aperçu persistante */}
+      <div className="xl:w-80 w-full flex flex-col gap-3 xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto xl:pb-4">
+        <p className="text-xs text-zinc-500 uppercase tracking-wide font-medium">Aperçu en direct</p>
+        {template === 'influencer' ? (
+          <div style={{ '--accent': accent } as React.CSSProperties}>
+            <CardFrontInfluencer
+              card={{
+                id: 'preview',
+                slug: 'preview',
+                name,
+                handle: `@${slug || 'votre-pseudo'}`,
+                niche: title || 'Votre niche · Lifestyle · Créatif',
+                photo: '/noname-spirit.jpg',
+                stats: { followers: '—', engagement: '—', collab: '—' },
+                links: { instagram: instagram || undefined, website: website || undefined },
+                accentColor: accent,
+              }}
+              theme="dark"
+              language="fr"
+              onSaveContact={() => {}}
+            />
+          </div>
+        ) : (
+          <VCard
+            card={previewCard}
+            theme={template === 'light' ? 'light' : 'dark'}
+            language="fr"
+            onSaveContact={() => {}}
+          />
+        )}
+        <a
+          href={`/${slug}`}
+          target="_blank"
+          className="flex items-center justify-center gap-1.5 text-xs text-zinc-500 hover:text-orange-400 transition-colors py-2"
+        >
+          <ExternalLink size={11} />
+          Voir ma carte en ligne
+        </a>
       </div>
+
+      </div>{/* fin flex row */}
     </DashboardLayout>
   );
 }

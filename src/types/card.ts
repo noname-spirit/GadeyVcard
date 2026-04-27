@@ -14,6 +14,12 @@ export interface CardContact {
   line?: string;
 }
 
+export interface CardCaptureForm {
+  title?: string;       // ex: "Audit de Marque Gratuit"
+  subtitle?: string;    // ex: "3 conseils offerts sous 24h"
+  ctaLabel?: string;    // ex: "Recevoir mon audit" | "Envoyer mes infos"
+}
+
 export interface CardData {
   id: string;
   slug: string;           // URL : domain.com/slug
@@ -25,6 +31,8 @@ export interface CardData {
   accentColor?: string;   // couleur brand personnalisée (hex)
   template?: 'dark' | 'light' | 'color' | 'influencer';
   updatedAt?: string;
+  plan?: 'starter' | 'pro'; // détermine l'accès au formulaire de capture
+  captureForm?: CardCaptureForm;
 }
 
 export type CardTheme = 'dark' | 'light';
