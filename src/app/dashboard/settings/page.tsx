@@ -21,12 +21,9 @@ import { VCard } from "@/components/card";
 import { CardFrontInfluencer } from "@/components/card/CardFrontInfluencer";
 import { LeadCaptureForm } from "@/components/card/LeadCaptureForm";
 import { LeadCaptureFormInfluencer } from "@/components/card/LeadCaptureFormInfluencer";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase/auth";
-import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase/config";
-import { useAuth } from "@/lib/firebase/AuthProvider";
-import { getCardsByUid } from "@/lib/firebase/get-cards";
+import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/lib/supabase/AuthProvider";
+import { getCardsByUid, upsertCard } from "@/lib/supabase/cards";
 
 const TABS = [
   { id: "profile", label: "Profil", icon: User },
@@ -124,7 +121,8 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
 
   const handleLogout = async () => {
-    await signOut(auth);
+    const supabase = createClient();
+    await supabase.auth.signOut();
     router.push("/");
   };
 
@@ -162,32 +160,26 @@ export default function SettingsPage() {
       setInstagram(c.socials?.instagram ?? "");
       setWebsite(c.socials?.website ?? "");
       setTemplate((c.template as "dark" | "light" | "color" | "influencer") ?? "dark");
-      setAccent(c.accentColor ?? "#f97316");
+      setAccent(c.accent_color ?? "#f97316");
       setphoto(c.photo ?? "");
     }).catch(() => {});
   }, [uid]);
 
   const handleSave = async () => {
-    if (!slug) return;
+    if (!slug || !uid) return;
     setSaving(true);
     try {
-      await updateDoc(doc(db, 'cards', slug), {
+      await upsertCard(uid, {
+        slug,
         name,
         title,
-        contact: {
-          phone: phone || null,
-          email: email || null,
-          whatsapp: whatsapp || null,
-        },
-        socials: {
-          instagram: instagram || null,
-          website: website || null,
-        },
-        photo: photo || null,
+        photo: photo || undefined,
+        contact: { phone: phone || null, email: email || null, whatsapp: whatsapp || null },
+        socials: { instagram: instagram || null, website: website || null },
+        accent_color: accent,
         template,
-        accentColor: accent,
-        updatedAt: serverTimestamp(),
       });
+      localStorage.setItem('vcard_settings', JSON.stringify({ name, title, slug, phone, email, whatsapp, instagram, website, template, accent }));
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (e) {

@@ -8,8 +8,7 @@ import { Watermark } from '@/components/card/Watermark';
 import { LeadCaptureForm } from '@/components/card/LeadCaptureForm';
 import { LeadCaptureFormInfluencer } from '@/components/card/LeadCaptureFormInfluencer';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
-import { useAuth } from '@/lib/firebase/AuthProvider';
-import { getCardsByUid } from '@/lib/firebase/get-cards';
+import { getCardBySlug, supabaseCardToCardData } from '@/lib/supabase/cards';
 
 const BASE_CARD: CardData = {
   id: 'demo',
@@ -49,7 +48,6 @@ const PAGE_SUBTITLE: Record<CardLanguage, string> = {
 
 export default function CardPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { uid } = useAuth();
   const [card, setCard] = useState<CardData>(BASE_CARD);
   const [theme, setTheme] = useState<CardTheme>('dark');
   const [language, setLanguage] = useState<CardLanguage>('en');
@@ -57,38 +55,13 @@ export default function CardPage() {
   const dark = theme === 'dark';
 
   useEffect(() => {
-    if (!uid) return;
-    getCardsByUid(uid).then((cards) => {
-      const match = cards.find((c) => c.slug === slug) ?? cards[0];
+    if (!slug || slug === 'demo') return;
+    getCardBySlug(slug).then((match) => {
       if (!match) return;
-
-      setCard((c) => ({
-        ...c,
-        id: match.slug,
-        slug: match.slug,
-        name: match.name ?? c.name,
-        title: match.title ?? c.title,
-        photo: match.photo ?? c.photo,
-        contact: {
-          phone: match.contact?.phone ?? undefined,
-          email: match.contact?.email ?? undefined,
-          whatsapp: match.contact?.whatsapp ?? undefined,
-          line: match.contact?.line ?? undefined,
-        },
-        socials: {
-          instagram: match.socials?.instagram ?? undefined,
-          youtube: match.socials?.youtube ?? undefined,
-          linkedin: match.socials?.linkedin ?? undefined,
-          website: match.socials?.website ?? undefined,
-        },
-        accentColor: match.accentColor ?? c.accentColor,
-        template: (match.template as CardData['template']) ?? c.template,
-        plan: (match.plan as CardData['plan']) ?? undefined,
-      }));
-
+      setCard(supabaseCardToCardData(match));
       if (match.template === 'light') setTheme('light');
     }).catch(() => {});
-  }, [uid, slug]);
+  }, [slug]);
 
   const handleSaveContact = async () => {
     setIsSaving(true);
