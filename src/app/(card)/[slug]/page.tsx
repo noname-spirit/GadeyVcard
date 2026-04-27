@@ -83,6 +83,7 @@ export default function CardPage() {
         },
         accentColor: match.accentColor ?? c.accentColor,
         template: (match.template as CardData['template']) ?? c.template,
+        plan: (match.plan as CardData['plan']) ?? undefined,
       }));
 
       if (match.template === 'light') setTheme('light');

@@ -21,6 +21,7 @@ export interface CardData {
   photo: string | null;
   template: string;
   accentColor: string;
+  plan?: 'starter' | 'pro';
   createdAt: unknown;
   updatedAt: unknown;
 }
