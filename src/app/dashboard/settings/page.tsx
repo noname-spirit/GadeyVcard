@@ -207,6 +207,18 @@ export default function SettingsPage() {
     template,
   };
 
+  const previewCard = {
+    id: 'preview',
+    slug: 'preview',
+    name,
+    title,
+    photo: '/noname-spirit.jpg',
+    socials: { instagram: instagram || undefined, website: website || undefined },
+    contact: { phone: phone || undefined, email: email || undefined, whatsapp: whatsapp || undefined },
+    accentColor: accent,
+    template,
+  };
+
   return (
     <DashboardLayout active="Paramètres">
       <div className="flex flex-col xl:flex-row gap-8 items-start">
