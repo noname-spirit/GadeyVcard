@@ -1,19 +1,21 @@
 export interface Lead {
-    nom: string;
-    email: string;
-    telephone: string;
-    domaine: string;
-    note?: string;
-    lineLink?: string;
-    createdAt: string; // ISO date string
-    source: string;
+  id?: string;
+  card_slug: string;      // vCard propriétaire du formulaire
+  nom: string;
+  contact: string;        // WhatsApp, LINE ou Email — champ libre
+  telephone?: string;
+  domaine?: string;       // secteur d'activité
+  message?: string;
+  source: 'formulaire' | 'qr_code' | 'direct';
+  language?: 'fr' | 'en' | 'th';
+  created_at?: string;
 }
 
-// Exemple d'utilisation :
-// const newLead: Lead = {
-//   nom: "Jean Dupont",
-//   email: "jean.dupont@email.com",
-//   telephone: "+33612345678",
-//   createdAt: new Date().toISOString(),
-//   source: "formulaire"
-// };
+export interface LeadFormData {
+  nom: string;
+  contact: string;
+  telephone: string;
+  domaine: string;
+  domaineCustom: string;
+  message: string;
+}
