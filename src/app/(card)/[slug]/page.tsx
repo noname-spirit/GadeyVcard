@@ -62,12 +62,13 @@ export default function CardPage() {
       const match = cards.find((c) => c.slug === slug) ?? cards[0];
       if (!match) return;
 
-      setCard({
+      setCard((c) => ({
+        ...c,
         id: match.slug,
         slug: match.slug,
-        name: match.name ?? '',
-        title: match.title ?? '',
-        photo: match.photo ?? '',
+        name: match.name ?? c.name,
+        title: match.title ?? c.title,
+        photo: match.photo ?? c.photo,
         contact: {
           phone: match.contact?.phone ?? undefined,
           email: match.contact?.email ?? undefined,
@@ -80,9 +81,9 @@ export default function CardPage() {
           linkedin: match.socials?.linkedin ?? undefined,
           website: match.socials?.website ?? undefined,
         },
-        accentColor: match.accentColor ?? '#f97316',
-        template: (match.template as CardData['template']) ?? 'dark',
-      });
+        accentColor: match.accentColor ?? c.accentColor,
+        template: (match.template as CardData['template']) ?? c.template,
+      }));
 
       if (match.template === 'light') setTheme('light');
     }).catch(() => {});
