@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { VCard } from '@/components/card';
 import { CardFrontRestaurant } from '@/components/card/CardFrontRestaurant';
 import { CardFrontInfluencer } from '@/components/card/CardFrontInfluencer';
+import { LeadCaptureForm } from '@/components/card/LeadCaptureForm';
+import { LeadCaptureFormInfluencer } from '@/components/card/LeadCaptureFormInfluencer';
 import type { CardData } from '@/types/card';
 import type { RestaurantCardData } from '@/components/card/CardFrontRestaurant';
 import type { InfluencerCardData } from '@/components/card/CardFrontInfluencer';
@@ -13,13 +15,14 @@ import type { InfluencerCardData } from '@/components/card/CardFrontInfluencer';
 const FREELANCE_DARK: CardData = {
   id: 'freelance-dark',
   slug: 'kevin',
-  name: 'Kevin Durand',
-  title: 'Graphiste & Brand Designer',
+  name: 'Noname Spirit',
+  title: 'Graphiste Logo & Web | Branding',
   photo: '/noname-spirit.jpg',
   socials: { instagram: '#', linkedin: '#', website: '#' },
-  contact: { phone: '+33 6 00 00 00 00', email: 'kevin@studio.fr', whatsapp: '+33600000000' },
+  contact: { phone: '+33 6 00 00 00 00', email: 'hello@noname-spirit.com', whatsapp: '+33600000000' },
   accentColor: '#f97316',
   template: 'dark',
+  plan: 'pro',
   updatedAt: new Date().toISOString(),
 };
 
@@ -65,6 +68,20 @@ const INFLUENCER: InfluencerCardData = {
   stats: { followers: '128K', engagement: '4.2%', collab: '50+' },
   links: { instagram: '#', youtube: '#', website: '#', mediaKit: '#' },
   accentColor: '#a855f7',
+  updatedAt: new Date().toISOString(),
+};
+
+const INFLUENCER_CARD: CardData = {
+  id: 'influencer',
+  slug: 'emma-lifestyle',
+  name: 'Emma Moreau',
+  title: 'Lifestyle · Food · Voyage · Bien-être',
+  photo: '/noname-spirit.jpg',
+  socials: { instagram: '#', website: '#' },
+  contact: { email: 'emma@lifestyle.fr' },
+  accentColor: '#a855f7',
+  plan: 'pro',
+  template: 'influencer',
   updatedAt: new Date().toISOString(),
 };
 
@@ -158,6 +175,18 @@ export default function TemplatesPage() {
                 >
                   <CardFrontInfluencer card={INFLUENCER} theme="dark" language="fr" onSaveContact={() => {}} />
                 </div>
+              )}
+
+              {/* Formulaires — exactement comme /demo */}
+              {active === 'influencer' && (
+                <LeadCaptureFormInfluencer card={INFLUENCER_CARD} theme="dark" language="fr" />
+              )}
+              {active !== 'influencer' && active !== 'restaurant' && (
+                <LeadCaptureForm
+                  card={active === 'freelance-light' ? FREELANCE_LIGHT : active === 'freelance-color' ? FREELANCE_COLOR : FREELANCE_DARK}
+                  theme={active === 'freelance-light' ? 'light' : 'dark'}
+                  language="fr"
+                />
               )}
             </div>
           </div>

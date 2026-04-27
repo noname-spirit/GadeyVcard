@@ -2,11 +2,13 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { doc, getDoc } from 'firebase/firestore';
 import { FieldValue } from 'firebase-admin/firestore';
 import { db } from '@/lib/firebase/config';
-import { adminDb } from '@/lib/firebase/admin';
+import { getAdminDb } from '@/lib/firebase/admin';
+
+export const dynamic = 'force-dynamic';
 
 /** Raccourci pour écrire dans Firestore via Admin SDK (bypass règles de sécurité) */
 const adminSet = (slug: string, data: object) =>
-  adminDb.collection('cards').doc(slug).set({ ...data, vcfUpdatedAt: FieldValue.serverTimestamp() }, { merge: true });
+  getAdminDb().collection('cards').doc(slug).set({ ...data, vcfUpdatedAt: FieldValue.serverTimestamp() }, { merge: true });
 
 /**
  * Échappe les caractères spéciaux réservés par le format vCard 3.0.
