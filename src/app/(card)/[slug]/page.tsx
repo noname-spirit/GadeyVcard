@@ -121,7 +121,13 @@ export default function CardPage() {
     <div className={`bg-linear-to-br ${pageBg} min-h-screen w-full transition-colors duration-300 flex flex-col items-center`}>
       <div className="flex flex-col items-center w-full max-w-md px-4 py-8 gap-6">
 
-        <div className="flex items-center gap-3 justify-center w-full">
+        <div className="flex items-center gap-3 justify-center w-full relative">
+          <a
+            href="/"
+            className={`absolute left-0 text-xs font-medium transition-colors ${dark ? 'text-zinc-600 hover:text-zinc-300' : 'text-zinc-400 hover:text-zinc-700'}`}
+          >
+            ← Accueil
+          </a>
           <h1 className={`text-xl font-bold bg-linear-to-r ${titleGradient} bg-clip-text text-transparent tracking-tight`}>
             Smart vCard
           </h1>
