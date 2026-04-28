@@ -6,9 +6,8 @@ import Link from "next/link";
 import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
 import type { OnboardingData } from "@/components/onboarding/OnboardingWizard";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { useAuth } from "@/lib/firebase/AuthProvider";
-import { addOnboarding } from "@/lib/firebase/add-onboarding";
-import { getCardsByUid } from "@/lib/firebase/get-cards";
+import { useAuth } from "@/lib/supabase/AuthProvider";
+import { getCardsByUid, upsertCard } from "@/lib/supabase/cards";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -24,20 +23,36 @@ export default function OnboardingPage() {
     }).catch(() => setChecking(false));
   }, [uid, loading, router]);
 
-  /**
-   * Appelée quand l'utilisateur valide la dernière étape du wizard.
-   * Envoie les données de la carte dans Firestore puis redirige vers le dashboard.
-   *
-   * @param {OnboardingData} data - Données complètes saisies dans le wizard
-   */
   const handleComplete = async (data: OnboardingData) => {
     if (!uid) return;
 
-    // 1. Sauvegarde la carte dans Firestore et récupère le slug final
-    const slug = await addOnboarding(uid, data);
-    console.log("Carte créée avec le slug :", slug);
-    // 2. Appelle la route VCF pour générer et persister le .vcf dans le document Firestore
-    await fetch(`/api/cards/${slug}/vcf`);
+    const finalSlug = data.slug?.trim() || data.name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || uid;
+
+    await upsertCard(uid, {
+      slug: finalSlug,
+      name: data.name ?? '',
+      title: data.title ?? '',
+      photo: data.photo || undefined,
+      contact: {
+        phone: data.phone || null,
+        email: data.email || null,
+        whatsapp: data.whatsapp || null,
+        line: data.line || null,
+      },
+      socials: {
+        instagram: data.instagram || null,
+        youtube: data.youtube || null,
+        linkedin: data.linkedin || null,
+        website: data.website || null,
+      },
+      accent_color: data.accentColor ?? '#f97316',
+      template: data.template ?? 'dark',
+    });
 
     router.push("/dashboard");
   };

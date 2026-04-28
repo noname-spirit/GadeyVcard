@@ -5,13 +5,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { auth, googleProvider, getFirebaseAuthError } from '@/lib/firebase/auth';
+import { createClient } from '@/lib/supabase/client';
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get('redirect') || '/onboarding';
+  const redirect = searchParams.get('redirect') || '/dashboard';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,40 +22,30 @@ function LoginForm() {
   const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault();
     setError('');
-
-    if (!email.trim()) {
-      setError('Veuillez saisir votre email.');
-      return;
-    }
-    if (!password) {
-      setError('Veuillez saisir votre mot de passe.');
-      return;
-    }
+    if (!email.trim()) { setError('Veuillez saisir votre email.'); return; }
+    if (!password) { setError('Veuillez saisir votre mot de passe.'); return; }
 
     setLoading(true);
-
-    try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+    const supabase = createClient();
+    const { error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+    if (err) {
+      setError(err.message === 'Invalid login credentials' ? 'Email ou mot de passe incorrect.' : err.message);
+      setLoading(false);
+    } else {
       router.push(redirect);
       router.refresh();
-    } catch (err) {
-      setError(getFirebaseAuthError(err));
-      setLoading(false);
     }
   };
 
   const handleGoogle = async () => {
     setError('');
     setLoadingGoogle(true);
-
-    try {
-      await signInWithPopup(auth, googleProvider);
-      router.push(redirect);
-      router.refresh();
-    } catch (err) {
-      setError(getFirebaseAuthError(err));
-      setLoadingGoogle(false);
-    }
+    const supabase = createClient();
+    const { error: err } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=${redirect}` },
+    });
+    if (err) { setError(err.message); setLoadingGoogle(false); }
   };
 
   return (
@@ -89,47 +78,27 @@ function LoginForm() {
           <label className="text-sm text-zinc-400 font-medium">Email</label>
           <div className="relative">
             <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="vous@email.com"
-              required
-              className="w-full pl-9 pr-4 py-2.5 text-sm bg-zinc-800/60 border border-zinc-700/40 rounded-xl text-zinc-100 placeholder:text-zinc-500 outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all"
-            />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@email.com" required
+              className="w-full pl-9 pr-4 py-2.5 text-sm bg-zinc-800/60 border border-zinc-700/40 rounded-xl text-zinc-100 placeholder:text-zinc-500 outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all" />
           </div>
         </div>
 
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
             <label className="text-sm text-zinc-400 font-medium">Mot de passe</label>
-            <a href="/forgot-password" className="text-xs text-zinc-500 hover:text-orange-400 transition-colors">
-              Oublié ?
-            </a>
+            <a href="/forgot-password" className="text-xs text-zinc-500 hover:text-orange-400 transition-colors">Oublié ?</a>
           </div>
           <div className="relative">
             <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
-            <input
-              type={showPwd ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              className="w-full pl-9 pr-10 py-2.5 text-sm bg-zinc-800/60 border border-zinc-700/40 rounded-xl text-zinc-100 placeholder:text-zinc-500 outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPwd(!showPwd)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
-            >
+            <input type={showPwd ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required
+              className="w-full pl-9 pr-10 py-2.5 text-sm bg-zinc-800/60 border border-zinc-700/40 rounded-xl text-zinc-100 placeholder:text-zinc-500 outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition-all" />
+            <button type="button" onClick={() => setShowPwd(!showPwd)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors">
               {showPwd ? <EyeOff size={14} /> : <Eye size={14} />}
             </button>
           </div>
         </div>
 
-        <Button type="submit" loading={loading} className="w-full mt-1">
-          Se connecter
-        </Button>
+        <Button type="submit" loading={loading} className="w-full mt-1">Se connecter</Button>
       </form>
     </div>
   );
@@ -138,27 +107,17 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <div className="min-h-screen bg-linear-to-br from-zinc-950 via-black to-zinc-950 flex items-center justify-center px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-sm flex flex-col items-center gap-8"
-      >
+      <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm flex flex-col items-center gap-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold bg-linear-to-r from-white to-zinc-400 bg-clip-text text-transparent">
-            Smart vCard
-          </h1>
+          <h1 className="text-2xl font-bold bg-linear-to-r from-white to-zinc-400 bg-clip-text text-transparent">Smart vCard</h1>
           <p className="text-zinc-500 text-sm mt-1">Connectez-vous à votre espace</p>
         </div>
-
         <Suspense fallback={<div className="w-full h-48 bg-zinc-900 rounded-2xl animate-pulse" />}>
           <LoginForm />
         </Suspense>
-
         <p className="text-sm text-zinc-600">
           Pas encore de compte ?{' '}
-          <a href="/register" className="text-orange-500 hover:text-orange-400 transition-colors font-medium">
-            Créer un compte
-          </a>
+          <a href="/register" className="text-orange-500 hover:text-orange-400 transition-colors font-medium">Créer un compte</a>
         </p>
       </motion.div>
     </div>
