@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Briefcase, Check, AlertCircle } from 'lucide-react';
+import { Briefcase, Check, AlertCircle, Lock } from 'lucide-react';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 
 const COLLAB_TYPES = {
@@ -81,13 +81,20 @@ const EMPTY: CollabFormData = {
   nom: '', entreprise: '', typeCollab: '', budget: '', contact: '', message: '',
 };
 
+const lockedLabels = {
+  fr: { message: 'Disponible à partir du plan Starter', cta: 'Passer au plan Starter' },
+  en: { message: 'Available from the Starter plan', cta: 'Upgrade to Starter' },
+  th: { message: 'ใช้ได้ตั้งแต่แพ็คเกจ Starter', cta: 'อัปเกรดเป็น Starter' },
+};
+
 interface Props {
   card: CardData;
   theme: CardTheme;
   language: CardLanguage;
+  locked?: boolean;
 }
 
-export function LeadCaptureFormInfluencer({ card, theme, language }: Props) {
+export function LeadCaptureFormInfluencer({ card, theme, language, locked = false }: Props) {
   const [form, setForm] = useState<CollabFormData>(EMPTY);
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -160,6 +167,8 @@ export function LeadCaptureFormInfluencer({ card, theme, language }: Props) {
     }
   };
 
+  const ll = lockedLabels[language];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -168,8 +177,27 @@ export function LeadCaptureFormInfluencer({ card, theme, language }: Props) {
       className="w-full max-w-md"
     >
       <div
-        className={`relative bg-linear-to-br ${cardBg} rounded-3xl p-5 border backdrop-blur-2xl ${cardShadow} transition-colors duration-300`}
+        className={`relative bg-linear-to-br ${cardBg} rounded-3xl p-5 border backdrop-blur-2xl ${cardShadow} transition-colors duration-300 ${locked ? 'select-none' : ''}`}
       >
+        {/* Overlay plan locked */}
+        {locked && (
+          <div className="absolute inset-0 rounded-3xl z-10 flex flex-col items-center justify-center gap-3 backdrop-blur-sm bg-zinc-950/70">
+            <div className="flex flex-col items-center gap-2 px-6 text-center">
+              <div className="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700/60 flex items-center justify-center">
+                <Lock size={18} className="text-zinc-400" />
+              </div>
+              <p className="text-sm font-semibold text-zinc-200">{ll.message}</p>
+              <a
+                href="/dashboard/upgrade"
+                className="mt-1 px-4 py-2 rounded-xl text-xs font-bold text-white transition-all"
+                style={{ background: `linear-gradient(to right, ${accent}, color-mix(in srgb, ${accent} 75%, black))` }}
+              >
+                {ll.cta}
+              </a>
+            </div>
+          </div>
+        )}
+
         {/* Ligne décorative haut */}
         <div
           className="absolute top-0 left-12 right-12 h-px"
