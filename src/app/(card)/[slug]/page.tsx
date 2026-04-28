@@ -8,8 +8,7 @@ import { Watermark } from '@/components/card/Watermark';
 import { LeadCaptureForm } from '@/components/card/LeadCaptureForm';
 import { LeadCaptureFormInfluencer } from '@/components/card/LeadCaptureFormInfluencer';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
-import { useAuth } from '@/lib/firebase/AuthProvider';
-import { getCardsByUid } from '@/lib/firebase/get-cards';
+import { getCardBySlug, supabaseCardToCardData } from '@/lib/supabase/cards';
 
 const BASE_CARD: CardData = {
   id: 'demo',
@@ -49,7 +48,6 @@ const PAGE_SUBTITLE: Record<CardLanguage, string> = {
 
 export default function CardPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { uid } = useAuth();
   const [card, setCard] = useState<CardData>(BASE_CARD);
   const [theme, setTheme] = useState<CardTheme>('dark');
   const [language, setLanguage] = useState<CardLanguage>('en');
@@ -57,36 +55,13 @@ export default function CardPage() {
   const dark = theme === 'dark';
 
   useEffect(() => {
-    if (!uid) return;
-    getCardsByUid(uid).then((cards) => {
-      const match = cards.find((c) => c.slug === slug) ?? cards[0];
+    if (!slug || slug === 'demo') return;
+    getCardBySlug(slug).then((match) => {
       if (!match) return;
-
-      setCard({
-        id: match.slug,
-        slug: match.slug,
-        name: match.name ?? '',
-        title: match.title ?? '',
-        photo: match.photo ?? '',
-        contact: {
-          phone: match.contact?.phone ?? undefined,
-          email: match.contact?.email ?? undefined,
-          whatsapp: match.contact?.whatsapp ?? undefined,
-          line: match.contact?.line ?? undefined,
-        },
-        socials: {
-          instagram: match.socials?.instagram ?? undefined,
-          youtube: match.socials?.youtube ?? undefined,
-          linkedin: match.socials?.linkedin ?? undefined,
-          website: match.socials?.website ?? undefined,
-        },
-        accentColor: match.accentColor ?? '#f97316',
-        template: (match.template as CardData['template']) ?? 'dark',
-      });
-
+      setCard(supabaseCardToCardData(match));
       if (match.template === 'light') setTheme('light');
     }).catch(() => {});
-  }, [uid, slug]);
+  }, [slug]);
 
   const handleSaveContact = async () => {
     setIsSaving(true);
@@ -119,7 +94,13 @@ export default function CardPage() {
     <div className={`bg-linear-to-br ${pageBg} min-h-screen w-full transition-colors duration-300 flex flex-col items-center`}>
       <div className="flex flex-col items-center w-full max-w-md px-4 py-8 gap-6">
 
-        <div className="flex items-center gap-3 justify-center w-full">
+        <div className="flex items-center gap-3 justify-center w-full relative">
+          <a
+            href="/"
+            className={`absolute left-0 text-xs font-medium transition-colors ${dark ? 'text-zinc-600 hover:text-zinc-300' : 'text-zinc-400 hover:text-zinc-700'}`}
+          >
+            ← Accueil
+          </a>
           <h1 className={`text-xl font-bold bg-linear-to-r ${titleGradient} bg-clip-text text-transparent tracking-tight`}>
             Smart vCard
           </h1>
@@ -156,11 +137,20 @@ export default function CardPage() {
             isSaving={isSaving}
           />
 
-          {card.plan === 'pro' && card.template === 'influencer' && (
-            <LeadCaptureFormInfluencer card={card} theme={theme} language={language} />
-          )}
-          {card.plan === 'pro' && card.template !== 'influencer' && (
-            <LeadCaptureForm card={card} theme={theme} language={language} />
+          {card.template === 'influencer' ? (
+            <LeadCaptureFormInfluencer
+              card={card}
+              theme={theme}
+              language={language}
+              locked={!card.plan}
+            />
+          ) : (
+            <LeadCaptureForm
+              card={card}
+              theme={theme}
+              language={language}
+              locked={!card.plan}
+            />
           )}
         </div>
 
