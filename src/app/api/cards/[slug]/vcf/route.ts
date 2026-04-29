@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,7 +68,7 @@ export async function POST(
 
   const vcfContent = buildVcf({ name: body.name, title: body.title, email: body.email, phone: body.phone, website: body.website, slug });
 
-  const supabase = createAdminClient();
+  const supabase = createClient();
   await supabase.from('cards').update({ vcf: vcfContent }).eq('slug', slug);
 
   return NextResponse.json({ slug, vcf: vcfContent }, { status: 200 });
@@ -84,7 +84,7 @@ export async function GET(
     return NextResponse.json({ error: 'Slug invalide' }, { status: 400 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = createClient();
   const { data: card } = await supabase.from('cards').select('*').eq('slug', slug).single();
 
   if (!card) {
@@ -94,9 +94,9 @@ export async function GET(
   const vcfContent = buildVcf({
     name:    card.name ?? 'Smart vCard User',
     title:   card.title ?? undefined,
-    email:   card.contact?.email ?? undefined,
-    phone:   card.contact?.phone ?? undefined,
-    website: card.socials?.website ?? undefined,
+    email:   card.email ?? undefined,
+    phone:   card.phone ?? undefined,
+    website: card.website ?? undefined,
     slug,
   });
 
