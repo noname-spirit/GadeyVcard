@@ -189,15 +189,29 @@ function Step5({ data, onChange }: { data: OnboardingData; onChange: (d: Partial
 // ─── Wizard ──────────────────────────────────────────────────────────────────
 
 interface OnboardingWizardProps {
-  onComplete: (data: OnboardingData) => void;
+  onComplete: (data: OnboardingData) => Promise<void>;
 }
 
 export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<OnboardingData>(INITIAL_DATA);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const update = (partial: Partial<OnboardingData>) => setData((d) => ({ ...d, ...partial }));
-  const next = () => step < 5 ? setStep(step + 1) : onComplete(data);
+
+  const next = async () => {
+    if (step < 5) { setStep(step + 1); return; }
+    setSubmitError('');
+    setSubmitting(true);
+    try {
+      await onComplete(data);
+    } catch {
+      setSubmitError('Une erreur est survenue. Veuillez réessayer.');
+      setSubmitting(false);
+    }
+  };
+
   const prev = () => step > 1 && setStep(step - 1);
 
   const stepComponents: Record<number, React.ReactNode> = {
@@ -254,15 +268,18 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       </AnimatePresence>
 
       {/* Navigation */}
-      <div className="flex gap-3 mt-8">
+      {submitError && (
+        <p className="mt-4 text-sm text-rose-400 text-center">{submitError}</p>
+      )}
+      <div className="flex gap-3 mt-4">
         {step > 1 && (
-          <Button variant="outline" onClick={prev} className="flex items-center gap-2">
+          <Button variant="outline" onClick={prev} disabled={submitting} className="flex items-center gap-2">
             <ChevronLeft size={16} />
             Retour
           </Button>
         )}
-        <Button onClick={next} className="flex-1 flex items-center justify-center gap-2">
-          {step === 5 ? 'Créer ma carte' : 'Continuer'}
+        <Button onClick={next} loading={submitting} disabled={submitting} className="flex-1 flex items-center justify-center gap-2">
+          {step === 5 ? (submitting ? 'Création…' : 'Créer ma carte') : 'Continuer'}
           {step < 5 && <ChevronRight size={16} />}
         </Button>
       </div>

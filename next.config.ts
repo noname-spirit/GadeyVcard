@@ -11,13 +11,10 @@ const cspHeader = `
   base-uri 'self';
   form-action 'self';
   connect-src 'self'
-    https://identitytoolkit.googleapis.com
-    https://securetoken.googleapis.com
+    https://*.supabase.co
     https://accounts.google.com
-    https://*.firebaseio.com
-    https://firestore.googleapis.com
     https://api.stripe.com;
-  frame-src https://accounts.google.com https://*.firebaseapp.com https://js.stripe.com https://hooks.stripe.com;
+  frame-src https://accounts.google.com https://js.stripe.com https://hooks.stripe.com;
   frame-ancestors 'none';
   upgrade-insecure-requests;
 `;

@@ -17,8 +17,6 @@
     "@supabase/supabase-js": "^2.105.0",
     "@vercel/postgres": "^0.10.0",
     "bcryptjs": "^3.0.3",
-    "firebase": "^12.12.1",
-    "firebase-admin": "^13.8.0",
     "framer-motion": "^12.34.4",
     "html5-qrcode": "^2.3.8",
     "jsonwebtoken": "^9.0.3",
