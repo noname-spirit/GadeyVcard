@@ -69,6 +69,7 @@ create table if not exists public.leads (
   name        text not null,
   email       text,
   phone       text,
+  domain      text,
   message     text,
   created_at  timestamptz not null default now()
 );

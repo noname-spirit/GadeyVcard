@@ -154,11 +154,11 @@ export default function SettingsPage() {
       setName(c.name ?? "");
       setTitle(c.title ?? "");
       setSlug(c.slug ?? "");
-      setPhone(c.contact?.phone ?? "");
-      setEmail(c.contact?.email ?? "");
-      setWhatsapp(c.contact?.whatsapp ?? "");
-      setInstagram(c.socials?.instagram ?? "");
-      setWebsite(c.socials?.website ?? "");
+      setPhone(c.phone ?? "");
+      setEmail(c.email ?? "");
+      setWhatsapp(c.whatsapp ?? "");
+      setInstagram(c.instagram ?? "");
+      setWebsite(c.website ?? "");
       setTemplate((c.template as "dark" | "light" | "color" | "influencer") ?? "dark");
       setAccent(c.accent_color ?? "#f97316");
       setphoto(c.photo ?? "");
@@ -173,7 +173,7 @@ export default function SettingsPage() {
         slug,
         name,
         title,
-        photo: photo || undefined,
+        photo: photo || '',
         contact: { phone: phone || null, email: email || null, whatsapp: whatsapp || null },
         socials: { instagram: instagram || null, website: website || null },
         accent_color: accent,
@@ -194,7 +194,7 @@ export default function SettingsPage() {
     slug: 'preview',
     name,
     title,
-    photo: '/noname-spirit.jpg',
+    photo: photo || '',
     socials: { instagram: instagram || undefined, website: website || undefined },
     contact: { phone: phone || undefined, email: email || undefined, whatsapp: whatsapp || undefined },
     accentColor: accent,

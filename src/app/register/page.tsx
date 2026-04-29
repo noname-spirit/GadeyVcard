@@ -6,8 +6,11 @@ import { Mail, Lock, Eye, EyeOff, User, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { createProfile } from '@/lib/supabase/profile';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,7 +26,7 @@ export default function RegisterPage() {
   const strengthLabel = ['', 'Faible', 'Moyen', 'Fort'];
   const strengthColor = ['', 'bg-rose-500', 'bg-orange-400', 'bg-emerald-400'];
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     setError('');
     if (!name.trim()) { setError('Veuillez saisir votre nom complet.'); return; }
@@ -32,13 +35,17 @@ export default function RegisterPage() {
 
     setLoading(true);
     const supabase = createClient();
-    const { error: err } = await supabase.auth.signUp({
+    const { data, error: err } = await supabase.auth.signUp({
       email: email.trim(),
       password,
-      options: { data: { display_name: name.trim() } },
+      options: { data: { full_name: name.trim() } },
     });
-    if (err) { setError(err.message); setLoading(false); }
-    else setSuccess(true);
+    if (err) { setError(err.message); }
+    else {
+      if (data.user) await createProfile(data.user.id, name.trim());
+      setSuccess(true);
+    }
+    setLoading(false);
   };
 
   const handleGoogle = async () => {

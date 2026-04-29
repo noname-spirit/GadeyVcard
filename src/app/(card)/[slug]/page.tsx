@@ -9,6 +9,10 @@ import { LeadCaptureForm } from '@/components/card/LeadCaptureForm';
 import { LeadCaptureFormInfluencer } from '@/components/card/LeadCaptureFormInfluencer';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 import { getCardBySlug, supabaseCardToCardData } from '@/lib/supabase/cards';
+import { trackCardEvent } from '@/lib/supabase/events';
+import Link from 'next/link';
+import { useAuth } from '@/lib/supabase/AuthProvider';
+import { getProfile } from '@/lib/supabase/profile';
 
 const BASE_CARD: CardData = {
   id: 'demo',
@@ -52,15 +56,33 @@ export default function CardPage() {
   const [theme, setTheme] = useState<CardTheme>('dark');
   const [language, setLanguage] = useState<CardLanguage>('en');
   const [isSaving, setIsSaving] = useState(false);
+  const [cardLoading, setCardLoading] = useState(true);
   const dark = theme === 'dark';
+  const[plan, setPlan] = useState<CardData['plan']>(undefined);
 
   useEffect(() => {
-    if (!slug || slug === 'demo') return;
-    getCardBySlug(slug).then((match) => {
-      if (!match) return;
-      setCard(supabaseCardToCardData(match));
-      if (match.template === 'light') setTheme('light');
-    }).catch(() => {});
+
+    // if (!uid) { setCardLoading(false); return; }
+    const formatName = (str : string) =>
+  decodeURIComponent(str).toLowerCase().replace(/\s+/g, '-');
+    const slugFomatted = formatName(slug);
+    console.log(slugFomatted, "slug formatted");
+
+
+    Promise.all([
+      getCardBySlug(slugFomatted),
+      getProfile(),
+    ]).then(([match, profile]) => {
+      if (match) {
+        setCard(supabaseCardToCardData(match));
+        setTheme(match.template === 'light' ? 'light' : 'dark');
+        trackCardEvent(match.id, 'view');
+      }
+      if (profile) {
+        setPlan(profile.plan as CardData['plan'] || undefined);
+      }
+    }).finally(() => setCardLoading(false));
+      
   }, [slug]);
 
   const handleSaveContact = async () => {
@@ -90,17 +112,25 @@ export default function CardPage() {
     ? 'bg-zinc-900/60 border-zinc-800/40 text-zinc-400 hover:text-orange-400'
     : 'bg-zinc-100/80 border-zinc-300/40 text-zinc-500 hover:text-orange-500';
 
+  if (cardLoading) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <div className="w-6 h-6 rounded-full border-2 border-orange-500 border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className={`bg-linear-to-br ${pageBg} min-h-screen w-full transition-colors duration-300 flex flex-col items-center`}>
       <div className="flex flex-col items-center w-full max-w-md px-4 py-8 gap-6">
 
         <div className="flex items-center gap-3 justify-center w-full relative">
-          <a
-            href="/"
+          <Link
+            href="/dashboard"
             className={`absolute left-0 text-xs font-medium transition-colors ${dark ? 'text-zinc-600 hover:text-zinc-300' : 'text-zinc-400 hover:text-zinc-700'}`}
           >
             ← Accueil
-          </a>
+          </Link>
           <h1 className={`text-xl font-bold bg-linear-to-r ${titleGradient} bg-clip-text text-transparent tracking-tight`}>
             Smart vCard
           </h1>
@@ -149,7 +179,7 @@ export default function CardPage() {
               card={card}
               theme={theme}
               language={language}
-              locked={!card.plan}
+              locked={plan === 'free' ? true : false}
             />
           )}
         </div>
