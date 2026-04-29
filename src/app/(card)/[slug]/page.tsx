@@ -8,7 +8,8 @@ import { Watermark } from '@/components/card/Watermark';
 import { LeadCaptureForm } from '@/components/card/LeadCaptureForm';
 import { LeadCaptureFormInfluencer } from '@/components/card/LeadCaptureFormInfluencer';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
-import { getCardBySlug, getCardsByUid, supabaseCardToCardData, SupabaseCard } from '@/lib/supabase/cards';
+import { getCardBySlug, supabaseCardToCardData } from '@/lib/supabase/cards';
+import { trackCardEvent } from '@/lib/supabase/events';
 import Link from 'next/link';
 import { useAuth } from '@/lib/supabase/AuthProvider';
 import { getProfile } from '@/lib/supabase/profile';
@@ -68,24 +69,19 @@ export default function CardPage() {
     console.log(slugFomatted, "slug formatted");
 
 
-    getCardBySlug(slugFomatted)
-      .then((card: SupabaseCard | null) => {
-        console.log(card, "card");
-        const match = card;
-        if (match) {
-          setCard(supabaseCardToCardData(match));
-          setTheme(match.template === 'light' ? 'light' : 'dark');
-        }
-      })
-      // .catch(() => {})
-      // .finally(() => );
-     
-     getProfile().then((profile) => {
+    Promise.all([
+      getCardBySlug(slugFomatted),
+      getProfile(),
+    ]).then(([match, profile]) => {
+      if (match) {
+        setCard(supabaseCardToCardData(match));
+        setTheme(match.template === 'light' ? 'light' : 'dark');
+        trackCardEvent(match.id, 'view');
+      }
       if (profile) {
-         setPlan(profile.plan as CardData['plan'] || undefined);
-      } else {
-        console.log("No profile found");
-      } }).finally(() => setCardLoading(false));
+        setPlan(profile.plan as CardData['plan'] || undefined);
+      }
+    }).finally(() => setCardLoading(false));
       
   }, [slug]);
 

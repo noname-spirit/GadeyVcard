@@ -10,8 +10,8 @@ import type { LeadRow } from '@/components/dashboard/LeadsTable';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/lib/supabase/AuthProvider';
 import { getCardsByUid } from '@/lib/supabase/cards';
-import { getLeadsByCardId } from '@/lib/supabase/leads';
-import { Card } from '@/components/ui';
+import { getLeadsByCardId, deleteLead } from '@/lib/supabase/leads';
+import { getCardStats } from '@/lib/supabase/events';
 
 const MOCK_STATS_BASE = [
   { label: 'Vues totales', value: '1 284', sub: '30 derniers jours', icon: Eye, trend: { value: 12, label: 'vs mois dernier' } },
@@ -30,26 +30,24 @@ export default function DashboardPage() {
   const router = useRouter();
   const [name,setName] = useState('');
 
-  const [slug] = useState(() => {
-    if (typeof window === 'undefined') return 'demo';
-    try {
-      const stored = localStorage.getItem('vcard_settings');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.slug || 'demo';
-      }
-    } catch { /* ignore */ }
-    return 'demo';
-  });
+  const [slug,setslug] = useState('demo');
 
   const [leads, setLeads] = useState<LeadRow[]>(MOCK_LEADS);
+  const [views, setViews] = useState(0);
+  const [clicks, setClicks] = useState(0);
 
   useEffect(() => {
     if (!uid) return;
     getCardsByUid(uid).then(async (cards) => {
       if (cards.length === 0) return;
-      const dbLeads = await getLeadsByCardId(cards[0].id);
+      setslug(cards[0].slug);
       setName(cards[0].name);
+      const [dbLeads, stats] = await Promise.all([
+        getLeadsByCardId(cards[0].id),
+        getCardStats(cards[0].id),
+      ]);
+      setViews(stats.views);
+      setClicks(stats.clicks);
       if (dbLeads.length > 0) {
         setLeads(dbLeads.map((l) => ({
           id: l.id ?? crypto.randomUUID(),
@@ -65,7 +63,10 @@ export default function DashboardPage() {
     }).catch(() => {});
   }, [uid]);
 
-  const handleDelete = (id: string) => console.log('Delete lead:', id);
+  const handleDelete = async (id: string) => {
+    await deleteLead(id);
+    setLeads((prev) => prev.filter((l) => l.id !== id));
+  };
 
   const handleExport = () => {
     const csv = ['Nom,Email,Téléphone,Message,Domaine,Source,Date',
@@ -103,7 +104,8 @@ export default function DashboardPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 lg:gap-4">
           {[
-            ...MOCK_STATS_BASE.slice(0, 2),
+            { label: 'Vues totales', value: String(views), sub: 'Toutes les visites', icon: Eye, trend: { value: 0, label: '' } },
+            { label: 'Clics liens', value: String(clicks), sub: 'Instagram, Site, WhatsApp…', icon: MousePointer, trend: { value: 0, label: '' } },
             { label: 'Leads captés', value: String(leads.length), sub: 'Formulaire + QR code', icon: Users, trend: { value: 0, label: '' } },
             ...MOCK_STATS_BASE.slice(2),
           ].map((s) => (
