@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, MousePointer, Users, TrendingUp, ExternalLink, Settings } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
@@ -8,11 +8,14 @@ import { LeadsTable } from '@/components/dashboard/LeadsTable';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import type { LeadRow } from '@/components/dashboard/LeadsTable';
 import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/lib/supabase/AuthProvider';
+import { getCardsByUid } from '@/lib/supabase/cards';
+import { getLeadsByCardId } from '@/lib/supabase/leads';
+import { Card } from '@/components/ui';
 
-const MOCK_STATS = [
+const MOCK_STATS_BASE = [
   { label: 'Vues totales', value: '1 284', sub: '30 derniers jours', icon: Eye, trend: { value: 12, label: 'vs mois dernier' } },
   { label: 'Clics liens', value: '347', sub: 'Instagram, Site, WhatsApp', icon: MousePointer, trend: { value: 8, label: 'vs mois dernier' } },
-  { label: 'Leads captés', value: '42', sub: 'Formulaire + QR code', icon: Users, trend: { value: 24, label: 'vs mois dernier' } },
   { label: 'Taux conversion', value: '3.2%', sub: 'Vues → Leads', icon: TrendingUp, trend: { value: -2, label: 'vs mois dernier' } },
 ];
 
@@ -23,6 +26,10 @@ const MOCK_LEADS: LeadRow[] = [
 ];
 
 export default function DashboardPage() {
+  const { uid } = useAuth();
+  const router = useRouter();
+  const [name,setName] = useState('');
+
   const [slug] = useState(() => {
     if (typeof window === 'undefined') return 'demo';
     try {
@@ -35,12 +42,34 @@ export default function DashboardPage() {
     return 'demo';
   });
 
-  const router = useRouter();
+  const [leads, setLeads] = useState<LeadRow[]>(MOCK_LEADS);
+
+  useEffect(() => {
+    if (!uid) return;
+    getCardsByUid(uid).then(async (cards) => {
+      if (cards.length === 0) return;
+      const dbLeads = await getLeadsByCardId(cards[0].id);
+      setName(cards[0].name);
+      if (dbLeads.length > 0) {
+        setLeads(dbLeads.map((l) => ({
+          id: l.id ?? crypto.randomUUID(),
+          nom: l.name,
+          email: l.email ?? '',
+          telephone: l.phone ?? undefined,
+          message: l.message ?? undefined,
+          domaine: l.domain ?? '',
+          source: 'formulaire',
+          createdAt: l.created_at ?? '',
+        })));
+      }
+    }).catch(() => {});
+  }, [uid]);
+
   const handleDelete = (id: string) => console.log('Delete lead:', id);
 
   const handleExport = () => {
-    const csv = ['Nom,Email,Téléphone,Domaine,Source,Date',
-      ...MOCK_LEADS.map((l) => `${l.nom},${l.email},${l.telephone || ''},${l.domaine},${l.source},${l.createdAt}`),
+    const csv = ['Nom,Email,Téléphone,Message,Domaine,Source,Date',
+      ...leads.map((l) => `${l.nom},${l.email},${l.telephone || ''},${l.message || ''},${l.domaine},${l.source},${l.createdAt}`),
     ].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -57,7 +86,7 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 className="text-xl lg:text-2xl font-bold text-white">Aperçu</h2>
-            <p className="text-zinc-500 text-sm mt-0.5">Bienvenue, Noname Spirit</p>
+            <p className="text-zinc-500 text-sm mt-0.5">Bienvenue, {name}</p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => window.open(`/${slug}`, '_blank')}>
@@ -73,7 +102,11 @@ export default function DashboardPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 lg:gap-4">
-          {MOCK_STATS.map((s) => (
+          {[
+            ...MOCK_STATS_BASE.slice(0, 2),
+            { label: 'Leads captés', value: String(leads.length), sub: 'Formulaire + QR code', icon: Users, trend: { value: 0, label: '' } },
+            ...MOCK_STATS_BASE.slice(2),
+          ].map((s) => (
             <StatCard key={s.label} {...s} />
           ))}
         </div>
@@ -82,9 +115,9 @@ export default function DashboardPage() {
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h3 className="text-base lg:text-lg font-semibold text-white">Leads récents</h3>
-            <span className="text-xs text-zinc-500">{MOCK_LEADS.length} contacts</span>
+            <span className="text-xs text-zinc-500">{leads.length} contacts</span>
           </div>
-          <LeadsTable leads={MOCK_LEADS} onDelete={handleDelete} onExport={handleExport} />
+          <LeadsTable leads={leads} onDelete={handleDelete} onExport={handleExport} />
         </div>
 
       </div>

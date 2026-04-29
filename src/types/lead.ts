@@ -1,13 +1,11 @@
 export interface Lead {
   id?: string;
-  card_slug: string;      // vCard propriétaire du formulaire
-  nom: string;
-  contact: string;        // WhatsApp, LINE ou Email — champ libre
-  telephone?: string;
-  domaine?: string;       // secteur d'activité
+  card_id: string;     // UUID FK → cards.id
+  name: string;
+  email?: string;
+  phone?: string;
+  domain?: string;
   message?: string;
-  source: 'formulaire' | 'qr_code' | 'direct';
-  language?: 'fr' | 'en' | 'th';
   created_at?: string;
 }
 

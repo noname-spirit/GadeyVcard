@@ -6,11 +6,12 @@ import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { createClient } from '@/lib/supabase/client';
+import { getCardsByUid } from '@/lib/supabase/cards';
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get('redirect') || '/dashboard';
+  const explicitRedirect = searchParams.get('redirect');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,6 +19,12 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [error, setError] = useState('');
+
+  const resolveDestination = async (uid: string): Promise<string> => {
+    if (explicitRedirect) return explicitRedirect;
+    const cards = await getCardsByUid(uid);
+    return cards.length > 0 ? '/dashboard' : '/onboarding';
+  };
 
   const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault();
@@ -27,12 +34,13 @@ function LoginForm() {
 
     setLoading(true);
     const supabase = createClient();
-    const { error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+    const { data, error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     if (err) {
       setError(err.message === 'Invalid login credentials' ? 'Email ou mot de passe incorrect.' : err.message);
       setLoading(false);
     } else {
-      router.push(redirect);
+      const dest = await resolveDestination(data.user.id);
+      router.push(dest);
       router.refresh();
     }
   };
@@ -43,7 +51,7 @@ function LoginForm() {
     const supabase = createClient();
     const { error: err } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=${redirect}` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=smart` },
     });
     if (err) { setError(err.message); setLoadingGoogle(false); }
   };

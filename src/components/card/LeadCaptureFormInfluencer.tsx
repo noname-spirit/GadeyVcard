@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Briefcase, Check, AlertCircle, Lock } from 'lucide-react';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
+import Link from 'next/link';
 
 const COLLAB_TYPES = {
   fr: ['Sponsored post', 'Reels sponsorisé', 'Story', 'Événement', 'Ambassadeur', 'Gifting', 'Autre'],
@@ -142,13 +143,11 @@ export function LeadCaptureFormInfluencer({ card, theme, language, locked = fals
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          card_slug: card.slug,
+          card_id: card.id,
           nom: `${form.nom} — ${form.entreprise}`,
           contact: form.contact,
           domaine: form.typeCollab || 'Collaboration',
           message,
-          source: 'formulaire',
-          language,
         }),
       });
 
@@ -187,13 +186,14 @@ export function LeadCaptureFormInfluencer({ card, theme, language, locked = fals
                 <Lock size={18} className="text-zinc-400" />
               </div>
               <p className="text-sm font-semibold text-zinc-200">{ll.message}</p>
-              <a
+              <Link
+
                 href="/dashboard/upgrade"
                 className="mt-1 px-4 py-2 rounded-xl text-xs font-bold text-white transition-all"
                 style={{ background: `linear-gradient(to right, ${accent}, color-mix(in srgb, ${accent} 75%, black))` }}
               >
                 {ll.cta}
-              </a>
+              </Link>
             </div>
           </div>
         )}

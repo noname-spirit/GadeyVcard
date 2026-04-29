@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Check, AlertCircle, ScanLine, X, Lock } from 'lucide-react';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 import type { LeadFormData } from '@/types/lead';
+import Link from 'next/link';
 
 const SECTEURS = [
   'Café', 'Villa', 'E-commerce', 'Marketing', 'Coaching',
@@ -209,16 +210,14 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
           setScannerReady(false);
 
           const parsed = parseQrPayload(decodedText);
-
+               console.log(parsed, "parsed QR data");
           try {
             await fetch('/api/leads', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                card_slug: card.slug,
+                card_id: card.id,
                 ...parsed,
-                source: 'qr_code',
-                language,
               }),
             });
             showFeedback('success', l.successScan);
@@ -248,19 +247,17 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
     setIsLoading(true);
     try {
       const domaineValue = form.domaine === 'Autre' ? form.domaineCustom : form.domaine;
-
+      console.log(form, domaineValue, "form submit");
       const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          card_slug: card.slug,
+          card_id: card.id,
           nom: form.nom,
           contact: form.contact,
           telephone: form.telephone,
-          domaine: domaineValue,
+          domaine: form.domaine,
           message: form.message,
-          source: 'formulaire',
-          language,
         }),
       });
 
@@ -304,13 +301,13 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
                 <Lock size={18} className="text-zinc-400" />
               </div>
               <p className="text-sm font-semibold text-zinc-200">{ll.message}</p>
-              <a
+              <Link
                 href="/dashboard/upgrade"
                 className="mt-1 px-4 py-2 rounded-xl text-xs font-bold text-white transition-all"
                 style={{ background: `linear-gradient(to right, ${accent}, color-mix(in srgb, ${accent} 75%, black))` }}
               >
                 {ll.cta}
-              </a>
+              </Link>
             </div>
           </div>
         )}

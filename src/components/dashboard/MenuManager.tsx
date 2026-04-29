@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Trash2, GripVertical, ChevronDown, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase/auth';
+import { createClient } from '@/lib/supabase/client';
 import type { MenuItem } from '@/components/card/CardFrontRestaurant';
 
 const CATEGORIES = ['Entrées', 'Plats', 'Desserts', 'Boissons'];
@@ -157,7 +156,8 @@ export function MenuManager({ items, onChange }: MenuManagerProps) {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await signOut(auth);
+    const supabase = createClient();
+    await supabase.auth.signOut();
     router.push('/');
   };
 

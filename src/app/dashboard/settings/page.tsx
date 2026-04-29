@@ -154,11 +154,11 @@ export default function SettingsPage() {
       setName(c.name ?? "");
       setTitle(c.title ?? "");
       setSlug(c.slug ?? "");
-      setPhone(c.contact?.phone ?? "");
-      setEmail(c.contact?.email ?? "");
-      setWhatsapp(c.contact?.whatsapp ?? "");
-      setInstagram(c.socials?.instagram ?? "");
-      setWebsite(c.socials?.website ?? "");
+      setPhone(c.phone ?? "");
+      setEmail(c.email ?? "");
+      setWhatsapp(c.whatsapp ?? "");
+      setInstagram(c.instagram ?? "");
+      setWebsite(c.website ?? "");
       setTemplate((c.template as "dark" | "light" | "color" | "influencer") ?? "dark");
       setAccent(c.accent_color ?? "#f97316");
       setphoto(c.photo ?? "");
