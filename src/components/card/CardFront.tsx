@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Download, Instagram, Youtube, Globe, Linkedin, Phone, Mail, MessageCircle } from 'lucide-react';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
+import { trackCardEvent, type LinkType } from '@/lib/supabase/events';
 
 const LINE_ICON = (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -30,6 +31,8 @@ interface CardFrontProps {
 export function CardFront({ card, theme, language, isSaving, freshnessBadge, onSaveContact }: CardFrontProps) {
   const dark = theme === 'dark';
   const l = labels[language];
+
+  const track = (linkType: LinkType) => trackCardEvent(card.id, linkType);
 
   const cardBg = dark
     ? 'from-zinc-900 via-zinc-900/95 to-black border-zinc-800/60'
@@ -145,8 +148,10 @@ export function CardFront({ card, theme, language, isSaving, freshnessBadge, onS
             <motion.a
               key={s.label}
               href={s.href}
+              data-name={s.label.toLowerCase()}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => track(s.label.toLowerCase() as LinkType)}
               whileHover={{ scale: 1.15, y: -3 }}
               whileTap={{ scale: 0.95 }}
               className={`p-1.5 rounded-full ${socialBtn} border transition-all duration-300`}
@@ -166,25 +171,25 @@ export function CardFront({ card, theme, language, isSaving, freshnessBadge, onS
           className="flex justify-center gap-2 w-full"
         >
           {card.contact.phone && (
-            <a href={`tel:${card.contact.phone}`} className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl ${actionCall} border transition-all duration-300 text-xs font-medium`}>
+            <a data-name="phone" href={`tel:${card.contact.phone}`} onClick={() => track('phone')} className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl ${actionCall} border transition-all duration-300 text-xs font-medium`}>
               <Phone size={14} />
               {l.phone}
             </a>
           )}
           {card.contact.email && (
-            <a href={`mailto:${card.contact.email}`} className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl ${actionMail} border transition-all duration-300 text-xs font-medium`}>
+            <a data-name="email" href={`mailto:${card.contact.email}`} onClick={() => track('email')} className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl ${actionMail} border transition-all duration-300 text-xs font-medium`}>
               <Mail size={14} />
               Email
             </a>
           )}
           {card.contact.whatsapp && (
-            <a href={`https://wa.me/${card.contact.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl ${actionWhatsapp} border transition-all duration-300 text-xs font-medium`}>
+            <a data-name="whatsapp" href={`https://wa.me/${card.contact.whatsapp.replace(/[^0-9]/g, '')}`} onClick={() => track('whatsapp')} target="_blank" rel="noopener noreferrer" className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl ${actionWhatsapp} border transition-all duration-300 text-xs font-medium`}>
               <MessageCircle size={14} />
               WhatsApp
             </a>
           )}
           {card.contact.line && (
-            <a href={card.contact.line} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-green-500/10 border border-green-500/30 text-xs font-medium text-green-700 hover:bg-green-500/20 transition-all duration-300">
+            <a data-name="line" href={card.contact.line} onClick={() => track('line')} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-green-500/10 border border-green-500/30 text-xs font-medium text-green-700 hover:bg-green-500/20 transition-all duration-300">
               {LINE_ICON}
               LINE
             </a>

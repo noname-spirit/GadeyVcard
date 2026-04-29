@@ -3,27 +3,29 @@ import type { CardData } from '@/types/card';
 
 export interface SupabaseCard {
   id: string;
-  uid: string;
+  user_id: string;
   slug: string;
   name: string;
-  title: string;
+  title: string | null;
   photo: string | null;
-  contact: {
-    phone?: string | null;
-    email?: string | null;
-    whatsapp?: string | null;
-    line?: string | null;
-  };
-  socials: {
-    instagram?: string | null;
-    youtube?: string | null;
-    linkedin?: string | null;
-    website?: string | null;
-  };
   accent_color: string;
   template: string;
   plan: 'free' | 'starter' | 'pro' | null;
-  vcf: string | null;
+  // Contact — colonnes plates
+  phone: string | null;
+  email: string | null;
+  whatsapp: string | null;
+  line_contact: string | null;
+  // Socials — colonnes plates
+  instagram: string | null;
+  youtube: string | null;
+  linkedin: string | null;
+  website: string | null;
+  tiktok: string | null;
+  twitter: string | null;
+  // Meta
+  is_active: boolean;
+  view_count: number;
   created_at: string;
   updated_at: string;
 }
@@ -33,19 +35,19 @@ export function supabaseCardToCardData(c: SupabaseCard): CardData {
     id: c.id,
     slug: c.slug,
     name: c.name,
-    title: c.title,
+    title: c.title ?? '',
     photo: c.photo ?? '',
     contact: {
-      phone: c.contact?.phone ?? undefined,
-      email: c.contact?.email ?? undefined,
-      whatsapp: c.contact?.whatsapp ?? undefined,
-      line: c.contact?.line ?? undefined,
+      phone: c.phone ?? undefined,
+      email: c.email ?? undefined,
+      whatsapp: c.whatsapp ?? undefined,
+      line: c.line_contact ?? undefined,
     },
     socials: {
-      instagram: c.socials?.instagram ?? undefined,
-      youtube: c.socials?.youtube ?? undefined,
-      linkedin: c.socials?.linkedin ?? undefined,
-      website: c.socials?.website ?? undefined,
+      instagram: c.instagram ?? undefined,
+      youtube: c.youtube ?? undefined,
+      linkedin: c.linkedin ?? undefined,
+      website: c.website ?? undefined,
     },
     accentColor: c.accent_color ?? '#f97316',
     template: (c.template as CardData['template']) ?? 'dark',
@@ -55,14 +57,18 @@ export function supabaseCardToCardData(c: SupabaseCard): CardData {
 }
 
 export async function getCardBySlug(slug: string): Promise<SupabaseCard | null> {
+  console.log(slug, "slug in getCardBySlug");
   const supabase = createClient();
   const { data, error } = await supabase
     .from('cards')
     .select('*')
     .eq('slug', slug)
-    .single();
-  if (error) return null;
-  return data as SupabaseCard;
+    .maybeSingle();
+  if (error) {
+    console.log('getCardBySlug error:', error.message, data);
+    return null;
+  }
+  return data as SupabaseCard | null;
 }
 
 export async function getCardsByUid(uid: string): Promise<SupabaseCard[]> {
@@ -70,7 +76,7 @@ export async function getCardsByUid(uid: string): Promise<SupabaseCard[]> {
   const { data, error } = await supabase
     .from('cards')
     .select('*')
-    .eq('uid', uid)
+    .eq('user_id', uid)
     .order('created_at', { ascending: false });
   if (error) return [];
   return (data ?? []) as SupabaseCard[];
@@ -79,19 +85,32 @@ export async function getCardsByUid(uid: string): Promise<SupabaseCard[]> {
 export async function upsertCard(uid: string, card: {
   slug: string;
   name: string;
-  title: string;
+  title?: string;
   photo?: string;
-  contact?: Record<string, string | null>;
-  socials?: Record<string, string | null>;
+  contact?: { phone?: string | null; email?: string | null; whatsapp?: string | null; line?: string | null };
+  socials?: { instagram?: string | null; youtube?: string | null; linkedin?: string | null; website?: string | null };
   accent_color?: string;
   template?: string;
   plan?: string;
 }): Promise<{ slug: string } | null> {
   const supabase = createClient();
+  const { contact, socials, ...rest } = card;
   const { data, error } = await supabase
     .from('cards')
     .upsert(
-      { ...card, uid, updated_at: new Date().toISOString() },
+      {
+        ...rest,
+        user_id: uid,
+        phone: contact?.phone ?? null,
+        email: contact?.email ?? null,
+        whatsapp: contact?.whatsapp ?? null,
+        line_contact: contact?.line ?? null,
+        instagram: socials?.instagram ?? null,
+        youtube: socials?.youtube ?? null,
+        linkedin: socials?.linkedin ?? null,
+        website: socials?.website ?? null,
+        updated_at: new Date().toISOString(),
+      },
       { onConflict: 'slug' }
     )
     .select('slug')

@@ -3,10 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, ExternalLink, Settings, Users, Menu, X, Zap, CreditCard, LogOut } from 'lucide-react';
+import { Eye, ExternalLink, Settings, Users, Menu, X, Zap, CreditCard, LogOut  } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { createClient } from '@/lib/supabase/client';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { useAuth } from '@/lib/supabase/AuthProvider';
+import { getCardsByUid, SupabaseCard } from '@/lib/supabase/cards';
+import { getProfile, Profile } from '@/lib/supabase/profile';
+import Link from 'next/link';
 
 const BASE_NAV = [
   { label: 'Aperçu', icon: Eye, href: '/dashboard' },
@@ -19,13 +23,16 @@ interface DashboardLayoutProps {
   active?: string;
 }
 
-function Sidebar({ active, slug, onClose, onLogout }: { active?: string; slug: string; onClose?: () => void; onLogout: () => void }) {
+function Sidebar({ active, slug, onClose, onLogout,profil }: { active?: string; slug: string; onClose?: () => void; onLogout: () => void; profil: Profile | null }) {
   const nav = [
     ...BASE_NAV.slice(0, 1),
     { label: 'Ma carte', icon: ExternalLink, href: `/${slug}` },
     ...BASE_NAV.slice(1),
   ];
+  useEffect(()=>{
 
+  },[profil])
+console.log(profil, "profil from sidebar");
   return (
     <div className="flex flex-col h-full p-4 gap-6">
       <div className="flex items-center justify-between pt-2">
@@ -55,13 +62,13 @@ function Sidebar({ active, slug, onClose, onLogout }: { active?: string; slug: s
         <div className="bg-zinc-800/40 border border-zinc-700/40 rounded-xl p-3 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <span className="text-xs text-zinc-500 font-medium">Plan actuel</span>
-            <span className="text-xs font-semibold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">Free</span>
+            <span className="text-xs font-semibold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">{profil?.plan}</span>
           </div>
-          <a href="/dashboard/upgrade">
+          <Link href="/dashboard/upgrade">
             <Button size="sm" className="w-full text-xs flex items-center justify-center gap-1.5">
               <Zap size={11} />Passer Pro
             </Button>
-          </a>
+          </Link>
         </div>
         <button onClick={onLogout}
           className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all w-full">
@@ -75,17 +82,24 @@ function Sidebar({ active, slug, onClose, onLogout }: { active?: string; slug: s
 export function DashboardLayout({ children, active }: DashboardLayoutProps) {
   const [open, setOpen] = useState(false);
   const [slug, setSlug] = useState('demo');
+  const [profil, setprofil] = useState<Profile | null>(null);
   const router = useRouter();
+  const { uid } = useAuth();
 
   useEffect(() => {
+    if (!uid) return;
+     const fetchData = async () => {
     try {
-      const stored = localStorage.getItem('vcard_settings');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.slug) setSlug(parsed.slug);
-      }
-    } catch { /* ignore */ }
-  }, []);
+      const data = await getProfile();
+      setprofil(data);
+      setSlug(data?.full_name || 'demo');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  fetchData();
+  }, [uid]);
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -98,7 +112,7 @@ export function DashboardLayout({ children, active }: DashboardLayoutProps) {
       <div className="min-h-screen bg-zinc-950 text-zinc-100 flex">
 
         <aside className="hidden lg:flex w-60 min-h-screen bg-zinc-900 border-r border-zinc-800/60 flex-col fixed top-0 left-0">
-          <Sidebar active={active} slug={slug} onLogout={handleLogout} />
+          <Sidebar active={active} slug={slug} onLogout={handleLogout} profil={profil} />
         </aside>
 
         <AnimatePresence>
@@ -109,7 +123,7 @@ export function DashboardLayout({ children, active }: DashboardLayoutProps) {
               <motion.aside initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 40 }}
                 className="fixed top-0 left-0 w-64 h-full bg-zinc-900 border-r border-zinc-800/60 z-50 lg:hidden">
-                <Sidebar active={active} slug={slug} onClose={() => setOpen(false)} onLogout={handleLogout} />
+                <Sidebar active={active} slug={slug} onClose={() => setOpen(false)} onLogout={handleLogout} profil={profil} />
               </motion.aside>
             </>
           )}
@@ -121,9 +135,9 @@ export function DashboardLayout({ children, active }: DashboardLayoutProps) {
               <Menu size={20} />
             </button>
             <span className="text-sm font-bold bg-linear-to-r from-white to-zinc-400 bg-clip-text text-transparent">Smart vCard</span>
-            <a href="/dashboard/upgrade" className="p-2 rounded-xl text-zinc-400 hover:text-orange-400 transition-all">
+            <Link href="/dashboard/upgrade" className="p-2 rounded-xl text-zinc-400 hover:text-orange-400 transition-all">
               <CreditCard size={18} />
-            </a>
+            </Link>
           </div>
           <div className="flex-1 p-4 lg:p-8">{children}</div>
         </main>

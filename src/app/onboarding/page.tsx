@@ -12,19 +12,19 @@ import { getCardsByUid, upsertCard } from "@/lib/supabase/cards";
 export default function OnboardingPage() {
   const router = useRouter();
   const { uid, loading } = useAuth();
-  const [checking, setChecking] = useState(true);
+  const [cardsChecked, setCardsChecked] = useState(false);
+  const checking = loading || (!!uid && !cardsChecked);
 
   useEffect(() => {
-    if (loading) return;
-    if (!uid) { setChecking(false); return; }
+    if (loading || !uid) return;
     getCardsByUid(uid).then((cards) => {
       if (cards.length > 0) router.replace("/dashboard");
-      else setChecking(false);
-    }).catch(() => setChecking(false));
+      else setCardsChecked(true);
+    }).catch(() => setCardsChecked(true));
   }, [uid, loading, router]);
 
-  const handleComplete = async (data: OnboardingData) => {
-    if (!uid) return;
+  const handleComplete = async (data: OnboardingData): Promise<void> => {
+    if (!uid) throw new Error('Non authentifié');
 
     const finalSlug = data.slug?.trim() || data.name
       .toLowerCase()
@@ -33,7 +33,7 @@ export default function OnboardingPage() {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '') || uid;
 
-    await upsertCard(uid, {
+    const result = await upsertCard(uid, {
       slug: finalSlug,
       name: data.name ?? '',
       title: data.title ?? '',
@@ -54,6 +54,7 @@ export default function OnboardingPage() {
       template: data.template ?? 'dark',
     });
 
+    if (!result) throw new Error('Échec de la création de la carte');
     router.push("/dashboard");
   };
 

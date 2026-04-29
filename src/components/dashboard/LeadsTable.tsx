@@ -9,6 +9,7 @@ export interface LeadRow {
   nom: string;
   email: string;
   telephone?: string;
+  message?: string;
   domaine: string;
   source: string;
   createdAt: string;
@@ -24,7 +25,7 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
   const [search, setSearch] = useState('');
 
   const filtered = leads.filter((l) =>
-    [l.nom, l.email, l.domaine].some((v) =>
+    [l.nom, l.email, l.telephone, l.message, l.domaine].some((v) =>
       v?.toLowerCase().includes(search.toLowerCase())
     )
   );
@@ -56,7 +57,7 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
         <table className="w-full text-sm min-w-150">
           <thead>
             <tr className="border-b border-zinc-800/60 bg-zinc-900/60">
-              {['Nom', 'Email', 'Domaine', 'Source', 'Date', ''].map((h) => (
+              {['Nom', 'Email', 'Téléphone', 'Message', 'Domaine', 'Source', 'Date', ''].map((h) => (
                 <th key={h} className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">
                   {h}
                 </th>
@@ -66,8 +67,8 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-12 text-center text-zinc-500 text-sm">
-                  Aucun lead pour l'instant.
+                <td colSpan={8} className="px-4 py-12 text-center text-zinc-500 text-sm">
+                  Aucun lead pour l&#39;instant.
                 </td>
               </tr>
             ) : (
@@ -75,6 +76,8 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
                 <tr key={lead.id} className="border-b border-zinc-800/40 hover:bg-zinc-800/20 transition-colors">
                   <td className="px-4 py-3 font-medium text-zinc-200">{lead.nom}</td>
                   <td className="px-4 py-3 text-zinc-400">{lead.email}</td>
+                  <td className="px-4 py-3 text-zinc-400">{lead.telephone || <span className="text-zinc-700">—</span>}</td>
+                  <td className="px-4 py-3 text-zinc-400 max-w-48 truncate" title={lead.message}>{lead.message || <span className="text-zinc-700">—</span>}</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 text-xs rounded-full bg-zinc-800 border border-zinc-700/40 text-zinc-400">
                       {lead.domaine}
