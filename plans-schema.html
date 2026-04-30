@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Smart vCard — Schéma des Plans</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #09090b;
+    color: #f4f4f5;
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+  .header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .header p { color: #71717a; font-size: 0.95rem; }
+
+  .updated {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.7rem;
+    color: #52525b;
+    background: #18181b;
+    border: 1px solid #27272a;
+    border-radius: 999px;
+    padding: 3px 12px;
+  }
+
+  /* ── PROGRESSION TRACK ── */
+  .track-label {
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #52525b;
+    margin-bottom: 16px;
+  }
+
+  .progression {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 48px;
+    position: relative;
+  }
+  .progression::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 2px;
+    background: linear-gradient(90deg, #3f3f46, #f97316, #eab308);
+    z-index: 0;
+  }
+
+  /* ── PLAN CARDS (main track) ── */
+  .plan-card {
+    position: relative;
+    z-index: 1;
+    background: #18181b;
+    border: 1px solid #27272a;
+    border-radius: 16px;
+    width: 236px;
+    padding: 20px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.2s, border-color 0.2s;
+    margin: 0 6px;
+  }
+  .plan-card:hover { transform: translateY(-4px); }
+
+  .plan-card.free   { border-color: #3f3f46; }
+  .plan-card.starter{ border-color: #f97316; box-shadow: 0 0 0 1px #f9731620, 0 8px 24px #f9731615; }
+  .plan-card.pro    { border-color: #eab308; box-shadow: 0 0 0 1px #eab30820, 0 8px 32px #eab30820; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    width: fit-content;
+  }
+  .badge.free     { background: #27272a; color: #a1a1aa; }
+  .badge.starter  { background: #f9731615; color: #fb923c; border: 1px solid #f9731630; }
+  .badge.pro      { background: #eab30815; color: #fbbf24; border: 1px solid #eab30830; }
+
+  .plan-icon { font-size: 1.6rem; }
+
+  .plan-price {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .plan-price .amount {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #f4f4f5;
+  }
+  .plan-price .period { font-size: 0.75rem; color: #71717a; }
+  .plan-price .yearly {
+    font-size: 0.65rem;
+    color: #52525b;
+    display: block;
+    width: 100%;
+    margin-top: 2px;
+  }
+
+  .plan-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #d4d4d8;
+  }
+
+  .features { display: flex; flex-direction: column; gap: 6px; }
+  .feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: #a1a1aa;
+    line-height: 1.4;
+  }
+  .feature .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .free   .dot { background: #52525b; }
+  .starter .dot { background: #f97316; }
+  .pro     .dot { background: #eab308; }
+
+  .divider {
+    height: 1px;
+    background: #27272a;
+    margin: 4px 0;
+  }
+
+  .locked {
+    color: #3f3f46;
+    font-size: 0.72rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .locked::before { content: '🔒'; font-size: 0.65rem; }
+
+  .arrow {
+    display: flex;
+    align-items: center;
+    color: #3f3f46;
+    font-size: 1rem;
+    flex-shrink: 0;
+    z-index: 2;
+    padding: 0 2px;
+  }
+
+  /* ── DASHBOARD GATING TABLE ── */
+  .gating-section {
+    margin-top: 8px;
+    margin-bottom: 48px;
+  }
+
+  .gating-table {
+    width: 100%;
+    max-width: 780px;
+    margin: 0 auto;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+  }
+  .gating-table th {
+    padding: 10px 14px;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #71717a;
+    border-bottom: 1px solid #27272a;
+  }
+  .gating-table th:first-child { text-align: left; }
+  .gating-table td {
+    padding: 9px 14px;
+    color: #a1a1aa;
+    border-bottom: 1px solid #18181b;
+    text-align: center;
+  }
+  .gating-table td:first-child { text-align: left; color: #d4d4d8; }
+  .gating-table tr:hover td { background: #18181b; }
+
+  .check { color: #f97316; font-size: 0.9rem; }
+  .check-pro { color: #eab308; font-size: 0.9rem; }
+  .cross { color: #3f3f46; font-size: 0.85rem; }
+  .partial { color: #60a5fa; font-size: 0.75rem; }
+
+  .row-section td {
+    padding-top: 18px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #52525b;
+    border-bottom: 1px solid #27272a;
+  }
+
+  /* ── SPECIALTY TRACK ── */
+  .specialty-section { margin-top: 8px; }
+
+  .specialty-grid {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .spec-card {
+    background: #18181b;
+    border: 1px solid #27272a;
+    border-radius: 16px;
+    width: 240px;
+    padding: 20px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.2s;
+  }
+  .spec-card:hover { transform: translateY(-4px); }
+
+  .spec-card.food       { border-color: #22c55e; box-shadow: 0 0 0 1px #22c55e15, 0 8px 24px #22c55e10; }
+  .spec-card.restaurant { border-color: #8b5cf6; box-shadow: 0 0 0 1px #8b5cf615, 0 8px 24px #8b5cf610; }
+  .spec-card.event      { border-color: #06b6d4; box-shadow: 0 0 0 1px #06b6d415, 0 8px 24px #06b6d410; }
+
+  .badge.food       { background: #22c55e10; color: #4ade80; border: 1px solid #22c55e25; }
+  .badge.restaurant { background: #8b5cf610; color: #a78bfa; border: 1px solid #8b5cf625; }
+  .badge.event      { background: #06b6d410; color: #22d3ee; border: 1px solid #06b6d425; }
+
+  .food       .dot { background: #22c55e; }
+  .restaurant .dot { background: #8b5cf6; }
+  .event      .dot { background: #06b6d4; }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    color: #71717a;
+  }
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .upsell-hint {
+    text-align: center;
+    font-size: 0.7rem;
+    color: #52525b;
+    margin-top: -32px;
+    margin-bottom: 40px;
+  }
+  .upsell-hint span {
+    background: #18181b;
+    border: 1px solid #27272a;
+    border-radius: 999px;
+    padding: 4px 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Smart vCard — Schéma des Plans</h1>
+  <p>Autorisations & fonctionnalités débloquées par abonnement</p>
+  <span class="updated">Mis à jour — 30 avril 2026</span>
+</div>
+
+<!-- TRACK INDIVIDUEL -->
+<div class="track-label">▸ Parcours individuel / professionnel</div>
+
+<div class="progression">
+
+  <!-- FREE -->
+  <div class="plan-card free">
+    <div><span class="badge free">🔓 Free</span></div>
+    <div class="plan-icon">👤</div>
+    <div>
+      <div class="plan-price">
+        <span class="amount">0 €</span><span class="period">/mois</span>
+      </div>
+      <div class="plan-name">Pour tester</div>
+    </div>
+    <div class="features">
+      <div class="feature"><span class="dot"></span>1 vCard</div>
+      <div class="feature"><span class="dot"></span>QR code visible sur la carte</div>
+      <div class="feature"><span class="dot"></span>3 liens sociaux max</div>
+      <div class="feature"><span class="dot"></span>Export .vcf (Save Contact)</div>
+      <div class="feature"><span class="dot"></span>Stats vues + clics visibles</div>
+      <div class="feature"><span class="dot"></span>Watermark app</div>
+    </div>
+    <div class="divider"></div>
+    <div class="locked">Leads (capture + dashboard)</div>
+    <div class="locked">Export CSV</div>
+    <div class="locked">QR code HD téléchargeable</div>
+    <div class="locked">Analytics</div>
+    <div class="locked">Taux de conversion</div>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <!-- STARTER -->
+  <div class="plan-card starter">
+    <div><span class="badge starter">⭐ Starter</span></div>
+    <div class="plan-icon">🚀</div>
+    <div>
+      <div class="plan-price">
+        <span class="amount">9 €</span><span class="period">/mois</span>
+        <span class="yearly">ou 7 €/mois · 84 €/an (−2 mois)</span>
+      </div>
+      <div class="plan-name">Auto-entrepreneurs, freelances</div>
+    </div>
+    <div class="features">
+      <div class="feature"><span class="dot"></span>QR code HD téléchargeable</div>
+      <div class="feature"><span class="dot"></span>Liens sociaux illimités</div>
+      <div class="feature"><span class="dot"></span>Photo profil HD</div>
+      <div class="feature"><span class="dot"></span>Leads capturés + dashboard</div>
+      <div class="feature"><span class="dot"></span>Export CSV ✓</div>
+      <div class="feature"><span class="dot"></span>Analytics basiques (vues, clics, conversion)</div>
+      <div class="feature"><span class="dot"></span>CRM léger (statuts + notes)</div>
+      <div class="feature"><span class="dot"></span>3 templates Free disponibles</div>
+      <div class="feature"><span class="dot"></span>Sans watermark app</div>
+    </div>
+    <div class="divider"></div>
+    <div class="locked">Analytics avancés (graphiques)</div>
+    <div class="locked">Calendly</div>
+    <div class="locked">Couleur accent personnalisée</div>
+    <div class="locked">Templates Pro (Influenceur, Restaurant)</div>
+    <div class="locked">Statut disponibilité</div>
+    <div class="locked">Signature email</div>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <!-- PRO -->
+  <div class="plan-card pro">
+    <div><span class="badge pro">👑 Pro</span></div>
+    <div class="plan-icon">💼</div>
+    <div>
+      <div class="plan-price">
+        <span class="amount">22 €</span><span class="period">/mois</span>
+        <span class="yearly">ou 16,58 €/mois · 199 €/an (−2 mois)</span>
+      </div>
+      <div class="plan-name">Consultants, coaches, commerciaux</div>
+    </div>
+    <div class="features">
+      <div class="feature"><span class="dot"></span>Tous les templates (dont Influenceur)</div>
+      <div class="feature"><span class="dot"></span>Couleur accent personnalisée</div>
+      <div class="feature"><span class="dot"></span>Analytics avancés (heure, semaine, device, liens)</div>
+      <div class="feature"><span class="dot"></span>Calendly intégré (modal sur la carte)</div>
+      <div class="feature"><span class="dot"></span>Statut disponibilité temps réel</div>
+      <div class="feature"><span class="dot"></span>Signature email HTML</div>
+      <div class="feature"><span class="dot"></span>Support prioritaire 48h</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="upsell-hint">
+  <span>Chaque plan hérite de toutes les fonctionnalités du plan précédent</span>
+</div>
+
+<!-- GATING TABLE -->
+<div class="track-label">▸ Détail du gating par page dashboard</div>
+
+<div class="gating-section">
+  <table class="gating-table">
+    <thead>
+      <tr>
+        <th>Fonctionnalité</th>
+        <th>Free</th>
+        <th>Starter</th>
+        <th>Pro</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr class="row-section"><td colspan="4">Aperçu (dashboard home)</td></tr>
+      <tr><td>Vues totales + Clics liens</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>Leads captés (stat)</td><td><span class="cross">🔒</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>Taux de conversion (stat)</td><td><span class="cross">🔒</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>Tableau leads récents</td><td><span class="cross">🔒</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>Export CSV</td><td><span class="cross">🔒</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
+
+      <tr class="row-section"><td colspan="4">Page Leads</td></tr>
+      <tr><td>Tableau leads + CRM (statuts, notes)</td><td><span class="cross">🔒</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>Export CSV</td><td><span class="cross">🔒</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
+
+      <tr class="row-section"><td colspan="4">Analytics</td></tr>
+      <tr><td>KPIs (vues, clics, conversion)</td><td><span class="cross">🔒</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>Graphiques avancés (heure, semaine, device…)</td><td><span class="cross">🔒</span></td><td><span class="cross">🔒</span></td><td><span class="check-pro">✓</span></td></tr>
+
+      <tr class="row-section"><td colspan="4">Settings — Design</td></tr>
+      <tr><td>Templates Free (dark, light, color)</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>Templates Pro (Influenceur, Restaurant)</td><td><span class="cross">🔒</span></td><td><span class="cross">🔒</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>Couleur accent personnalisée</td><td><span class="cross">🔒</span></td><td><span class="cross">🔒</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>QR Code HD téléchargeable (PNG)</td><td><span class="cross">🔒</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
+
+      <tr class="row-section"><td colspan="4">Settings — Pro</td></tr>
+      <tr><td>Calendly (champ URL + bouton carte)</td><td><span class="cross">🔒</span></td><td><span class="cross">🔒</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>Statut de disponibilité</td><td><span class="cross">🔒</span></td><td><span class="cross">🔒</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>Signature email HTML</td><td><span class="cross">🔒</span></td><td><span class="cross">🔒</span></td><td><span class="check-pro">✓</span></td></tr>
+
+      <tr class="row-section"><td colspan="4">Carte publique (/slug)</td></tr>
+      <tr><td>Affichage carte (flip, liens, QR)</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>Export .vcf (Save Contact)</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>Formulaire lead</td><td><span class="cross">🔒</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>Bouton Calendly (Prendre RDV)</td><td><span class="cross">🔒</span></td><td><span class="cross">🔒</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>Watermark app</td><td>Affiché</td><td>Masqué</td><td>Masqué</td></tr>
+
+    </tbody>
+  </table>
+</div>
+
+<!-- TRACK SPÉCIALISÉ -->
+<div class="track-label">▸ Plans spécialisés — indépendants du parcours individuel</div>
+
+<div class="specialty-section">
+  <div class="specialty-grid">
+
+    <!-- PRO FOOD -->
+    <div class="spec-card food">
+      <div><span class="badge food">🍴 Pro Food</span></div>
+      <div class="plan-icon">👨‍🍳</div>
+      <div>
+        <div class="plan-price"><span class="amount">19 €</span><span class="period">/mois</span></div>
+        <div class="plan-name">Traiteurs, chefs privés, food trucks</div>
+      </div>
+      <div class="features">
+        <div class="feature"><span class="dot"></span>Menu digital (30 plats + photos)</div>
+        <div class="feature"><span class="dot"></span>Galerie lookbook 20 photos HD</div>
+        <div class="feature"><span class="dot"></span>Formulaire devis / commande</div>
+        <div class="feature"><span class="dot"></span>WhatsApp Business 1-click</div>
+        <div class="feature"><span class="dot"></span>Feed Instagram auto (6 photos)</div>
+        <div class="feature"><span class="dot"></span>1 000 leads/mois</div>
+        <div class="feature"><span class="dot"></span>Stats basiques · Sans branding</div>
+      </div>
+      <div class="locked">Calendly / agenda</div>
+    </div>
+
+    <!-- RESTAURANT -->
+    <div class="spec-card restaurant">
+      <div><span class="badge restaurant">🏪 Restaurant</span></div>
+      <div class="plan-icon">🍽️</div>
+      <div>
+        <div class="plan-price"><span class="amount">39 €</span><span class="period">/mois</span></div>
+        <div class="plan-name">Restaurants, bistrots, dark kitchens</div>
+      </div>
+      <div class="features">
+        <div class="feature"><span class="dot"></span>QR codes par table × 30</div>
+        <div class="feature"><span class="dot"></span>Menu illimité + épuisé temps réel</div>
+        <div class="feature"><span class="dot"></span>Carte de fidélité QR (points)</div>
+        <div class="feature"><span class="dot"></span>Lien réservation (TheFork…)</div>
+        <div class="feature"><span class="dot"></span>Codes promo attribuables</div>
+        <div class="feature"><span class="dot"></span>5 000 leads/mois</div>
+        <div class="feature"><span class="dot"></span>Analytics avancés · Notifs push</div>
+        <div class="feature"><span class="dot"></span>Support dédié 24h</div>
+      </div>
+    </div>
+
+    <!-- ÉVÉNEMENT -->
+    <div class="spec-card event">
+      <div><span class="badge event">🎪 Événement</span></div>
+      <div class="plan-icon">🤝</div>
+      <div>
+        <div class="plan-price"><span class="amount">79–499 €</span><span class="period">/ pack 30j</span></div>
+        <div class="plan-name">Organisateurs de salons & conférences</div>
+      </div>
+      <div class="features">
+        <div class="feature"><span class="dot"></span>vCard par participant (30j)</div>
+        <div class="feature"><span class="dot"></span>QR code badge-style (format salon)</div>
+        <div class="feature"><span class="dot"></span>Échange carte-à-carte en 1 scan</div>
+        <div class="feature"><span class="dot"></span>Leads illimités pendant l'event</div>
+        <div class="feature"><span class="dot"></span>Export CSV individuel + global</div>
+        <div class="feature"><span class="dot"></span>Dashboard central organisateur</div>
+        <div class="feature"><span class="dot"></span>Branding événement (logo + couleur)</div>
+        <div class="feature"><span class="dot"></span>Conversion J+28 → plan individuel</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#52525b"></div>Free</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div>Starter</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#eab308"></div>Pro</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Pro Food</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div>Restaurant</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div>Événement</div>
+  <div class="legend-item"><span style="font-size:0.65rem">🔒 = Fonctionnalité verrouillée</span></div>
+  <div class="legend-item"><span style="font-size:0.65rem;color:#f97316">✓ = Starter+</span></div>
+  <div class="legend-item"><span style="font-size:0.65rem;color:#eab308">✓ = Pro uniquement</span></div>
+</div>
+
+</body>
+</html>
