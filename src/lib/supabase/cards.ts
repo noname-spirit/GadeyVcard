@@ -48,6 +48,8 @@ export function supabaseCardToCardData(c: SupabaseCard): CardData {
       youtube: c.youtube ?? undefined,
       linkedin: c.linkedin ?? undefined,
       website: c.website ?? undefined,
+      tiktok: c.tiktok ?? undefined,
+      twitter: c.twitter ?? undefined,
     },
     accentColor: c.accent_color ?? '#f97316',
     template: (c.template as CardData['template']) ?? 'dark',
@@ -88,7 +90,7 @@ export async function upsertCard(uid: string, card: {
   title?: string;
   photo?: string;
   contact?: { phone?: string | null; email?: string | null; whatsapp?: string | null; line?: string | null };
-  socials?: { instagram?: string | null; youtube?: string | null; linkedin?: string | null; website?: string | null };
+  socials?: { instagram?: string | null; youtube?: string | null; linkedin?: string | null; website?: string | null; tiktok?: string | null; twitter?: string | null };
   accent_color?: string;
   template?: string;
   plan?: string;
@@ -109,6 +111,8 @@ export async function upsertCard(uid: string, card: {
         youtube: socials?.youtube ?? null,
         linkedin: socials?.linkedin ?? null,
         website: socials?.website ?? null,
+        tiktok: socials?.tiktok ?? null,
+        twitter: socials?.twitter ?? null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'slug' }
