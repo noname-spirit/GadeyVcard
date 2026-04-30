@@ -13,11 +13,6 @@ import { getCardsByUid } from '@/lib/supabase/cards';
 import { getLeadsByCardId, deleteLead } from '@/lib/supabase/leads';
 import { getCardStats } from '@/lib/supabase/events';
 
-const MOCK_STATS_BASE = [
-  { label: 'Vues totales', value: '1 284', sub: '30 derniers jours', icon: Eye, trend: { value: 12, label: 'vs mois dernier' } },
-  { label: 'Clics liens', value: '347', sub: 'Instagram, Site, WhatsApp', icon: MousePointer, trend: { value: 8, label: 'vs mois dernier' } },
-  { label: 'Taux conversion', value: '3.2%', sub: 'Vues → Leads', icon: TrendingUp, trend: { value: -2, label: 'vs mois dernier' } },
-];
 
 const MOCK_LEADS: LeadRow[] = [
   { id: '1', nom: 'Sophie Martin', email: 'sophie@cafe.fr', telephone: '+33612345678', domaine: 'Café', source: 'formulaire', createdAt: '2026-04-15T10:00:00Z' },
@@ -42,7 +37,7 @@ export default function DashboardPage() {
       if (cards.length === 0) return;
       setslug(cards[0].slug);
       setName(cards[0].name);
-      const [dbLeads, stats] = await Promise.all([
+const [dbLeads, stats] = await Promise.all([
         getLeadsByCardId(cards[0].id),
         getCardStats(cards[0].id),
       ]);
@@ -107,7 +102,7 @@ export default function DashboardPage() {
             { label: 'Vues totales', value: String(views), sub: 'Toutes les visites', icon: Eye, trend: { value: 0, label: '' } },
             { label: 'Clics liens', value: String(clicks), sub: 'Instagram, Site, WhatsApp…', icon: MousePointer, trend: { value: 0, label: '' } },
             { label: 'Leads captés', value: String(leads.length), sub: 'Formulaire + QR code', icon: Users, trend: { value: 0, label: '' } },
-            ...MOCK_STATS_BASE.slice(2),
+            { label: 'Taux conversion', value: leads.length && views ? `${((leads.length / views) * 100).toFixed(1)}%` : '—', sub: 'Vues → Leads', icon: TrendingUp, trend: { value: 0, label: '' } },
           ].map((s) => (
             <StatCard key={s.label} {...s} />
           ))}

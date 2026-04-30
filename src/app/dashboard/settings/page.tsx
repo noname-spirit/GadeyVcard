@@ -133,6 +133,11 @@ export default function SettingsPage() {
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [instagram, setInstagram] = useState("");
+  const [youtube, setYoutube] = useState("");
+  const [linkedin, setLinkedin] = useState("");
+  const [line, setLine] = useState("");
+  const [tiktok, setTiktok] = useState("");
+  const [twitter, setTwitter] = useState("");
   const [website, setWebsite] = useState("");
   const [template, setTemplate] = useState<
     "dark" | "light" | "color" | "influencer"
@@ -158,6 +163,11 @@ export default function SettingsPage() {
       setEmail(c.email ?? "");
       setWhatsapp(c.whatsapp ?? "");
       setInstagram(c.instagram ?? "");
+      setYoutube(c.youtube ?? "");
+      setLinkedin(c.linkedin ?? "");
+      setLine(c.line_contact ?? "");
+      setTiktok(c.tiktok ?? "");
+      setTwitter(c.twitter ?? "");
       setWebsite(c.website ?? "");
       setTemplate((c.template as "dark" | "light" | "color" | "influencer") ?? "dark");
       setAccent(c.accent_color ?? "#f97316");
@@ -174,8 +184,8 @@ export default function SettingsPage() {
         name,
         title,
         photo: photo || '',
-        contact: { phone: phone || null, email: email || null, whatsapp: whatsapp || null },
-        socials: { instagram: instagram || null, website: website || null },
+        contact: { phone: phone || null, email: email || null, whatsapp: whatsapp || null, line: line || null },
+        socials: { instagram: instagram || null, youtube: youtube || null, linkedin: linkedin || null, tiktok: tiktok || null, twitter: twitter || null, website: website || null },
         accent_color: accent,
         template,
       });
@@ -195,8 +205,8 @@ export default function SettingsPage() {
     name,
     title,
     photo: photo || '',
-    socials: { instagram: instagram || undefined, website: website || undefined },
-    contact: { phone: phone || undefined, email: email || undefined, whatsapp: whatsapp || undefined },
+    socials: { instagram: instagram || undefined, youtube: youtube || undefined, linkedin: linkedin || undefined, tiktok: tiktok || undefined, twitter: twitter || undefined, website: website || undefined },
+    contact: { phone: phone || undefined, email: email || undefined, whatsapp: whatsapp || undefined, line: line || undefined },
     accentColor: accent,
     template,
   };
@@ -336,40 +346,23 @@ export default function SettingsPage() {
           )}
 
           {tab === "links" && (
-            <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
-              <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">
-                Contact & Réseaux
-              </h3>
-              <Field
-                label="Téléphone"
-                value={phone}
-                onChange={setPhone}
-                type="tel"
-              />
-              <Field
-                label="Email"
-                value={email}
-                onChange={setEmail}
-                type="email"
-              />
-              <Field
-                label="WhatsApp"
-                value={whatsapp}
-                onChange={setWhatsapp}
-                placeholder="+33 6 …"
-              />
-              <Field
-                label="Instagram"
-                value={instagram}
-                onChange={setInstagram}
-                prefix="IG"
-              />
-              <Field
-                label="Site web"
-                value={website}
-                onChange={setWebsite}
-                prefix="🌐"
-              />
+            <div className="flex flex-col gap-4">
+              <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
+                <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Contact</h3>
+                <Field label="Téléphone" value={phone} onChange={setPhone} type="tel" />
+                <Field label="Email" value={email} onChange={setEmail} type="email" />
+                <Field label="WhatsApp" value={whatsapp} onChange={setWhatsapp} placeholder="+33 6 …" />
+                <Field label="LINE" value={line} onChange={setLine} placeholder="https://line.me/ti/p/~pseudo" prefix="LINE" />
+              </div>
+              <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
+                <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Réseaux sociaux</h3>
+                <Field label="Instagram" value={instagram} onChange={setInstagram} placeholder="https://instagram.com/pseudo" prefix="IG" />
+                <Field label="YouTube" value={youtube} onChange={setYoutube} placeholder="https://youtube.com/@chaine" prefix="YT" />
+                <Field label="LinkedIn" value={linkedin} onChange={setLinkedin} placeholder="https://linkedin.com/in/pseudo" prefix="LI" />
+                <Field label="TikTok" value={tiktok} onChange={setTiktok} placeholder="https://tiktok.com/@pseudo" prefix="TT" />
+                <Field label="Twitter / X" value={twitter} onChange={setTwitter} placeholder="https://x.com/pseudo" prefix="X" />
+                <Field label="Site web" value={website} onChange={setWebsite} placeholder="https://monsite.com" prefix="🌐" />
+              </div>
             </div>
           )}
 
