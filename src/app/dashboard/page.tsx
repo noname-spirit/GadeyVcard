@@ -12,6 +12,8 @@ import { useAuth } from '@/lib/supabase/AuthProvider';
 import { getCardsByUid } from '@/lib/supabase/cards';
 import { getLeadsByCardId, deleteLead } from '@/lib/supabase/leads';
 import { getCardStats } from '@/lib/supabase/events';
+import { getProfile } from '@/lib/supabase/profile';
+import { LockedFeature } from '@/components/ui/LockedFeature';
 
 const MOCK_STATS_BASE = [
   { label: 'Vues totales', value: '1 284', sub: '30 derniers jours', icon: Eye, trend: { value: 12, label: 'vs mois dernier' } },
@@ -35,9 +37,12 @@ export default function DashboardPage() {
   const [leads, setLeads] = useState<LeadRow[]>(MOCK_LEADS);
   const [views, setViews] = useState(0);
   const [clicks, setClicks] = useState(0);
+  const [userPlan, setUserPlan] = useState<'free' | 'starter' | 'pro' | 'business'>('free');
+  const canExport = userPlan !== 'free';
 
   useEffect(() => {
     if (!uid) return;
+    getProfile().then((p) => { if (p) setUserPlan(p.plan ?? 'free'); }).catch(() => {});
     getCardsByUid(uid).then(async (cards) => {
       if (cards.length === 0) return;
       setslug(cards[0].slug);
@@ -103,23 +108,37 @@ export default function DashboardPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 lg:gap-4">
-          {[
-            { label: 'Vues totales', value: String(views), sub: 'Toutes les visites', icon: Eye, trend: { value: 0, label: '' } },
-            { label: 'Clics liens', value: String(clicks), sub: 'Instagram, Site, WhatsApp…', icon: MousePointer, trend: { value: 0, label: '' } },
-            { label: 'Leads captés', value: String(leads.length), sub: 'Formulaire + QR code', icon: Users, trend: { value: 0, label: '' } },
-            ...MOCK_STATS_BASE.slice(2),
-          ].map((s) => (
-            <StatCard key={s.label} {...s} />
-          ))}
+          <StatCard label="Vues totales" value={String(views)} sub="Toutes les visites" icon={Eye} trend={{ value: 0, label: '' }} />
+          <StatCard label="Clics liens" value={String(clicks)} sub="Instagram, Site, WhatsApp…" icon={MousePointer} trend={{ value: 0, label: '' }} />
+          {userPlan === 'free' ? (
+            <LockedFeature plan="starter" label="Leads captés" desc="Capturez et suivez vos contacts">
+              <StatCard label="Leads captés" value="—" sub="Formulaire + QR code" icon={Users} trend={{ value: 0, label: '' }} />
+            </LockedFeature>
+          ) : (
+            <StatCard label="Leads captés" value={String(leads.length)} sub="Formulaire + QR code" icon={Users} trend={{ value: 0, label: '' }} />
+          )}
+          {userPlan === 'free' ? (
+            <LockedFeature plan="starter" label="Taux de conversion" desc="Vues → Leads">
+              <StatCard label="Taux conversion" value="3.2%" sub="Vues → Leads" icon={TrendingUp} trend={{ value: -2, label: 'vs mois dernier' }} />
+            </LockedFeature>
+          ) : (
+            <StatCard label="Taux conversion" value="3.2%" sub="Vues → Leads" icon={TrendingUp} trend={{ value: -2, label: 'vs mois dernier' }} />
+          )}
         </div>
 
         {/* Leads */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h3 className="text-base lg:text-lg font-semibold text-white">Leads récents</h3>
-            <span className="text-xs text-zinc-500">{leads.length} contacts</span>
+            {userPlan !== 'free' && <span className="text-xs text-zinc-500">{leads.length} contacts</span>}
           </div>
-          <LeadsTable leads={leads} onDelete={handleDelete} onExport={handleExport} />
+          {userPlan === 'free' ? (
+            <LockedFeature plan="starter" label="Capture de leads" desc="Recevez et gérez les contacts qui visitent votre carte">
+              <LeadsTable leads={MOCK_LEADS} />
+            </LockedFeature>
+          ) : (
+            <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} />
+          )}
         </div>
 
       </div>

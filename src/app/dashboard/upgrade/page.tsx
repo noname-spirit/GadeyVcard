@@ -12,21 +12,39 @@ const PLANS = [
   {
     id: 'starter',
     name: 'Starter',
-    price: { monthly: 5, yearly: 4 },
-    features: ['1 carte', 'QR code + export', 'Stats basiques', '3 templates', 'Sans watermark'],
+    price: { monthly: 9, yearly: 7, yearlyTotal: 84 },
+    features: [
+      '1 vCard',
+      'QR code HD téléchargeable',
+      'Liens sociaux illimités',
+      '500 leads / mois inclus',
+      'Export CSV leads',
+      'Stats basiques (vues, clics, appareil)',
+      '3 templates au choix',
+      'Sans branding app',
+      'Export .vcf',
+      'Essai 14 jours sans CB',
+    ],
   },
   {
     id: 'pro',
     name: 'Pro',
-    price: { monthly: 15, yearly: 12 },
-    features: ['1 carte', 'Toutes les stats', 'Agenda Calendar', 'Custom domain', 'Leads CSV', 'Support NFC'],
+    price: { monthly: 22, yearly: 16.58, yearlyTotal: 199 },
+    features: [
+      '1 vCard',
+      'QR code HD + NFC ready',
+      'URL personnalisée + Vanity URL courte',
+      'Liens sociaux illimités',
+      'Tous les templates + couleur accent perso',
+      '2 000 leads / mois inclus',
+      'Export CSV leads',
+      'Analytics avancés (vues · clics · géo · device · heure de pointe)',
+      'Calendly intégré — prise de RDV depuis la carte',
+      'Notification temps réel nouveau lead',
+      'Support prioritaire — réponse 48h',
+      'Essai 14 jours sans CB',
+    ],
     popular: true,
-  },
-  {
-    id: 'business',
-    name: 'Business',
-    price: { monthly: 30, yearly: 24 },
-    features: ['5 cartes', 'Tout le plan Pro', 'CSV avancé', 'Support prioritaire'],
   },
 ];
 
@@ -36,13 +54,11 @@ export default function UpgradePage() {
   const [showModal, setShowModal] = useState(false);
 
   const selectedPlan = PLANS.find((p) => p.id === selected)!;
-  const amount = billing === 'yearly'
-    ? selectedPlan.price.yearly * 12
-    : selectedPlan.price.monthly;
+  const amount = billing === 'yearly' ? selectedPlan.price.yearlyTotal : selectedPlan.price.monthly;
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-3xl flex flex-col gap-8">
+      <div className="w-full max-w-2xl flex flex-col gap-8">
 
         {/* Header */}
         <div className="flex items-center gap-4">
@@ -68,11 +84,11 @@ export default function UpgradePage() {
             className={`px-5 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${billing === 'yearly' ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
           >
             Annuel
-            <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">−20%</span>
+            <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">−2 mois offerts</span>
           </button>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-2 gap-4">
           {PLANS.map((plan) => (
             <motion.button
               key={plan.id}
@@ -100,15 +116,21 @@ export default function UpgradePage() {
                 <div className={`w-5 h-5 rounded-full border-2 transition-all ${selected === plan.id ? 'bg-orange-500 border-orange-500' : 'border-zinc-600'}`} />
               </div>
 
-              <div className="mb-4">
-                <span className="text-3xl font-bold text-white">{plan.price[billing]}€</span>
+              <div className="mb-1">
+                <span className="text-3xl font-bold text-white">
+                  {billing === 'yearly' ? plan.price.yearly.toFixed(2) : plan.price.monthly}€
+                </span>
                 <span className="text-zinc-500 text-sm">/mois</span>
               </div>
+              {billing === 'yearly' && (
+                <p className="text-xs text-zinc-600 mb-4">{plan.price.yearlyTotal}€ facturés annuellement</p>
+              )}
+              {billing === 'monthly' && <div className="mb-4" />}
 
               <div className="flex flex-col gap-1.5">
                 {plan.features.map((f) => (
-                  <div key={f} className="flex items-center gap-2 text-xs text-zinc-400">
-                    <Check size={12} className="text-emerald-400 shrink-0" />
+                  <div key={f} className="flex items-start gap-2 text-xs text-zinc-400">
+                    <Check size={12} className="text-emerald-400 shrink-0 mt-0.5" />
                     {f}
                   </div>
                 ))}
@@ -124,13 +146,17 @@ export default function UpgradePage() {
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-zinc-400">Plan {selectedPlan.name} ({billing === 'monthly' ? 'mensuel' : 'annuel'})</span>
-              <span className="text-white font-semibold">{selectedPlan.price[billing]}€/mois</span>
+              <span className="text-white font-semibold">
+                {billing === 'yearly'
+                  ? `${selectedPlan.price.yearly.toFixed(2)}€/mois`
+                  : `${selectedPlan.price.monthly}€/mois`}
+              </span>
             </div>
             {billing === 'yearly' && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-zinc-500">Économie annuelle</span>
                 <span className="text-emerald-400 font-semibold">
-                  −{((PLANS.find(p => p.id === selected)!.price.monthly - selectedPlan.price.yearly) * 12).toFixed(0)}€/an
+                  −{(selectedPlan.price.monthly * 12 - selectedPlan.price.yearlyTotal)}€/an
                 </span>
               </div>
             )}
@@ -139,7 +165,7 @@ export default function UpgradePage() {
               <span className="text-zinc-300 font-medium">Total</span>
               <span className="text-xl font-bold text-white">
                 {billing === 'yearly'
-                  ? `${(selectedPlan.price.yearly * 12).toFixed(0)}€/an`
+                  ? `${selectedPlan.price.yearlyTotal}€/an`
                   : `${selectedPlan.price.monthly}€/mois`}
               </span>
             </div>

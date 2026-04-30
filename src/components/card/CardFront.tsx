@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Download, Instagram, Youtube, Globe, Linkedin, Phone, Mail, MessageCircle } from 'lucide-react';
+import { Download, Instagram, Youtube, Globe, Linkedin, Phone, Mail, MessageCircle, CalendarDays } from 'lucide-react';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 import { trackCardEvent, type LinkType } from '@/lib/supabase/events';
 
@@ -26,9 +26,10 @@ interface CardFrontProps {
   isSaving?: boolean;
   freshnessBadge?: { label: string; color: string } | null;
   onSaveContact: () => void;
+  onCalendlyClick?: () => void;
 }
 
-export function CardFront({ card, theme, language, isSaving, freshnessBadge, onSaveContact }: CardFrontProps) {
+export function CardFront({ card, theme, language, isSaving, freshnessBadge, onSaveContact, onCalendlyClick }: CardFrontProps) {
   const dark = theme === 'dark';
   const l = labels[language];
 
@@ -215,6 +216,26 @@ export function CardFront({ card, theme, language, isSaving, freshnessBadge, onS
         <Download size={16} className={`transition-transform ${isSaving ? 'animate-spin' : 'group-hover:translate-y-0.5'}`} />
         {isSaving ? l.adding : l.save}
       </motion.button>
+
+      {onCalendlyClick && (
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45, duration: 0.5 }}
+          onClick={onCalendlyClick}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="w-full py-2.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-300 border"
+          style={{
+            color: 'var(--accent)',
+            borderColor: 'color-mix(in srgb, var(--accent) 30%, transparent)',
+            background: 'color-mix(in srgb, var(--accent) 8%, transparent)',
+          }}
+        >
+          <CalendarDays size={15} />
+          {language === 'fr' ? 'Prendre rendez-vous' : language === 'th' ? 'นัดหมาย' : 'Book a meeting'}
+        </motion.button>
+      )}
     </div>
   );
 }

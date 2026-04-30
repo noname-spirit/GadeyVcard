@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, CalendarDays, X } from 'lucide-react';
 import { VCard } from '@/components/card';
 import { Watermark } from '@/components/card/Watermark';
 import { LeadCaptureForm } from '@/components/card/LeadCaptureForm';
@@ -11,8 +11,6 @@ import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 import { getCardBySlug, supabaseCardToCardData } from '@/lib/supabase/cards';
 import { trackCardEvent } from '@/lib/supabase/events';
 import Link from 'next/link';
-import { useAuth } from '@/lib/supabase/AuthProvider';
-import { getProfile } from '@/lib/supabase/profile';
 
 const BASE_CARD: CardData = {
   id: 'demo',
@@ -35,6 +33,7 @@ const BASE_CARD: CardData = {
   template: 'dark',
   updatedAt: new Date().toISOString(),
   plan: 'pro',
+  calendlyUrl: 'https://calendly.com/demo',
   captureForm: {
     title: 'Travaillons ensemble',
     subtitle: 'Laissez vos coordonnées — je vous recontacte sous 24h',
@@ -50,6 +49,41 @@ const PAGE_SUBTITLE: Record<CardLanguage, string> = {
   th: 'สแกน บันทึก และติดต่อกันได้เลย',
 };
 
+function CalendlyModal({ url, onClose }: { url: string; onClose: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="bg-zinc-900 rounded-t-3xl sm:rounded-3xl w-full max-w-md h-[88vh] sm:h-175 overflow-hidden border border-zinc-800/60 flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-800/60 shrink-0">
+          <div className="flex items-center gap-2 text-sm font-semibold text-zinc-200">
+            <CalendarDays size={15} className="text-orange-400" />
+            Prendre rendez-vous
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-all"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        <iframe
+          src={url}
+          width="100%"
+          height="100%"
+          frameBorder={0}
+          className="flex-1 min-h-0"
+          title="Calendly — prise de rendez-vous"
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function CardPage() {
   const { slug } = useParams<{ slug: string }>();
   const [card, setCard] = useState<CardData>(BASE_CARD);
@@ -57,32 +91,21 @@ export default function CardPage() {
   const [language, setLanguage] = useState<CardLanguage>('en');
   const [isSaving, setIsSaving] = useState(false);
   const [cardLoading, setCardLoading] = useState(true);
+  const [showCalendly, setShowCalendly] = useState(false);
   const dark = theme === 'dark';
-  const[plan, setPlan] = useState<CardData['plan']>(undefined);
 
   useEffect(() => {
+    const formatName = (str: string) =>
+      decodeURIComponent(str).toLowerCase().replace(/\s+/g, '-');
+    const slugFormatted = formatName(slug);
 
-    // if (!uid) { setCardLoading(false); return; }
-    const formatName = (str : string) =>
-  decodeURIComponent(str).toLowerCase().replace(/\s+/g, '-');
-    const slugFomatted = formatName(slug);
-    console.log(slugFomatted, "slug formatted");
-
-
-    Promise.all([
-      getCardBySlug(slugFomatted),
-      getProfile(),
-    ]).then(([match, profile]) => {
+    getCardBySlug(slugFormatted).then((match) => {
       if (match) {
         setCard(supabaseCardToCardData(match));
         setTheme(match.template === 'light' ? 'light' : 'dark');
         trackCardEvent(match.id, 'view');
       }
-      if (profile) {
-        setPlan(profile.plan as CardData['plan'] || undefined);
-      }
     }).finally(() => setCardLoading(false));
-      
   }, [slug]);
 
   const handleSaveContact = async () => {
@@ -157,6 +180,25 @@ export default function CardPage() {
           {PAGE_SUBTITLE[language]}
         </p>
 
+        {/* Badge disponibilité */}
+        {card.availabilityStatus && (
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-medium w-fit mx-auto ${
+            card.availabilityStatus === 'available' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+            card.availabilityStatus === 'busy' ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' :
+            'bg-zinc-800/60 border-zinc-700/40 text-zinc-400'
+          }`}>
+            <span className={`w-2 h-2 rounded-full ${
+              card.availabilityStatus === 'available' ? 'bg-emerald-400' :
+              card.availabilityStatus === 'busy' ? 'bg-amber-400' : 'bg-zinc-500'
+            }`} />
+            {card.availabilityText || (
+              card.availabilityStatus === 'available' ? 'Disponible pour de nouveaux projets' :
+              card.availabilityStatus === 'busy' ? 'Occupé — contactez-moi quand même' :
+              'Indisponible pour le moment'
+            )}
+          </div>
+        )}
+
         {/* VCard + formulaire groupés avec le même écart que le bouton interne (mt-2) */}
         <div className="flex flex-col w-full max-w-md gap-2">
           <VCard
@@ -165,6 +207,7 @@ export default function CardPage() {
             language={language}
             onSaveContact={handleSaveContact}
             isSaving={isSaving}
+            onCalendlyClick={card.calendlyUrl && card.plan === 'pro' ? () => { trackCardEvent(card.id, 'calendly'); setShowCalendly(true); } : undefined}
           />
 
           {card.template === 'influencer' ? (
@@ -179,12 +222,17 @@ export default function CardPage() {
               card={card}
               theme={theme}
               language={language}
-              locked={plan === 'free' ? true : false}
+              locked={false}
             />
           )}
         </div>
 
-        <Watermark plan={card.template === 'dark' ? 'free' : 'pro'} />
+        {/* Modal Calendly */}
+        {showCalendly && card.calendlyUrl && (
+          <CalendlyModal url={card.calendlyUrl} onClose={() => setShowCalendly(false)} />
+        )}
+
+        <Watermark plan={card.plan && card.plan !== 'free' ? 'pro' : 'free'} />
       </div>
     </div>
   );

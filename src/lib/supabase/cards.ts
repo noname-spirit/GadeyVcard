@@ -23,6 +23,10 @@ export interface SupabaseCard {
   website: string | null;
   tiktok: string | null;
   twitter: string | null;
+  // Pro features
+  calendly_url: string | null;
+  availability_status: string | null;
+  availability_text: string | null;
   // Meta
   is_active: boolean;
   view_count: number;
@@ -53,6 +57,9 @@ export function supabaseCardToCardData(c: SupabaseCard): CardData {
     template: (c.template as CardData['template']) ?? 'dark',
     plan: (c.plan as CardData['plan']) ?? undefined,
     updatedAt: c.updated_at,
+    calendlyUrl: c.calendly_url ?? undefined,
+    availabilityStatus: c.availability_status ?? undefined,
+    availabilityText: c.availability_text ?? undefined,
   };
 }
 
@@ -92,6 +99,9 @@ export async function upsertCard(uid: string, card: {
   accent_color?: string;
   template?: string;
   plan?: string;
+  calendly_url?: string | null;
+  availability_status?: string | null;
+  availability_text?: string | null;
 }): Promise<{ slug: string } | null> {
   const supabase = createClient();
   const { contact, socials, ...rest } = card;
