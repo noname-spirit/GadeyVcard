@@ -31,8 +31,11 @@ export interface CardData {
   accentColor?: string;   // couleur brand personnalisée (hex)
   template?: 'dark' | 'light' | 'color' | 'influencer';
   updatedAt?: string;
-  plan?: 'business' | 'pro' | "free"; // détermine l'accès au formulaire de capture
+  plan?: 'free' | 'starter' | 'pro' | 'business';
   captureForm?: CardCaptureForm;
+  calendlyUrl?: string;
+  availabilityStatus?: string;
+  availabilityText?: string;
 }
 
 export type CardTheme = 'dark' | 'light';

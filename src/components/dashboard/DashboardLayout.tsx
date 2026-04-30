@@ -3,18 +3,19 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, ExternalLink, Settings, Users, Menu, X, Zap, CreditCard, LogOut  } from 'lucide-react';
+import { Eye, ExternalLink, Settings, Users, Menu, X, Zap, CreditCard, LogOut, BarChart2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { createClient } from '@/lib/supabase/client';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/lib/supabase/AuthProvider';
-import { getCardsByUid, SupabaseCard } from '@/lib/supabase/cards';
+import { getCardsByUid } from '@/lib/supabase/cards';
 import { getProfile, Profile } from '@/lib/supabase/profile';
 import Link from 'next/link';
 
 const BASE_NAV = [
   { label: 'Aperçu', icon: Eye, href: '/dashboard' },
-  { label: 'Leads', icon: Users, href: '/dashboard' },
+  { label: 'Leads', icon: Users, href: '/dashboard/leads' },
+  { label: 'Analytics', icon: BarChart2, href: '/dashboard/analytics' },
   { label: 'Paramètres', icon: Settings, href: '/dashboard/settings' },
 ];
 
@@ -29,10 +30,6 @@ function Sidebar({ active, slug, onClose, onLogout,profil }: { active?: string; 
     { label: 'Ma carte', icon: ExternalLink, href: `/${slug}` },
     ...BASE_NAV.slice(1),
   ];
-  useEffect(()=>{
-
-  },[profil])
-console.log(profil, "profil from sidebar");
   return (
     <div className="flex flex-col h-full p-4 gap-6">
       <div className="flex items-center justify-between pt-2">
@@ -88,17 +85,10 @@ export function DashboardLayout({ children, active }: DashboardLayoutProps) {
 
   useEffect(() => {
     if (!uid) return;
-     const fetchData = async () => {
-    try {
-      const data = await getProfile();
-      setprofil(data);
-      setSlug(data?.full_name || 'demo');
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  fetchData();
+    getProfile().then((data) => setprofil(data)).catch(() => {});
+    getCardsByUid(uid).then((cards) => {
+      if (cards.length > 0) setSlug(cards[0].slug);
+    }).catch(() => {});
   }, [uid]);
 
   const handleLogout = async () => {

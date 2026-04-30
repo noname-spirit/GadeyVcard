@@ -22,9 +22,10 @@ interface VCardProps {
   language: CardLanguage;
   onSaveContact: () => void;
   isSaving?: boolean;
+  onCalendlyClick?: () => void;
 }
 
-export function VCard({ card, theme, language, onSaveContact, isSaving }: VCardProps) {
+export function VCard({ card, theme, language, onSaveContact, isSaving, onCalendlyClick }: VCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const dark = theme === 'dark';
   const l = flipLabels[language];
@@ -92,6 +93,7 @@ export function VCard({ card, theme, language, onSaveContact, isSaving }: VCardP
                 isSaving={isSaving}
                 freshnessBadge={freshnessBadge}
                 onSaveContact={onSaveContact}
+                onCalendlyClick={onCalendlyClick}
               />
             </motion.div>
 

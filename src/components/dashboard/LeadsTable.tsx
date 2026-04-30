@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Download, Trash2, Search } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Download, Trash2, Search, StickyNote, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 export interface LeadRow {
@@ -13,6 +13,8 @@ export interface LeadRow {
   domaine: string;
   source: string;
   createdAt: string;
+  status?: 'new' | 'contacted' | 'converted';
+  notes?: string;
 }
 
 interface LeadsTableProps {
@@ -21,8 +23,50 @@ interface LeadsTableProps {
   onExport?: () => void;
 }
 
+type LeadStatus = 'new' | 'contacted' | 'converted';
+
+const STATUS = {
+  new: { label: 'Nouveau', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
+  contacted: { label: 'Contacté', color: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
+  converted: { label: 'Converti', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
+};
+
+const STATUS_CYCLE: (LeadStatus | undefined)[] = [undefined, 'new', 'contacted', 'converted'];
+
 export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
   const [search, setSearch] = useState('');
+  const [statuses, setStatuses] = useState<Record<string, LeadStatus | undefined>>({});
+  const [notes, setNotes] = useState<Record<string, string>>({});
+  const [editingNote, setEditingNote] = useState<string | null>(null);
+  const [draftNote, setDraftNote] = useState('');
+
+  useEffect(() => {
+    const s: Record<string, LeadStatus | undefined> = {};
+    const n: Record<string, string> = {};
+    leads.forEach((l) => {
+      if (l.status) s[l.id] = l.status;
+      if (l.notes) n[l.id] = l.notes;
+    });
+    setStatuses(s);
+    setNotes(n);
+  }, [leads]);
+
+  const cycleStatus = (id: string) => {
+    const current = statuses[id];
+    const idx = STATUS_CYCLE.indexOf(current);
+    const next = STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length];
+    setStatuses((prev) => ({ ...prev, [id]: next }));
+  };
+
+  const openNote = (id: string) => {
+    setDraftNote(notes[id] ?? '');
+    setEditingNote(id);
+  };
+
+  const saveNote = (id: string) => {
+    setNotes((prev) => ({ ...prev, [id]: draftNote }));
+    setEditingNote(null);
+  };
 
   const filtered = leads.filter((l) =>
     [l.nom, l.email, l.telephone, l.message, l.domaine].some((v) =>
@@ -54,10 +98,10 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
 
       {/* Table */}
       <div className="rounded-2xl border border-zinc-800/60 overflow-x-auto">
-        <table className="w-full text-sm min-w-150">
+        <table className="w-full text-sm min-w-275">
           <thead>
             <tr className="border-b border-zinc-800/60 bg-zinc-900/60">
-              {['Nom', 'Email', 'Téléphone', 'Message', 'Domaine', 'Source', 'Date', ''].map((h) => (
+              {['Nom', 'Email', 'Téléphone', 'Message', 'Domaine', 'Source', 'Statut', 'Notes', 'Date', ''].map((h) => (
                 <th key={h} className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">
                   {h}
                 </th>
@@ -67,46 +111,92 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-zinc-500 text-sm">
+                <td colSpan={10} className="px-4 py-12 text-center text-zinc-500 text-sm">
                   Aucun lead pour l&#39;instant.
                 </td>
               </tr>
             ) : (
-              filtered.map((lead) => (
-                <tr key={lead.id} className="border-b border-zinc-800/40 hover:bg-zinc-800/20 transition-colors">
-                  <td className="px-4 py-3 font-medium text-zinc-200">{lead.nom}</td>
-                  <td className="px-4 py-3 text-zinc-400">{lead.email}</td>
-                  <td className="px-4 py-3 text-zinc-400">{lead.telephone || <span className="text-zinc-700">—</span>}</td>
-                  <td className="px-4 py-3 text-zinc-400 max-w-48 truncate" title={lead.message}>{lead.message || <span className="text-zinc-700">—</span>}</td>
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-0.5 text-xs rounded-full bg-zinc-800 border border-zinc-700/40 text-zinc-400">
-                      {lead.domaine}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${
-                      lead.source === 'qd code'
-                        ? 'bg-orange-500/10 text-orange-400 border border-orange-500/30'
-                        : 'bg-zinc-800 text-zinc-400 border border-zinc-700/40'
-                    }`}>
-                      {lead.source}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-zinc-500 text-xs">
-                    {new Date(lead.createdAt).toLocaleDateString('fr-FR')}
-                  </td>
-                  <td className="px-4 py-3">
-                    {onDelete && (
+              filtered.map((lead) => {
+                const status = statuses[lead.id];
+                const note = notes[lead.id];
+                return (
+                  <tr key={lead.id} className="border-b border-zinc-800/40 hover:bg-zinc-800/20 transition-colors">
+                    <td className="px-4 py-3 font-medium text-zinc-200">{lead.nom}</td>
+                    <td className="px-4 py-3 text-zinc-400">{lead.email}</td>
+                    <td className="px-4 py-3 text-zinc-400">{lead.telephone || <span className="text-zinc-700">—</span>}</td>
+                    <td className="px-4 py-3 text-zinc-400 max-w-36">
+                      {lead.message
+                        ? <span className="block truncate" title={lead.message}>{lead.message}</span>
+                        : <span className="text-zinc-700">—</span>}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="px-2 py-0.5 text-xs rounded-full bg-zinc-800 border border-zinc-700/40 text-zinc-400">
+                        {lead.domaine}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={[
+                        'px-2 py-0.5 text-xs rounded-full border font-medium',
+                        lead.source === 'qd code'
+                          ? 'bg-violet-500/10 text-violet-400 border-violet-500/30'
+                          : 'bg-zinc-800 text-zinc-400 border-zinc-700/40',
+                      ].join(' ')}>
+                        {lead.source}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
                       <button
-                        onClick={() => onDelete(lead.id)}
-                        className="p-1.5 rounded-lg text-zinc-600 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
+                        onClick={() => cycleStatus(lead.id)}
+                        title="Cliquer pour changer le statut"
+                        className={[
+                          'px-2.5 py-0.5 text-xs rounded-full font-medium border transition-all',
+                          status ? STATUS[status].color : 'bg-zinc-800 text-zinc-500 border-zinc-700/40 hover:border-zinc-600',
+                        ].join(' ')}
                       >
-                        <Trash2 size={14} />
+                        {status ? STATUS[status].label : '—'}
                       </button>
-                    )}
-                  </td>
-                </tr>
-              ))
+                    </td>
+                    <td className="px-4 py-3">
+                      {editingNote === lead.id ? (
+                        <div className="flex items-center gap-1">
+                          <input
+                            autoFocus
+                            type="text"
+                            value={draftNote}
+                            onChange={(e) => setDraftNote(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') saveNote(lead.id); if (e.key === 'Escape') setEditingNote(null); }}
+                            className="w-32 px-2 py-1 text-xs bg-zinc-800 border border-zinc-700/40 rounded-lg text-zinc-100 outline-none focus:border-orange-500/50"
+                          />
+                          <button onClick={() => saveNote(lead.id)} className="p-1 text-emerald-400 hover:text-emerald-300">✓</button>
+                          <button onClick={() => setEditingNote(null)} className="p-1 text-zinc-500 hover:text-zinc-300"><X size={11} /></button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => openNote(lead.id)}
+                          title={note || 'Ajouter une note'}
+                          className="flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-300 transition-colors max-w-36 truncate"
+                        >
+                          <StickyNote size={12} className={note ? 'text-amber-400' : ''} />
+                          <span className="truncate">{note || 'Note...'}</span>
+                        </button>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-zinc-500 text-xs whitespace-nowrap">
+                      {new Date(lead.createdAt).toLocaleDateString('fr-FR')}
+                    </td>
+                    <td className="px-4 py-3">
+                      {onDelete && (
+                        <button
+                          onClick={() => onDelete(lead.id)}
+                          className="p-1.5 rounded-lg text-zinc-600 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

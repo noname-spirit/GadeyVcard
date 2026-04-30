@@ -3,6 +3,7 @@ import { createClient } from './client';
 export type LinkType =
   | 'instagram' | 'youtube' | 'linkedin' | 'website'
   | 'phone' | 'email' | 'whatsapp' | 'line'
+  | 'calendly'
   | 'view';
 
 export function trackCardEvent(cardId: string, linkType: LinkType): void {
