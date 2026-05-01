@@ -29,7 +29,7 @@ export default function LeadsPage() {
   const canExport = userPlan !== 'free';
 
   useEffect(() => {
-    getProfile().then((p) => { if (p) setUserPlan(p.plan ?? 'free'); }).catch(() => {});
+    getProfile().then((p) => { if (p) setUserPlan(p.plan ?? 'free'); }).catch(() => { });
     if (!uid) { Promise.resolve().then(() => setLoading(false)); return; }
     getCardsByUid(uid).then(async (cards) => {
       if (!cards.length) { setLoading(false); return; }
@@ -139,7 +139,7 @@ export default function LeadsPage() {
             <LeadsTable leads={MOCK_LEADS} />
           </LockedFeature>
         ) : (
-          <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} />
+          <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} onUpdate={handleUpdate} />
         )}
 
       </div>
