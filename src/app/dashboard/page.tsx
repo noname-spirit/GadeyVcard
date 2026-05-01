@@ -15,11 +15,6 @@ import { getCardStats } from '@/lib/supabase/events';
 import { getProfile } from '@/lib/supabase/profile';
 import { LockedFeature } from '@/components/ui/LockedFeature';
 
-const MOCK_STATS_BASE = [
-  { label: 'Vues totales', value: '1 284', sub: '30 derniers jours', icon: Eye, trend: { value: 12, label: 'vs mois dernier' } },
-  { label: 'Clics liens', value: '347', sub: 'Instagram, Site, WhatsApp', icon: MousePointer, trend: { value: 8, label: 'vs mois dernier' } },
-  { label: 'Taux conversion', value: '3.2%', sub: 'Vues → Leads', icon: TrendingUp, trend: { value: -2, label: 'vs mois dernier' } },
-];
 
 const MOCK_LEADS: LeadRow[] = [
   { id: '1', nom: 'Sophie Martin', email: 'sophie@cafe.fr', telephone: '+33612345678', domaine: 'Café', source: 'formulaire', createdAt: '2026-04-15T10:00:00Z' },
@@ -47,7 +42,7 @@ export default function DashboardPage() {
       if (cards.length === 0) return;
       setslug(cards[0].slug);
       setName(cards[0].name);
-      const [dbLeads, stats] = await Promise.all([
+const [dbLeads, stats] = await Promise.all([
         getLeadsByCardId(cards[0].id),
         getCardStats(cards[0].id),
       ]);
