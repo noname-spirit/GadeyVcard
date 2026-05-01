@@ -385,40 +385,23 @@ export default function SettingsPage() {
           )}
 
           {tab === "links" && (
-            <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
-              <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">
-                Contact & Réseaux
-              </h3>
-              <Field
-                label="Téléphone"
-                value={phone}
-                onChange={setPhone}
-                type="tel"
-              />
-              <Field
-                label="Email"
-                value={email}
-                onChange={setEmail}
-                type="email"
-              />
-              <Field
-                label="WhatsApp"
-                value={whatsapp}
-                onChange={setWhatsapp}
-                placeholder="+33 6 …"
-              />
-              <Field
-                label="Instagram"
-                value={instagram}
-                onChange={setInstagram}
-                prefix="IG"
-              />
-              <Field
-                label="Site web"
-                value={website}
-                onChange={setWebsite}
-                prefix="🌐"
-              />
+            <div className="flex flex-col gap-5">
+              <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
+                <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Contact</h3>
+                <Field label="Téléphone" value={phone} onChange={setPhone} type="tel" />
+                <Field label="Email" value={email} onChange={setEmail} type="email" />
+                <Field label="WhatsApp" value={whatsapp} onChange={setWhatsapp} placeholder="+33 6 …" />
+                <Field label="LINE" value={line} onChange={setLine} placeholder="ID LINE" prefix="LINE" />
+              </div>
+              <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
+                <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Réseaux sociaux</h3>
+                <Field label="Instagram" value={instagram} onChange={setInstagram} placeholder="votre.nom" prefix="instagram.com/" />
+                <Field label="YouTube" value={youtube} onChange={setYoutube} placeholder="@votre-chaine" prefix="youtube.com/" />
+                <Field label="LinkedIn" value={linkedin} onChange={setLinkedin} placeholder="votre-nom" prefix="linkedin.com/in/" />
+                <Field label="TikTok" value={tiktok} onChange={setTiktok} placeholder="@votre.nom" prefix="tiktok.com/@" />
+                <Field label="X / Twitter" value={twitter} onChange={setTwitter} placeholder="votre_nom" prefix="x.com/" />
+                <Field label="Site web" value={website} onChange={setWebsite} placeholder="https://votresite.com" prefix="🌐" />
+              </div>
             </div>
           )}
 

@@ -13,14 +13,17 @@ export interface LeadRow {
   domaine: string;
   source: string;
   createdAt: string;
-  status?: 'new' | 'contacted' | 'converted';
+  statut?: 'new' | 'contacted' | 'converted';
   notes?: string;
 }
+
+type UpdateFields = { statut?: string; notes?: string; source?: string };
 
 interface LeadsTableProps {
   leads: LeadRow[];
   onDelete?: (id: string) => void;
   onExport?: () => void;
+  onUpdate?: (id: string, fields: UpdateFields) => void;
 }
 
 type LeadStatus = 'new' | 'contacted' | 'converted';
@@ -33,22 +36,36 @@ const STATUS = {
 
 const STATUS_CYCLE: (LeadStatus | undefined)[] = [undefined, 'new', 'contacted', 'converted'];
 
-export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
+const SOURCE_OPTIONS = ['formulaire', 'qr code', 'téléphone', 'email', 'référence', 'autre'];
+
+function initStatuses(rows: LeadRow[]): Record<string, LeadStatus | undefined> {
+  const s: Record<string, LeadStatus | undefined> = {};
+  rows.forEach((l) => { if (l.statut) s[l.id] = l.statut as LeadStatus; });
+  return s;
+}
+function initNotes(rows: LeadRow[]): Record<string, string> {
+  const n: Record<string, string> = {};
+  rows.forEach((l) => { if (l.notes) n[l.id] = l.notes; });
+  return n;
+}
+function initSources(rows: LeadRow[]): Record<string, string> {
+  const src: Record<string, string> = {};
+  rows.forEach((l) => { if (l.source) src[l.id] = l.source; });
+  return src;
+}
+
+export function LeadsTable({ leads, onDelete, onExport, onUpdate }: LeadsTableProps) {
   const [search, setSearch] = useState('');
-  const [statuses, setStatuses] = useState<Record<string, LeadStatus | undefined>>({});
-  const [notes, setNotes] = useState<Record<string, string>>({});
+  const [statuses, setStatuses] = useState<Record<string, LeadStatus | undefined>>(() => initStatuses(leads));
+  const [notes, setNotes] = useState<Record<string, string>>(() => initNotes(leads));
+  const [sources, setSources] = useState<Record<string, string>>(() => initSources(leads));
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [draftNote, setDraftNote] = useState('');
 
   useEffect(() => {
-    const s: Record<string, LeadStatus | undefined> = {};
-    const n: Record<string, string> = {};
-    leads.forEach((l) => {
-      if (l.status) s[l.id] = l.status;
-      if (l.notes) n[l.id] = l.notes;
-    });
-    setStatuses(s);
-    setNotes(n);
+    setStatuses(initStatuses(leads));
+    setNotes(initNotes(leads));
+    setSources(initSources(leads));
   }, [leads]);
 
   const cycleStatus = (id: string) => {
@@ -56,6 +73,7 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
     const idx = STATUS_CYCLE.indexOf(current);
     const next = STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length];
     setStatuses((prev) => ({ ...prev, [id]: next }));
+    onUpdate?.(id, { statut: next ?? '' });
   };
 
   const openNote = (id: string) => {
@@ -66,6 +84,12 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
   const saveNote = (id: string) => {
     setNotes((prev) => ({ ...prev, [id]: draftNote }));
     setEditingNote(null);
+    onUpdate?.(id, { notes: draftNote });
+  };
+
+  const changeSource = (id: string, value: string) => {
+    setSources((prev) => ({ ...prev, [id]: value }));
+    onUpdate?.(id, { source: value });
   };
 
   const filtered = leads.filter((l) =>
@@ -135,14 +159,15 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={[
-                        'px-2 py-0.5 text-xs rounded-full border font-medium',
-                        lead.source === 'qd code'
-                          ? 'bg-violet-500/10 text-violet-400 border-violet-500/30'
-                          : 'bg-zinc-800 text-zinc-400 border-zinc-700/40',
-                      ].join(' ')}>
-                        {lead.source}
-                      </span>
+                      <select
+                        value={sources[lead.id] ?? lead.source}
+                        onChange={(e) => changeSource(lead.id, e.target.value)}
+                        className="px-2 py-0.5 text-xs rounded-full border bg-zinc-800 text-zinc-400 border-zinc-700/40 outline-none focus:border-orange-500/50 cursor-pointer"
+                      >
+                        {SOURCE_OPTIONS.map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                      </select>
                     </td>
                     <td className="px-4 py-3">
                       <button

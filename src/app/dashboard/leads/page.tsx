@@ -7,7 +7,7 @@ import { LeadsTable } from '@/components/dashboard/LeadsTable';
 import type { LeadRow } from '@/components/dashboard/LeadsTable';
 import { useAuth } from '@/lib/supabase/AuthProvider';
 import { getCardsByUid } from '@/lib/supabase/cards';
-import { getLeadsByCardId, deleteLead } from '@/lib/supabase/leads';
+import { getLeadsByCardId, deleteLead, updateLead } from '@/lib/supabase/leads';
 import { getProfile } from '@/lib/supabase/profile';
 import { LockedFeature } from '@/components/ui/LockedFeature';
 
@@ -27,11 +27,13 @@ export default function LeadsPage() {
   const canExport = userPlan !== 'free';
 
   useEffect(() => {
-    getProfile().then((p) => { if (p) setUserPlan(p.plan ?? 'free'); }).catch(() => {});
-    if (!uid) { setLoading(false); return; }
-    getCardsByUid(uid).then(async (cards) => {
+    async function load() {
+      const profile = await getProfile().catch(() => null);
+      if (profile) setUserPlan(profile.plan ?? 'free');
+      if (!uid) { setLoading(false); return; }
+      const cards = await getCardsByUid(uid).catch(() => []);
       if (!cards.length) { setLoading(false); return; }
-      const dbLeads = await getLeadsByCardId(cards[0].id);
+      const dbLeads = await getLeadsByCardId(cards[0].id).catch(() => []);
       if (dbLeads.length > 0) {
         setLeads(dbLeads.map((l) => ({
           id: l.id ?? crypto.randomUUID(),
@@ -40,16 +42,25 @@ export default function LeadsPage() {
           telephone: l.phone ?? undefined,
           message: l.message ?? undefined,
           domaine: l.domain ?? '',
-          source: 'formulaire',
+          source: l.source ?? 'formulaire',
+          statut: (l.statut as LeadRow['statut']) ?? undefined,
+          notes: l.notes ?? undefined,
           createdAt: l.created_at ?? '',
         })));
       }
-    }).catch(() => {}).finally(() => setLoading(false));
+      setLoading(false);
+    }
+    load();
   }, [uid]);
 
   const handleDelete = async (id: string) => {
     await deleteLead(id);
     setLeads((prev) => prev.filter((l) => l.id !== id));
+  };
+
+  const handleUpdate = async (id: string, fields: { statut?: string; notes?: string; source?: string }) => {
+    await updateLead(id, fields);
+    setLeads((prev) => prev.map((l) => l.id === id ? { ...l, ...fields, statut: fields.statut as LeadRow['statut'] } : l));
   };
 
   const handleExport = () => {
@@ -62,6 +73,10 @@ export default function LeadsPage() {
     a.href = url; a.download = 'leads.csv'; a.click();
     URL.revokeObjectURL(url);
   };
+
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000);
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
 
   return (
     <DashboardLayout active="Leads">
@@ -92,8 +107,8 @@ export default function LeadsPage() {
         <div className="grid grid-cols-3 gap-3">
           {[
             { label: 'Total', value: leads.length, icon: Users, color: 'text-orange-400 bg-orange-500/10' },
-            { label: 'Ce mois', value: leads.filter((l) => new Date(l.createdAt) > new Date(Date.now() - 30 * 86400000)).length, icon: Users, color: 'text-emerald-400 bg-emerald-500/10' },
-            { label: 'Cette semaine', value: leads.filter((l) => new Date(l.createdAt) > new Date(Date.now() - 7 * 86400000)).length, icon: Users, color: 'text-blue-400 bg-blue-500/10' },
+            { label: 'Ce mois', value: leads.filter((l) => new Date(l.createdAt) > thirtyDaysAgo).length, icon: Users, color: 'text-emerald-400 bg-emerald-500/10' },
+            { label: 'Cette semaine', value: leads.filter((l) => new Date(l.createdAt) > sevenDaysAgo).length, icon: Users, color: 'text-blue-400 bg-blue-500/10' },
           ].map((s) => (
             <div key={s.label} className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-4 flex flex-col gap-2">
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${s.color}`}>
@@ -112,7 +127,7 @@ export default function LeadsPage() {
             <div className="w-6 h-6 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
           </div>
         ) : (
-          <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} />
+          <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} onUpdate={handleUpdate} />
         )}
 
       </div>

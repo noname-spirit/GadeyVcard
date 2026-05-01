@@ -52,6 +52,7 @@ export default function OnboardingPage() {
       },
       accent_color: data.accentColor ?? '#f97316',
       template: data.template ?? 'dark',
+      plan: 'free',
     });
 
     if (!result) throw new Error('Échec de la création de la carte');

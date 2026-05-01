@@ -10,7 +10,7 @@ import type { LeadRow } from '@/components/dashboard/LeadsTable';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/lib/supabase/AuthProvider';
 import { getCardsByUid } from '@/lib/supabase/cards';
-import { getLeadsByCardId, deleteLead } from '@/lib/supabase/leads';
+import { getLeadsByCardId, deleteLead, updateLead } from '@/lib/supabase/leads';
 import { getCardStats } from '@/lib/supabase/events';
 import { getProfile } from '@/lib/supabase/profile';
 import { LockedFeature } from '@/components/ui/LockedFeature';
@@ -56,7 +56,9 @@ const [dbLeads, stats] = await Promise.all([
           telephone: l.phone ?? undefined,
           message: l.message ?? undefined,
           domaine: l.domain ?? '',
-          source: 'formulaire',
+          source: l.source ?? 'formulaire',
+          statut: (l.statut as LeadRow['statut']) ?? undefined,
+          notes: l.notes ?? undefined,
           createdAt: l.created_at ?? '',
         })));
       }
@@ -66,6 +68,11 @@ const [dbLeads, stats] = await Promise.all([
   const handleDelete = async (id: string) => {
     await deleteLead(id);
     setLeads((prev) => prev.filter((l) => l.id !== id));
+  };
+
+  const handleUpdate = async (id: string, fields: { statut?: string; notes?: string; source?: string }) => {
+    await updateLead(id, fields);
+    setLeads((prev) => prev.map((l) => l.id === id ? { ...l, ...fields, statut: fields.statut as LeadRow['statut'] } : l));
   };
 
   const handleExport = () => {
@@ -132,7 +139,7 @@ const [dbLeads, stats] = await Promise.all([
               <LeadsTable leads={MOCK_LEADS} />
             </LockedFeature>
           ) : (
-            <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} />
+            <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} onUpdate={handleUpdate} />
           )}
         </div>
 

@@ -4,7 +4,7 @@ export interface Profile {
   id: string;
   full_name: string | null;
   avatar_url: string | null;
-  plan: 'free' | 'pro' | 'business';
+  plan: 'free' | 'starter' | 'pro' | 'business';
   trial_ends_at: string | null;
   stripe_customer_id: string | null;
   created_at: string;
@@ -41,4 +41,12 @@ export async function updateProfile(fields: Partial<Pick<Profile, 'full_name' | 
   if (!user) return;
   const { error } = await supabase.from('profiles').update(fields).eq('id', user.id);
   if (error) console.error('updateProfile:', error.message);
+}
+
+export async function updatePlan(plan: Profile['plan']): Promise<void> {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  const { error } = await supabase.from('profiles').update({ plan }).eq('id', user.id);
+  if (error) console.error('updatePlan:', error.message);
 }
