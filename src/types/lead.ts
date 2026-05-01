@@ -1,5 +1,4 @@
 export interface Lead {
-  status: undefined;
   id?: string;
   card_id: string;
   name: string;

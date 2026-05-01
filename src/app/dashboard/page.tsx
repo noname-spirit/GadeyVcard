@@ -25,9 +25,9 @@ const MOCK_LEADS: LeadRow[] = [
 export default function DashboardPage() {
   const { uid } = useAuth();
   const router = useRouter();
-  const [name,setName] = useState('');
+  const [name, setName] = useState('');
 
-  const [slug,setslug] = useState('demo');
+  const [slug, setslug] = useState('demo');
 
   const [leads, setLeads] = useState<LeadRow[]>([]);
   const [views, setViews] = useState(0);
@@ -37,12 +37,12 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!uid) return;
-    getProfile().then((p) => { if (p) setUserPlan(p.plan ?? 'free'); }).catch(() => {});
+    getProfile().then((p) => { if (p) setUserPlan(p.plan ?? 'free'); }).catch(() => { });
     getCardsByUid(uid).then(async (cards) => {
       if (cards.length === 0) return;
       setslug(cards[0].slug);
       setName(cards[0].name);
-const [dbLeads, stats] = await Promise.all([
+      const [dbLeads, stats] = await Promise.all([
         getLeadsByCardId(cards[0].id),
         getCardStats(cards[0].id),
       ]);
@@ -60,7 +60,7 @@ const [dbLeads, stats] = await Promise.all([
         notes: l.notes ?? undefined,
         createdAt: l.created_at ?? '',
       })));
-    }).catch(() => {});
+    }).catch(() => { });
   }, [uid]);
 
   const handleDelete = async (id: string) => {
