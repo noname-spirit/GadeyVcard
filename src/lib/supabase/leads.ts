@@ -15,6 +15,16 @@ export async function submitLead(lead: Lead): Promise<{ error: string | null }> 
   return { error: null };
 }
 
+export async function updateLead(
+  id: string,
+  fields: { statut?: string | null; notes?: string | null; source?: string | null }
+): Promise<{ error: string | null }> {
+  const supabase = createClient();
+  const { error } = await supabase.from('leads').update(fields).eq('id', id);
+  if (error) return { error: error.message };
+  return { error: null };
+}
+
 export async function deleteLead(id: string): Promise<{ error: string | null }> {
   const supabase = createClient();
   const { error } = await supabase.from('leads').delete().eq('id', id);
