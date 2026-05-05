@@ -4,7 +4,7 @@ export interface Profile {
   id: string;
   full_name: string | null;
   avatar_url: string | null;
-  plan: 'free' | 'pro' | 'business';
+  plan: 'free' | 'starter' | 'pro' | 'business';
   trial_ends_at: string | null;
   stripe_customer_id: string | null;
   created_at: string;

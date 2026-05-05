@@ -414,6 +414,36 @@ export default function SettingsPage() {
                 prefix="IG"
               />
               <Field
+                label="YouTube"
+                value={youtube}
+                onChange={setYoutube}
+                prefix="YT"
+              />
+              <Field
+                label="LinkedIn"
+                value={linkedin}
+                onChange={setLinkedin}
+                prefix="in"
+              />
+              <Field
+                label="TikTok"
+                value={tiktok}
+                onChange={setTiktok}
+                prefix="TK"
+              />
+              <Field
+                label="Twitter / X"
+                value={twitter}
+                onChange={setTwitter}
+                prefix="X"
+              />
+              <Field
+                label="LINE"
+                value={line}
+                onChange={setLine}
+                prefix="LINE"
+              />
+              <Field
                 label="Site web"
                 value={website}
                 onChange={setWebsite}
@@ -642,7 +672,10 @@ export default function SettingsPage() {
           )}
 
           {tab === "notifications" && (
-            <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-5">
+            <div className="relative bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-5 opacity-50 pointer-events-none select-none">
+              <div className="absolute inset-0 rounded-2xl z-10 flex items-center justify-center">
+                <span className="text-xs font-medium text-zinc-500 bg-zinc-900/90 border border-zinc-700/40 px-3 py-1.5 rounded-full">Bientôt disponible</span>
+              </div>
               <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">
                 Alertes email
               </h3>
@@ -650,14 +683,12 @@ export default function SettingsPage() {
                 {
                   label: "Nouveau lead",
                   sub: "Quand quelqu'un remplit votre formulaire",
-                  value: notifLead,
-                  set: setNotifLead,
+                  value: false,
                 },
                 {
                   label: "Vues carte",
                   sub: "Résumé hebdomadaire des visites",
-                  value: notifView,
-                  set: setNotifView,
+                  value: false,
                 },
               ].map((n) => (
                 <div
@@ -670,20 +701,9 @@ export default function SettingsPage() {
                     </p>
                     <p className="text-xs text-zinc-500 mt-0.5">{n.sub}</p>
                   </div>
-                  <button
-                    onClick={() => n.set(!n.value)}
-                    className={`relative w-11 h-6 rounded-full border transition-all shrink-0 ${n.value ? "bg-orange-500/20 border-orange-500/40" : "bg-zinc-800 border-zinc-700/40"}`}
-                  >
-                    <motion.div
-                      animate={{ x: n.value ? 20 : 2 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 500,
-                        damping: 30,
-                      }}
-                      className={`absolute top-0.5 w-5 h-5 rounded-full shadow-sm ${n.value ? "bg-orange-400" : "bg-zinc-500"}`}
-                    />
-                  </button>
+                  <div className="relative w-11 h-6 rounded-full border bg-zinc-800 border-zinc-700/40 shrink-0">
+                    <div className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-zinc-500" />
+                  </div>
                 </div>
               ))}
             </div>
@@ -716,7 +736,7 @@ export default function SettingsPage() {
               card={{ ...previewCard, template: 'influencer' }}
               theme="dark"
               language="fr"
-              locked
+              locked={userPlan === 'free'}
             />
           </div>
         ) : (
@@ -731,7 +751,7 @@ export default function SettingsPage() {
               card={previewCard}
               theme={template === 'light' ? 'light' : 'dark'}
               language="fr"
-              locked
+              locked={userPlan === 'free'}
             />
           </div>
         )}
