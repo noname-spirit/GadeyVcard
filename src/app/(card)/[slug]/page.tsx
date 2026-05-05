@@ -205,7 +205,7 @@ export default function CardPage() {
         {/* Rendu selon le template */}
         <div className="flex flex-col w-full max-w-md gap-2">
           {card.template === 'restaurant' ? (
-            <>
+            <div style={{ '--accent': card.accentColor || '#22c55e' } as React.CSSProperties} className="flex flex-col gap-2 w-full">
               <CardFrontRestaurant
                 card={{
                   id: card.id,
@@ -258,7 +258,7 @@ export default function CardPage() {
                   />
                 )}
               </AnimatePresence>
-            </>
+            </div>
           ) : (
             <>
               <VCard
