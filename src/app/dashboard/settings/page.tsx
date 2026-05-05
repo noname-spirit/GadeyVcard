@@ -31,7 +31,7 @@ import { LeadCaptureForm } from "@/components/card/LeadCaptureForm";
 import { LeadCaptureFormInfluencer } from "@/components/card/LeadCaptureFormInfluencer";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/supabase/AuthProvider";
-import { getCardsByUid, upsertCard } from "@/lib/supabase/cards";
+import { getCardsByUid, upsertCard, updateCard } from "@/lib/supabase/cards";
 import { getProfile } from "@/lib/supabase/profile";
 import { LockedFeature } from "@/components/ui/LockedFeature";
 
@@ -162,6 +162,7 @@ export default function SettingsPage() {
   const [availabilityStatus, setAvailabilityStatus] = useState("");
   const [availabilityText, setAvailabilityText] = useState("");
   const [copiedSignature, setCopiedSignature] = useState(false);
+  const [cardId, setCardId] = useState<string | null>(null);
   const [userPlan, setUserPlan] = useState<'free' | 'starter' | 'pro' | 'business'>('free');
   const isPro = userPlan === 'pro' || userPlan === 'business';
   const canExportQr = userPlan !== 'free';
@@ -190,6 +191,7 @@ export default function SettingsPage() {
     getCardsByUid(uid).then((cards) => {
       if (cards.length === 0) return;
       const c = cards[0];
+      setCardId(c.id);
       setName(c.name ?? "");
       setTitle(c.title ?? "");
       setSlug(c.slug ?? "");
@@ -215,21 +217,28 @@ export default function SettingsPage() {
   const handleSave = async () => {
     if (!slug || !uid) return;
     setSaving(true);
+    const payload = {
+      slug,
+      name,
+      title,
+      photo: photo || '',
+      contact: { phone: phone || null, email: email || null, whatsapp: whatsapp || null, line: line || null },
+      socials: { instagram: instagram || null, youtube: youtube || null, linkedin: linkedin || null, tiktok: tiktok || null, twitter: twitter || null, website: website || null },
+      accent_color: accent,
+      template,
+      calendly_url: calendlyUrl || null,
+      availability_status: availabilityStatus || null,
+      availability_text: availabilityText || null,
+    };
     try {
-      const result = await upsertCard(uid, {
-        slug,
-        name,
-        title,
-        photo: photo || '',
-        contact: { phone: phone || null, email: email || null, whatsapp: whatsapp || null, line: line || null },
-        socials: { instagram: instagram || null, youtube: youtube || null, linkedin: linkedin || null, tiktok: tiktok || null, twitter: twitter || null, website: website || null },
-        accent_color: accent,
-        template,
-        calendly_url: calendlyUrl || null,
-        availability_status: availabilityStatus || null,
-        availability_text: availabilityText || null,
-      });
-      if (!result) {
+      let ok: boolean;
+      if (cardId) {
+        ok = await updateCard(cardId, payload);
+      } else {
+        const result = await upsertCard(uid, payload);
+        ok = !!result;
+      }
+      if (!ok) {
         setSaveError(true);
         setTimeout(() => setSaveError(false), 4000);
       } else {
@@ -721,7 +730,16 @@ export default function SettingsPage() {
       {/* Colonne aperçu persistante */}
       <div className="xl:w-80 w-full flex flex-col gap-3 xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto xl:pb-4">
         <p className="text-xs text-zinc-500 uppercase tracking-wide font-medium">Aperçu en direct</p>
-        {template === 'influencer' ? (
+        {template === 'restaurant' ? (
+          <div className="w-full rounded-2xl bg-linear-to-br from-emerald-900/60 to-emerald-950/80 border border-emerald-800/40 flex flex-col items-center justify-center gap-3 py-16 px-6 text-center">
+            <span className="text-3xl">🍽️</span>
+            <p className="text-sm font-semibold text-emerald-300">Template Restaurant</p>
+            <p className="text-xs text-zinc-500">Aperçu non disponible dans l&apos;éditeur — vois ta carte en ligne pour le rendu complet.</p>
+            <a href={`/${slug}`} target="_blank" className="mt-1 text-xs text-emerald-400 hover:text-emerald-300 underline underline-offset-2 transition-colors">
+              Voir ma carte →
+            </a>
+          </div>
+        ) : template === 'influencer' ? (
           <div style={{ '--accent': accent } as React.CSSProperties} className="flex flex-col gap-2">
             <CardFrontInfluencer
               card={{
