@@ -130,6 +130,7 @@ export default function SettingsPage() {
   const [tab, setTab] = useState<Tab>("profile");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -151,7 +152,7 @@ export default function SettingsPage() {
   const [twitter, setTwitter] = useState("");
   const [website, setWebsite] = useState("");
   const [template, setTemplate] = useState<
-    "dark" | "light" | "color" | "influencer"
+    "dark" | "light" | "color" | "influencer" | "restaurant"
   >("dark");
   const [accent, setAccent] = useState("#f97316");
   const [notifLead, setNotifLead] = useState(true);
@@ -202,7 +203,7 @@ export default function SettingsPage() {
       setTiktok(c.tiktok ?? "");
       setTwitter(c.twitter ?? "");
       setWebsite(c.website ?? "");
-      setTemplate((c.template as "dark" | "light" | "color" | "influencer") ?? "dark");
+      setTemplate((c.template as "dark" | "light" | "color" | "influencer" | "restaurant") ?? "dark");
       setAccent(c.accent_color ?? "#f97316");
       setphoto(c.photo ?? "");
       setCalendlyUrl(c.calendly_url ?? "");
@@ -215,7 +216,7 @@ export default function SettingsPage() {
     if (!slug || !uid) return;
     setSaving(true);
     try {
-      await upsertCard(uid, {
+      const result = await upsertCard(uid, {
         slug,
         name,
         title,
@@ -228,11 +229,17 @@ export default function SettingsPage() {
         availability_status: availabilityStatus || null,
         availability_text: availabilityText || null,
       });
-      localStorage.setItem('vcard_settings', JSON.stringify({ name, title, slug, phone, email, whatsapp, instagram, website, template, accent }));
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
+      if (!result) {
+        setSaveError(true);
+        setTimeout(() => setSaveError(false), 4000);
+      } else {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2500);
+      }
     } catch (e) {
       console.error('Erreur lors de la sauvegarde :', e);
+      setSaveError(true);
+      setTimeout(() => setSaveError(false), 4000);
     } finally {
       setSaving(false);
     }
@@ -248,6 +255,7 @@ export default function SettingsPage() {
     contact: { phone: phone || undefined, email: email || undefined, whatsapp: whatsapp || undefined, line: line || undefined },
     accentColor: accent,
     template,
+    plan: userPlan,
   };
 
   return (
@@ -285,7 +293,7 @@ export default function SettingsPage() {
             className="flex items-center gap-2 self-start sm:self-auto"
           >
             <Save size={14} />
-            {saved ? "Sauvegardé ✓" : "Sauvegarder"}
+            {saved ? "Sauvegardé ✓" : saveError ? "Erreur — réessayer" : "Sauvegarder"}
           </Button>
         </div>
 
