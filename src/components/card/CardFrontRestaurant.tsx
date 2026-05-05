@@ -77,14 +77,15 @@ export function RestaurantMenuPanel({ card, theme, language }: RestaurantMenuPan
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 16 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
-      className={`w-full rounded-3xl border overflow-hidden ${overlayBg} ${dark ? 'border-zinc-800/60' : 'border-zinc-200/60'}`}
+      className={`w-full rounded-3xl border overflow-hidden flex flex-col ${overlayBg} ${dark ? 'border-zinc-800/60' : 'border-zinc-200/60'}`}
+      style={{ maxHeight: '72vh' }}
     >
-      <div className={`flex items-center gap-2 px-4 py-3.5 border-b ${overlayHeader}`}>
+      <div className={`flex items-center gap-2 px-4 py-3.5 border-b shrink-0 ${overlayHeader}`}>
         <Utensils size={13} style={{ color: 'var(--accent)' }} />
         <span className={`text-sm font-semibold ${dark ? 'text-white' : 'text-zinc-900'}`}>{l.menu}</span>
         <span className={`text-xs ${dark ? 'text-zinc-500' : 'text-zinc-400'}`}>· {card.name}</span>
       </div>
-      <div className="px-4 py-4 flex flex-col gap-5">
+      <div className="px-4 py-4 flex flex-col gap-5 overflow-y-auto">
         {Object.entries(grouped).map(([category, items], i) => (
           <motion.div
             key={category}
