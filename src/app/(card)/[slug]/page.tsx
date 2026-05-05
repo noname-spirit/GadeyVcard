@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { useParams } from 'next/navigation';
 import { Sun, Moon, CalendarDays, X } from 'lucide-react';
 import { VCard } from '@/components/card';
 import { Watermark } from '@/components/card/Watermark';
 import { LeadCaptureForm } from '@/components/card/LeadCaptureForm';
 import { LeadCaptureFormInfluencer } from '@/components/card/LeadCaptureFormInfluencer';
-import { CardFrontRestaurant } from '@/components/card/CardFrontRestaurant';
+import { CardFrontRestaurant, RestaurantMenuPanel } from '@/components/card/CardFrontRestaurant';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 import { getCardBySlug, supabaseCardToCardData } from '@/lib/supabase/cards';
 import { trackCardEvent } from '@/lib/supabase/events';
@@ -93,6 +94,7 @@ export default function CardPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [cardLoading, setCardLoading] = useState(true);
   const [showCalendly, setShowCalendly] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const dark = theme === 'dark';
 
   useEffect(() => {
@@ -203,33 +205,60 @@ export default function CardPage() {
         {/* Rendu selon le template */}
         <div className="flex flex-col w-full max-w-md gap-2">
           {card.template === 'restaurant' ? (
-            <CardFrontRestaurant
-              card={{
-                id: card.id,
-                slug: card.slug,
-                name: card.name,
-                tagline: card.title || 'Cuisine · Ambiance · Saveurs',
-                photo: card.photo || '/noname-spirit.jpg',
-                contact: {
-                  phone: card.contact?.phone,
-                  website: card.contact?.email ? undefined : card.socials?.website,
-                  address: undefined,
-                  hours: undefined,
-                },
-                menu: [
-                  { id: '1', name: 'Soupe du jour', price: 8, category: 'Entrées', available: true, emoji: '🍲' },
-                  { id: '2', name: 'Buddha Bowl', price: 14, category: 'Plats', available: true, emoji: '🥗' },
-                  { id: '3', name: 'Burger Végé', price: 16, category: 'Plats', available: false, emoji: '🍔' },
-                  { id: '4', name: 'Tiramisu Coco', price: 7, category: 'Desserts', available: true, emoji: '🍮' },
-                  { id: '5', name: 'Kombucha', price: 5, category: 'Boissons', available: true, emoji: '🥤' },
-                ],
-                accentColor: card.accentColor,
-              }}
-              theme={theme}
-              language={language}
-              isSaving={isSaving}
-              onSaveContact={handleSaveContact}
-            />
+            <>
+              <CardFrontRestaurant
+                card={{
+                  id: card.id,
+                  slug: card.slug,
+                  name: card.name,
+                  tagline: card.title || 'Cuisine · Ambiance · Saveurs',
+                  photo: card.photo || '/noname-spirit.jpg',
+                  contact: {
+                    phone: card.contact?.phone,
+                    website: card.socials?.website,
+                    address: undefined,
+                    hours: undefined,
+                  },
+                  menu: [
+                    { id: '1', name: 'Soupe du jour', price: 8, category: 'Entrées', available: true, emoji: '🍲' },
+                    { id: '2', name: 'Buddha Bowl', price: 14, category: 'Plats', available: true, emoji: '🥗' },
+                    { id: '3', name: 'Burger Végé', price: 16, category: 'Plats', available: false, emoji: '🍔' },
+                    { id: '4', name: 'Tiramisu Coco', price: 7, category: 'Desserts', available: true, emoji: '🍮' },
+                    { id: '5', name: 'Kombucha', price: 5, category: 'Boissons', available: true, emoji: '🥤' },
+                  ],
+                  accentColor: card.accentColor,
+                }}
+                theme={theme}
+                language={language}
+                isSaving={isSaving}
+                onSaveContact={handleSaveContact}
+                onMenuOpen={() => setMenuOpen(!menuOpen)}
+              />
+              <AnimatePresence>
+                {menuOpen && (
+                  <RestaurantMenuPanel
+                    card={{
+                      id: card.id,
+                      slug: card.slug,
+                      name: card.name,
+                      tagline: card.title || '',
+                      photo: card.photo || '/noname-spirit.jpg',
+                      contact: { phone: card.contact?.phone, website: card.socials?.website },
+                      menu: [
+                        { id: '1', name: 'Soupe du jour', price: 8, category: 'Entrées', available: true, emoji: '🍲' },
+                        { id: '2', name: 'Buddha Bowl', price: 14, category: 'Plats', available: true, emoji: '🥗' },
+                        { id: '3', name: 'Burger Végé', price: 16, category: 'Plats', available: false, emoji: '🍔' },
+                        { id: '4', name: 'Tiramisu Coco', price: 7, category: 'Desserts', available: true, emoji: '🍮' },
+                        { id: '5', name: 'Kombucha', price: 5, category: 'Boissons', available: true, emoji: '🥤' },
+                      ],
+                      accentColor: card.accentColor,
+                    }}
+                    theme={theme}
+                    language={language}
+                  />
+                )}
+              </AnimatePresence>
+            </>
           ) : (
             <>
               <VCard

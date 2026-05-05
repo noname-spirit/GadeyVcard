@@ -46,12 +46,88 @@ interface CardFrontRestaurantProps {
   language: CardLanguage;
   isSaving?: boolean;
   onSaveContact: () => void;
+  onMenuOpen?: () => void; // si fourni → panel externe, pas d'overlay interne
 }
 
-export function CardFrontRestaurant({ card, theme, language, isSaving, onSaveContact }: CardFrontRestaurantProps) {
+export interface RestaurantMenuPanelProps {
+  card: RestaurantCardData;
+  theme: CardTheme;
+  language: CardLanguage;
+}
+
+export function RestaurantMenuPanel({ card, theme, language }: RestaurantMenuPanelProps) {
+  const dark = theme === 'dark';
+  const l = labels[language];
+  const overlayBg = dark ? 'bg-zinc-900' : 'bg-zinc-50';
+  const overlayHeader = dark ? 'border-zinc-800/60' : 'border-zinc-200/60';
+  const sectionTitle = dark ? 'text-zinc-400' : 'text-zinc-500';
+  const itemBg = dark ? 'bg-zinc-800/40 border-zinc-700/40' : 'bg-white border-zinc-200';
+  const itemText = dark ? 'text-zinc-200' : 'text-zinc-800';
+  const itemPrice = dark ? 'text-orange-400' : 'text-orange-500';
+
+  const grouped = CATEGORY_ORDER.reduce<Record<string, MenuItem[]>>((acc, cat) => {
+    const items = card.menu.filter((m) => m.category === cat);
+    if (items.length > 0) acc[cat] = items;
+    return acc;
+  }, {});
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 16 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+      className={`w-full rounded-3xl border overflow-hidden ${overlayBg} ${dark ? 'border-zinc-800/60' : 'border-zinc-200/60'}`}
+    >
+      <div className={`flex items-center gap-2 px-4 py-3.5 border-b ${overlayHeader}`}>
+        <Utensils size={13} style={{ color: 'var(--accent)' }} />
+        <span className={`text-sm font-semibold ${dark ? 'text-white' : 'text-zinc-900'}`}>{l.menu}</span>
+        <span className={`text-xs ${dark ? 'text-zinc-500' : 'text-zinc-400'}`}>· {card.name}</span>
+      </div>
+      <div className="px-4 py-4 flex flex-col gap-5">
+        {Object.entries(grouped).map(([category, items], i) => (
+          <motion.div
+            key={category}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.06, duration: 0.25 }}
+            className="flex flex-col gap-2"
+          >
+            <p
+              className={`text-[11px] font-semibold ${sectionTitle} tracking-widest uppercase pb-1 border-b`}
+              style={{ borderColor: 'color-mix(in srgb, var(--accent) 20%, transparent)' }}
+            >
+              {category}
+            </p>
+            {items.map((item) => (
+              <div key={item.id} className={`flex items-center justify-between px-3 py-2.5 rounded-xl border ${itemBg}`}>
+                <div className="flex items-center gap-2">
+                  {item.emoji && <span className="text-base">{item.emoji}</span>}
+                  <span className={`text-sm font-medium ${item.available ? itemText : 'text-zinc-600 line-through'}`}>
+                    {item.name}
+                  </span>
+                </div>
+                {item.available ? (
+                  <span className={`text-sm font-bold ${itemPrice}`}>{item.price}€</span>
+                ) : (
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${dark ? 'text-zinc-500 bg-zinc-800/60 border-zinc-700/40' : 'text-zinc-400 bg-zinc-100 border-zinc-200'}`}>
+                    {l.sold_out}
+                  </span>
+                )}
+              </div>
+            ))}
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+export function CardFrontRestaurant({ card, theme, language, isSaving, onSaveContact, onMenuOpen }: CardFrontRestaurantProps) {
   const dark = theme === 'dark';
   const l = labels[language];
   const [menuOpen, setMenuOpen] = useState(false);
+  const handleMenuClick = () => onMenuOpen ? onMenuOpen() : setMenuOpen(true);
 
   const cardBg = dark
     ? 'from-zinc-900 via-zinc-900/95 to-black border-zinc-800/60'
@@ -179,7 +255,7 @@ export function CardFrontRestaurant({ card, theme, language, isSaving, onSaveCon
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.32, duration: 0.5 }}
-              onClick={() => setMenuOpen(true)}
+              onClick={handleMenuClick}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               className="w-full py-2.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all border"
