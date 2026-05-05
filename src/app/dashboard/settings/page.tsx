@@ -808,7 +808,7 @@ export default function SettingsPage() {
               card={{ ...previewCard, template: 'influencer' }}
               theme="dark"
               language="fr"
-              locked={userPlan === 'free'}
+              locked={!userPlan || userPlan === 'free'}
             />
           </div>
         ) : (
@@ -823,7 +823,7 @@ export default function SettingsPage() {
               card={previewCard}
               theme={template === 'light' ? 'light' : 'dark'}
               language="fr"
-              locked={userPlan === 'free'}
+              locked={!userPlan || userPlan === 'free'}
             />
           </div>
         )}
