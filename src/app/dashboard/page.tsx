@@ -29,7 +29,7 @@ export default function DashboardPage() {
 
   const [slug,setslug] = useState('demo');
 
-  const [leads, setLeads] = useState<LeadRow[]>(MOCK_LEADS);
+  const [leads, setLeads] = useState<LeadRow[]>([]);
   const [views, setViews] = useState(0);
   const [clicks, setClicks] = useState(0);
   const [userPlan, setUserPlan] = useState<'free' | 'starter' | 'pro' | 'business'>('free');
@@ -48,18 +48,16 @@ const [dbLeads, stats] = await Promise.all([
       ]);
       setViews(stats.views);
       setClicks(stats.clicks);
-      if (dbLeads.length > 0) {
-        setLeads(dbLeads.map((l) => ({
-          id: l.id ?? crypto.randomUUID(),
-          nom: l.name,
-          email: l.email ?? '',
-          telephone: l.phone ?? undefined,
-          message: l.message ?? undefined,
-          domaine: l.domain ?? '',
-          source: 'formulaire',
-          createdAt: l.created_at ?? '',
-        })));
-      }
+      setLeads(dbLeads.map((l) => ({
+        id: l.id ?? crypto.randomUUID(),
+        nom: l.name,
+        email: l.email ?? '',
+        telephone: l.phone ?? undefined,
+        message: l.message ?? undefined,
+        domaine: l.domain ?? '',
+        source: 'formulaire',
+        createdAt: l.created_at ?? '',
+      })));
     }).catch(() => {});
   }, [uid]);
 
