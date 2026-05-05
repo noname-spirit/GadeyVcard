@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/Button";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { VCard } from "@/components/card";
 import { CardFrontInfluencer } from "@/components/card/CardFrontInfluencer";
+import { CardFrontRestaurant } from "@/components/card/CardFrontRestaurant";
 import { LeadCaptureForm } from "@/components/card/LeadCaptureForm";
 import { LeadCaptureFormInfluencer } from "@/components/card/LeadCaptureFormInfluencer";
 import { createClient } from "@/lib/supabase/client";
@@ -731,13 +732,34 @@ export default function SettingsPage() {
       <div className="xl:w-80 w-full flex flex-col gap-3 xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto xl:pb-4">
         <p className="text-xs text-zinc-500 uppercase tracking-wide font-medium">Aperçu en direct</p>
         {template === 'restaurant' ? (
-          <div className="w-full rounded-2xl bg-linear-to-br from-emerald-900/60 to-emerald-950/80 border border-emerald-800/40 flex flex-col items-center justify-center gap-3 py-16 px-6 text-center">
-            <span className="text-3xl">🍽️</span>
-            <p className="text-sm font-semibold text-emerald-300">Template Restaurant</p>
-            <p className="text-xs text-zinc-500">Aperçu non disponible dans l&apos;éditeur — vois ta carte en ligne pour le rendu complet.</p>
-            <a href={`/${slug}`} target="_blank" className="mt-1 text-xs text-emerald-400 hover:text-emerald-300 underline underline-offset-2 transition-colors">
-              Voir ma carte →
-            </a>
+          <div style={{ '--accent': accent } as React.CSSProperties}>
+            <CardFrontRestaurant
+              card={{
+                id: 'preview',
+                slug: 'preview',
+                name: name || 'Nom du restaurant',
+                tagline: title || 'Cuisine · Ambiance · Saveurs',
+                photo: photo || '/noname-spirit.jpg',
+                contact: {
+                  phone: phone || undefined,
+                  website: website || undefined,
+                  address: 'Paris, France',
+                  hours: '12h–14h30 · 19h–22h30',
+                },
+                menu: [
+                  { id: '1', name: 'Soupe du jour', price: 8, category: 'Entrées', available: true, emoji: '🍲' },
+                  { id: '2', name: 'Tartare de boeuf', price: 14, category: 'Entrées', available: true, emoji: '🥩' },
+                  { id: '3', name: 'Plat du jour', price: 18, category: 'Plats', available: true, emoji: '🍽️' },
+                  { id: '4', name: 'Risotto aux champignons', price: 16, category: 'Plats', available: false, emoji: '🍄' },
+                  { id: '5', name: 'Tarte tatin', price: 7, category: 'Desserts', available: true, emoji: '🍎' },
+                  { id: '6', name: 'Café gourmand', price: 6, category: 'Desserts', available: true, emoji: '☕' },
+                ],
+                accentColor: accent,
+              }}
+              theme="dark"
+              language="fr"
+              onSaveContact={() => {}}
+            />
           </div>
         ) : template === 'influencer' ? (
           <div style={{ '--accent': accent } as React.CSSProperties} className="flex flex-col gap-2">
