@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Save,
   ExternalLink,
@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/Button";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { VCard } from "@/components/card";
 import { CardFrontInfluencer } from "@/components/card/CardFrontInfluencer";
-import { CardFrontRestaurant } from "@/components/card/CardFrontRestaurant";
+import { CardFrontRestaurant, RestaurantMenuPanel } from "@/components/card/CardFrontRestaurant";
 import { LeadCaptureForm } from "@/components/card/LeadCaptureForm";
 import { LeadCaptureFormInfluencer } from "@/components/card/LeadCaptureFormInfluencer";
 import { createClient } from "@/lib/supabase/client";
@@ -164,6 +164,7 @@ export default function SettingsPage() {
   const [availabilityText, setAvailabilityText] = useState("");
   const [copiedSignature, setCopiedSignature] = useState(false);
   const [cardId, setCardId] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [userPlan, setUserPlan] = useState<'free' | 'starter' | 'pro' | 'business'>('free');
   const isPro = userPlan === 'pro' || userPlan === 'business';
   const canExportQr = userPlan !== 'free';
@@ -732,7 +733,7 @@ export default function SettingsPage() {
       <div className="xl:w-80 w-full flex flex-col gap-3 xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto xl:pb-4">
         <p className="text-xs text-zinc-500 uppercase tracking-wide font-medium">Aperçu en direct</p>
         {template === 'restaurant' ? (
-          <div style={{ '--accent': accent } as React.CSSProperties}>
+          <div style={{ '--accent': accent } as React.CSSProperties} className="flex flex-col gap-2">
             <CardFrontRestaurant
               card={{
                 id: 'preview',
@@ -758,7 +759,32 @@ export default function SettingsPage() {
               theme="dark"
               language="fr"
               onSaveContact={() => {}}
+              onMenuOpen={() => setMenuOpen(!menuOpen)}
             />
+            <AnimatePresence>
+              {menuOpen && (
+                <RestaurantMenuPanel
+                  card={{
+                    id: 'preview',
+                    slug: 'preview',
+                    name: name || 'Le Botaniste',
+                    tagline: title || 'Cuisine végane · Paris 11e',
+                    photo: photo || '/noname-spirit.jpg',
+                    contact: { phone: phone || undefined, website: website || undefined },
+                    menu: [
+                      { id: '1', name: 'Soupe du jour', price: 8, category: 'Entrées', available: true, emoji: '🍲' },
+                      { id: '2', name: 'Buddha Bowl', price: 14, category: 'Plats', available: true, emoji: '🥗' },
+                      { id: '3', name: 'Burger Végé', price: 16, category: 'Plats', available: false, emoji: '🍔' },
+                      { id: '4', name: 'Tiramisu Coco', price: 7, category: 'Desserts', available: true, emoji: '🍮' },
+                      { id: '5', name: 'Kombucha', price: 5, category: 'Boissons', available: true, emoji: '🥤' },
+                    ],
+                    accentColor: accent,
+                  }}
+                  theme="dark"
+                  language="fr"
+                />
+              )}
+            </AnimatePresence>
           </div>
         ) : template === 'influencer' ? (
           <div style={{ '--accent': accent } as React.CSSProperties} className="flex flex-col gap-2">
