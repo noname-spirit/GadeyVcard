@@ -12,11 +12,11 @@ import { getProfile } from '@/lib/supabase/profile';
 import { LockedFeature } from '@/components/ui/LockedFeature';
 
 const MOCK_LEADS: LeadRow[] = [
-  { id: '1', nom: 'Sophie Martin', email: 'sophie@cafe.fr', telephone: '+33612345678', domaine: 'Café', source: 'formulaire', createdAt: '2026-04-15T10:00:00Z' },
-  { id: '2', nom: 'Maxime Nguyen', email: 'max@studio.com', telephone: '+33698765432', domaine: 'Marketing', source: 'qd code', createdAt: '2026-04-14T14:30:00Z' },
-  { id: '3', nom: 'Léa Dupont', email: 'lea@villa.com', telephone: '+33611223344', domaine: 'Immobilier', source: 'formulaire', createdAt: '2026-04-13T09:15:00Z' },
-  { id: '4', nom: 'Thomas Bernard', email: 'thomas@tech.io', telephone: '+33622334455', domaine: 'Tech', source: 'formulaire', createdAt: '2026-04-12T16:00:00Z' },
-  { id: '5', nom: 'Emma Rousseau', email: 'emma@design.fr', telephone: undefined, domaine: 'Design', source: 'qd code', createdAt: '2026-04-11T11:30:00Z' },
+  { id: '1', nom: 'Contact A', email: 'contact@exemple.com', telephone: '+33 6 •• •• •• ••', domaine: 'Café', source: 'formulaire', createdAt: '2026-04-15T10:00:00Z' },
+  { id: '2', nom: 'Contact B', email: 'contact@exemple.com', telephone: '+33 6 •• •• •• ••', domaine: 'Marketing', source: 'qd code', createdAt: '2026-04-14T14:30:00Z' },
+  { id: '3', nom: 'Contact C', email: 'contact@exemple.com', telephone: '+33 6 •• •• •• ••', domaine: 'Immobilier', source: 'formulaire', createdAt: '2026-04-13T09:15:00Z' },
+  { id: '4', nom: 'Contact D', email: 'contact@exemple.com', telephone: '+33 6 •• •• •• ••', domaine: 'Tech', source: 'formulaire', createdAt: '2026-04-12T16:00:00Z' },
+  { id: '5', nom: 'Contact E', email: 'contact@exemple.com', telephone: undefined, domaine: 'Design', source: 'qd code', createdAt: '2026-04-11T11:30:00Z' },
 ];
 
 export default function LeadsPage() {
@@ -111,6 +111,10 @@ export default function LeadsPage() {
           <div className="flex items-center justify-center py-12">
             <div className="w-6 h-6 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
           </div>
+        ) : userPlan === 'free' ? (
+          <LockedFeature plan="starter" label="Capture de leads" desc="Recevez et gérez les contacts qui visitent votre carte">
+            <LeadsTable leads={MOCK_LEADS} />
+          </LockedFeature>
         ) : (
           <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} />
         )}

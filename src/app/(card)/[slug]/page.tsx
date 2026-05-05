@@ -207,7 +207,7 @@ export default function CardPage() {
             language={language}
             onSaveContact={handleSaveContact}
             isSaving={isSaving}
-            onCalendlyClick={card.calendlyUrl && card.plan === 'pro' ? () => { trackCardEvent(card.id, 'calendly'); setShowCalendly(true); } : undefined}
+            onCalendlyClick={card.calendlyUrl && (card.plan === 'pro' || card.plan === 'business') ? () => { trackCardEvent(card.id, 'calendly'); setShowCalendly(true); } : undefined}
           />
 
           {card.template === 'influencer' ? (
@@ -215,14 +215,14 @@ export default function CardPage() {
               card={card}
               theme={theme}
               language={language}
-              locked={!card.plan}
+              locked={!card.plan || card.plan === 'free'}
             />
           ) : (
             <LeadCaptureForm
               card={card}
               theme={theme}
               language={language}
-              locked={false}
+              locked={!card.plan || card.plan === 'free'}
             />
           )}
         </div>
@@ -232,7 +232,7 @@ export default function CardPage() {
           <CalendlyModal url={card.calendlyUrl} onClose={() => setShowCalendly(false)} />
         )}
 
-        <Watermark plan={card.plan && card.plan !== 'free' ? 'pro' : 'free'} />
+        <Watermark plan={!card.plan || card.plan === 'free' ? 'free' : 'pro'} />
       </div>
     </div>
   );
