@@ -61,11 +61,13 @@ function Sidebar({ active, slug, onClose, onLogout,profil }: { active?: string; 
             <span className="text-xs text-zinc-500 font-medium">Plan actuel</span>
             <span className="text-xs font-semibold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">{profil?.plan}</span>
           </div>
-          <Link href="/dashboard/upgrade">
-            <Button size="sm" className="w-full text-xs flex items-center justify-center gap-1.5">
-              <Zap size={11} />Passer Pro
-            </Button>
-          </Link>
+          {profil?.plan !== 'pro' && profil?.plan !== 'business' && (
+            <Link href="/dashboard/upgrade">
+              <Button size="sm" className="w-full text-xs flex items-center justify-center gap-1.5">
+                <Zap size={11} />Passer Pro
+              </Button>
+            </Link>
+          )}
         </div>
         <button onClick={onLogout}
           className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all w-full">
@@ -125,9 +127,13 @@ export function DashboardLayout({ children, active }: DashboardLayoutProps) {
               <Menu size={20} />
             </button>
             <span className="text-sm font-bold bg-linear-to-r from-white to-zinc-400 bg-clip-text text-transparent">Smart vCard</span>
-            <Link href="/dashboard/upgrade" className="p-2 rounded-xl text-zinc-400 hover:text-orange-400 transition-all">
-              <CreditCard size={18} />
-            </Link>
+            {profil?.plan !== 'pro' && profil?.plan !== 'business' ? (
+              <Link href="/dashboard/upgrade" className="p-2 rounded-xl text-zinc-400 hover:text-orange-400 transition-all">
+                <CreditCard size={18} />
+              </Link>
+            ) : (
+              <div className="p-2 w-9" />
+            )}
           </div>
           <div className="flex-1 p-4 lg:p-8">{children}</div>
         </main>

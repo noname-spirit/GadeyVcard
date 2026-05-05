@@ -460,15 +460,14 @@ export default function SettingsPage() {
                   {TEMPLATES.map((t) => (
                     <button
                       key={t.id}
-                      onClick={() => t.pro ? router.push('/dashboard/upgrade') : setTemplate(t.id as typeof template)}
+                      onClick={() => (t.pro && !isPro) ? router.push('/dashboard/upgrade') : setTemplate(t.id as typeof template)}
                       className={[
                         `relative h-20 rounded-xl bg-linear-to-br ${t.bg} border-2 transition-all flex flex-col items-start justify-end p-2.5 overflow-hidden`,
-                        !t.pro && template === t.id ? 'border-orange-500 scale-105' : 'border-transparent opacity-70 hover:opacity-100',
-                        t.pro ? 'cursor-pointer' : '',
+                        template === t.id ? 'border-orange-500 scale-105' : 'border-transparent opacity-70 hover:opacity-100',
                       ].join(' ')}
                     >
                       <span className={`text-xs font-semibold ${t.text} leading-tight`}>{t.label}</span>
-                      {t.pro && (
+                      {t.pro && !isPro && (
                         <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-full px-2 py-0.5">
                           <Lock size={9} className="text-amber-400" />
                           <span className="text-[10px] font-bold text-amber-400">Pro</span>
