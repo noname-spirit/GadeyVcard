@@ -78,7 +78,7 @@ export function RestaurantMenuPanel({ card, theme, language }: RestaurantMenuPan
       exit={{ opacity: 0, y: 16 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
       className={`w-full rounded-3xl border overflow-hidden flex flex-col ${overlayBg} ${dark ? 'border-zinc-800/60' : 'border-zinc-200/60'}`}
-      style={{ maxHeight: '72vh' }}
+      style={{ maxHeight: '280px' }}
     >
       <div className={`flex items-center gap-2 px-4 py-3.5 border-b shrink-0 ${overlayHeader}`}>
         <Utensils size={13} style={{ color: 'var(--accent)' }} />
