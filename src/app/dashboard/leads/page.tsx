@@ -49,8 +49,8 @@ export default function LeadsPage() {
         })));
       }
       setLoading(false);
-    }
-    load();
+    })
+
   }, [uid]);
 
   const handleDelete = async (id: string) => {
@@ -60,7 +60,7 @@ export default function LeadsPage() {
 
   const handleUpdate = async (id: string, fields: { statut?: string; notes?: string; source?: string }) => {
     await updateLead(id, fields);
-    setLeads((prev) => prev.map((l) => l.id === id ? { ...l, ...fields, statut: fields.statut as LeadRow['statut'] } : l));
+    setLeads((prev) => prev.map((l) => l.id === id ? { ...l, ...fields, statut: fields.statut as LeadRow['status'] } : l));
   };
 
   const handleExport = () => {
@@ -132,7 +132,7 @@ export default function LeadsPage() {
             <LeadsTable leads={MOCK_LEADS} />
           </LockedFeature>
         ) : (
-          <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} onUpdate={handleUpdate} />
+          <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} />
         )}
 
       </div>
