@@ -17,9 +17,9 @@ import { LockedFeature } from '@/components/ui/LockedFeature';
 
 
 const MOCK_LEADS: LeadRow[] = [
-  { id: '1', nom: 'Sophie Martin', email: 'sophie@cafe.fr', telephone: '+33612345678', domaine: 'Café', source: 'formulaire', createdAt: '2026-04-15T10:00:00Z' },
-  { id: '2', nom: 'Maxime Nguyen', email: 'max@studio.com', telephone: '+33698765432', domaine: 'Marketing', source: 'qd code', createdAt: '2026-04-14T14:30:00Z' },
-  { id: '3', nom: 'Léa Dupont', email: 'lea@villa.com', telephone: '+33611223344', domaine: 'Villa', source: 'formulaire', createdAt: '2026-04-13T09:15:00Z' },
+  { id: '1', nom: 'Contact A', email: 'contact@exemple.com', telephone: '+33 6 •• •• •• ••', domaine: 'Café', source: 'formulaire', createdAt: '2026-04-15T10:00:00Z' },
+  { id: '2', nom: 'Contact B', email: 'contact@exemple.com', telephone: '+33 6 •• •• •• ••', domaine: 'Marketing', source: 'qd code', createdAt: '2026-04-14T14:30:00Z' },
+  { id: '3', nom: 'Contact C', email: 'contact@exemple.com', telephone: '+33 6 •• •• •• ••', domaine: 'Immobilier', source: 'formulaire', createdAt: '2026-04-13T09:15:00Z' },
 ];
 
 export default function DashboardPage() {
@@ -29,7 +29,7 @@ export default function DashboardPage() {
 
   const [slug,setslug] = useState('demo');
 
-  const [leads, setLeads] = useState<LeadRow[]>(MOCK_LEADS);
+  const [leads, setLeads] = useState<LeadRow[]>([]);
   const [views, setViews] = useState(0);
   const [clicks, setClicks] = useState(0);
   const [userPlan, setUserPlan] = useState<'free' | 'starter' | 'pro' | 'business'>('free');
@@ -48,20 +48,18 @@ const [dbLeads, stats] = await Promise.all([
       ]);
       setViews(stats.views);
       setClicks(stats.clicks);
-      if (dbLeads.length > 0) {
-        setLeads(dbLeads.map((l) => ({
-          id: l.id ?? crypto.randomUUID(),
-          nom: l.name,
-          email: l.email ?? '',
-          telephone: l.phone ?? undefined,
-          message: l.message ?? undefined,
-          domaine: l.domain ?? '',
-          source: l.source ?? 'formulaire',
-          statut: (l.statut as LeadRow['statut']) ?? undefined,
-          notes: l.notes ?? undefined,
-          createdAt: l.created_at ?? '',
-        })));
-      }
+      setLeads(dbLeads.map((l) => ({
+        id: l.id ?? crypto.randomUUID(),
+        nom: l.name,
+        email: l.email ?? '',
+        telephone: l.phone ?? undefined,
+        message: l.message ?? undefined,
+        domaine: l.domain ?? '',
+        source: l.source ?? 'formulaire',
+        status: (l.status as LeadRow['status']) ?? undefined,
+        notes: l.notes ?? undefined,
+        createdAt: l.created_at ?? '',
+      })));
     }).catch(() => {});
   }, [uid]);
 
@@ -70,10 +68,6 @@ const [dbLeads, stats] = await Promise.all([
     setLeads((prev) => prev.filter((l) => l.id !== id));
   };
 
-  const handleUpdate = async (id: string, fields: { statut?: string; notes?: string; source?: string }) => {
-    await updateLead(id, fields);
-    setLeads((prev) => prev.map((l) => l.id === id ? { ...l, ...fields, statut: fields.statut as LeadRow['statut'] } : l));
-  };
 
   const handleExport = () => {
     const csv = ['Nom,Email,Téléphone,Message,Domaine,Source,Date',

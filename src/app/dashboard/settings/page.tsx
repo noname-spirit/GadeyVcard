@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Save,
   ExternalLink,
@@ -27,11 +27,12 @@ import { Button } from "@/components/ui/Button";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { VCard } from "@/components/card";
 import { CardFrontInfluencer } from "@/components/card/CardFrontInfluencer";
+import { CardFrontRestaurant, RestaurantMenuPanel } from "@/components/card/CardFrontRestaurant";
 import { LeadCaptureForm } from "@/components/card/LeadCaptureForm";
 import { LeadCaptureFormInfluencer } from "@/components/card/LeadCaptureFormInfluencer";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/supabase/AuthProvider";
-import { getCardsByUid, upsertCard } from "@/lib/supabase/cards";
+import { getCardsByUid, upsertCard, updateCard } from "@/lib/supabase/cards";
 import { getProfile } from "@/lib/supabase/profile";
 import { LockedFeature } from "@/components/ui/LockedFeature";
 
@@ -130,6 +131,7 @@ export default function SettingsPage() {
   const [tab, setTab] = useState<Tab>("profile");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -151,7 +153,7 @@ export default function SettingsPage() {
   const [twitter, setTwitter] = useState("");
   const [website, setWebsite] = useState("");
   const [template, setTemplate] = useState<
-    "dark" | "light" | "color" | "influencer"
+    "dark" | "light" | "color" | "influencer" | "restaurant"
   >("dark");
   const [accent, setAccent] = useState("#f97316");
   const [notifLead, setNotifLead] = useState(true);
@@ -161,6 +163,8 @@ export default function SettingsPage() {
   const [availabilityStatus, setAvailabilityStatus] = useState("");
   const [availabilityText, setAvailabilityText] = useState("");
   const [copiedSignature, setCopiedSignature] = useState(false);
+  const [cardId, setCardId] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [userPlan, setUserPlan] = useState<'free' | 'starter' | 'pro' | 'business'>('free');
   const isPro = userPlan === 'pro' || userPlan === 'business';
   const canExportQr = userPlan !== 'free';
@@ -189,6 +193,7 @@ export default function SettingsPage() {
     getCardsByUid(uid).then((cards) => {
       if (cards.length === 0) return;
       const c = cards[0];
+      setCardId(c.id);
       setName(c.name ?? "");
       setTitle(c.title ?? "");
       setSlug(c.slug ?? "");
@@ -202,7 +207,7 @@ export default function SettingsPage() {
       setTiktok(c.tiktok ?? "");
       setTwitter(c.twitter ?? "");
       setWebsite(c.website ?? "");
-      setTemplate((c.template as "dark" | "light" | "color" | "influencer") ?? "dark");
+      setTemplate((c.template as "dark" | "light" | "color" | "influencer" | "restaurant") ?? "dark");
       setAccent(c.accent_color ?? "#f97316");
       setphoto(c.photo ?? "");
       setCalendlyUrl(c.calendly_url ?? "");
@@ -214,25 +219,38 @@ export default function SettingsPage() {
   const handleSave = async () => {
     if (!slug || !uid) return;
     setSaving(true);
+    const payload = {
+      slug,
+      name,
+      title,
+      photo: photo || '',
+      contact: { phone: phone || null, email: email || null, whatsapp: whatsapp || null, line: line || null },
+      socials: { instagram: instagram || null, youtube: youtube || null, linkedin: linkedin || null, tiktok: tiktok || null, twitter: twitter || null, website: website || null },
+      accent_color: accent,
+      template,
+      calendly_url: calendlyUrl || null,
+      availability_status: availabilityStatus || null,
+      availability_text: availabilityText || null,
+    };
     try {
-      await upsertCard(uid, {
-        slug,
-        name,
-        title,
-        photo: photo || '',
-        contact: { phone: phone || null, email: email || null, whatsapp: whatsapp || null, line: line || null },
-        socials: { instagram: instagram || null, youtube: youtube || null, linkedin: linkedin || null, tiktok: tiktok || null, twitter: twitter || null, website: website || null },
-        accent_color: accent,
-        template,
-        calendly_url: calendlyUrl || null,
-        availability_status: availabilityStatus || null,
-        availability_text: availabilityText || null,
-      });
-      localStorage.setItem('vcard_settings', JSON.stringify({ name, title, slug, phone, email, whatsapp, instagram, website, template, accent }));
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
+      let ok: boolean;
+      if (cardId) {
+        ok = await updateCard(cardId, payload);
+      } else {
+        const result = await upsertCard(uid, payload);
+        ok = !!result;
+      }
+      if (!ok) {
+        setSaveError(true);
+        setTimeout(() => setSaveError(false), 4000);
+      } else {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2500);
+      }
     } catch (e) {
       console.error('Erreur lors de la sauvegarde :', e);
+      setSaveError(true);
+      setTimeout(() => setSaveError(false), 4000);
     } finally {
       setSaving(false);
     }
@@ -248,6 +266,7 @@ export default function SettingsPage() {
     contact: { phone: phone || undefined, email: email || undefined, whatsapp: whatsapp || undefined, line: line || undefined },
     accentColor: accent,
     template,
+    plan: userPlan,
   };
 
   return (
@@ -285,7 +304,7 @@ export default function SettingsPage() {
             className="flex items-center gap-2 self-start sm:self-auto"
           >
             <Save size={14} />
-            {saved ? "Sauvegardé ✓" : "Sauvegarder"}
+            {saved ? "Sauvegardé ✓" : saveError ? "Erreur — réessayer" : "Sauvegarder"}
           </Button>
         </div>
 
@@ -385,23 +404,70 @@ export default function SettingsPage() {
           )}
 
           {tab === "links" && (
-            <div className="flex flex-col gap-5">
-              <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
-                <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Contact</h3>
-                <Field label="Téléphone" value={phone} onChange={setPhone} type="tel" />
-                <Field label="Email" value={email} onChange={setEmail} type="email" />
-                <Field label="WhatsApp" value={whatsapp} onChange={setWhatsapp} placeholder="+33 6 …" />
-                <Field label="LINE" value={line} onChange={setLine} placeholder="ID LINE" prefix="LINE" />
-              </div>
-              <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
-                <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Réseaux sociaux</h3>
-                <Field label="Instagram" value={instagram} onChange={setInstagram} placeholder="votre.nom" prefix="instagram.com/" />
-                <Field label="YouTube" value={youtube} onChange={setYoutube} placeholder="@votre-chaine" prefix="youtube.com/" />
-                <Field label="LinkedIn" value={linkedin} onChange={setLinkedin} placeholder="votre-nom" prefix="linkedin.com/in/" />
-                <Field label="TikTok" value={tiktok} onChange={setTiktok} placeholder="@votre.nom" prefix="tiktok.com/@" />
-                <Field label="X / Twitter" value={twitter} onChange={setTwitter} placeholder="votre_nom" prefix="x.com/" />
-                <Field label="Site web" value={website} onChange={setWebsite} placeholder="https://votresite.com" prefix="🌐" />
-              </div>
+            <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
+              <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">
+                Contact & Réseaux
+              </h3>
+              <Field
+                label="Téléphone"
+                value={phone}
+                onChange={setPhone}
+                type="tel"
+              />
+              <Field
+                label="Email"
+                value={email}
+                onChange={setEmail}
+                type="email"
+              />
+              <Field
+                label="WhatsApp"
+                value={whatsapp}
+                onChange={setWhatsapp}
+                placeholder="+33 6 …"
+              />
+              <Field
+                label="Instagram"
+                value={instagram}
+                onChange={setInstagram}
+                prefix="IG"
+              />
+              <Field
+                label="YouTube"
+                value={youtube}
+                onChange={setYoutube}
+                prefix="YT"
+              />
+              <Field
+                label="LinkedIn"
+                value={linkedin}
+                onChange={setLinkedin}
+                prefix="in"
+              />
+              <Field
+                label="TikTok"
+                value={tiktok}
+                onChange={setTiktok}
+                prefix="TK"
+              />
+              <Field
+                label="Twitter / X"
+                value={twitter}
+                onChange={setTwitter}
+                prefix="X"
+              />
+              <Field
+                label="LINE"
+                value={line}
+                onChange={setLine}
+                prefix="LINE"
+              />
+              <Field
+                label="Site web"
+                value={website}
+                onChange={setWebsite}
+                prefix="🌐"
+              />
             </div>
           )}
 
@@ -413,15 +479,14 @@ export default function SettingsPage() {
                   {TEMPLATES.map((t) => (
                     <button
                       key={t.id}
-                      onClick={() => t.pro ? router.push('/dashboard/upgrade') : setTemplate(t.id as typeof template)}
+                      onClick={() => (t.pro && !isPro) ? router.push('/dashboard/upgrade') : setTemplate(t.id as typeof template)}
                       className={[
                         `relative h-20 rounded-xl bg-linear-to-br ${t.bg} border-2 transition-all flex flex-col items-start justify-end p-2.5 overflow-hidden`,
-                        !t.pro && template === t.id ? 'border-orange-500 scale-105' : 'border-transparent opacity-70 hover:opacity-100',
-                        t.pro ? 'cursor-pointer' : '',
+                        template === t.id ? 'border-orange-500 scale-105' : 'border-transparent opacity-70 hover:opacity-100',
                       ].join(' ')}
                     >
                       <span className={`text-xs font-semibold ${t.text} leading-tight`}>{t.label}</span>
-                      {t.pro && (
+                      {t.pro && !isPro && (
                         <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-full px-2 py-0.5">
                           <Lock size={9} className="text-amber-400" />
                           <span className="text-[10px] font-bold text-amber-400">Pro</span>
@@ -625,7 +690,10 @@ export default function SettingsPage() {
           )}
 
           {tab === "notifications" && (
-            <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-5">
+            <div className="relative bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-5 opacity-50 pointer-events-none select-none">
+              <div className="absolute inset-0 rounded-2xl z-10 flex items-center justify-center">
+                <span className="text-xs font-medium text-zinc-500 bg-zinc-900/90 border border-zinc-700/40 px-3 py-1.5 rounded-full">Bientôt disponible</span>
+              </div>
               <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">
                 Alertes email
               </h3>
@@ -633,14 +701,12 @@ export default function SettingsPage() {
                 {
                   label: "Nouveau lead",
                   sub: "Quand quelqu'un remplit votre formulaire",
-                  value: notifLead,
-                  set: setNotifLead,
+                  value: false,
                 },
                 {
                   label: "Vues carte",
                   sub: "Résumé hebdomadaire des visites",
-                  value: notifView,
-                  set: setNotifView,
+                  value: false,
                 },
               ].map((n) => (
                 <div
@@ -653,20 +719,9 @@ export default function SettingsPage() {
                     </p>
                     <p className="text-xs text-zinc-500 mt-0.5">{n.sub}</p>
                   </div>
-                  <button
-                    onClick={() => n.set(!n.value)}
-                    className={`relative w-11 h-6 rounded-full border transition-all shrink-0 ${n.value ? "bg-orange-500/20 border-orange-500/40" : "bg-zinc-800 border-zinc-700/40"}`}
-                  >
-                    <motion.div
-                      animate={{ x: n.value ? 20 : 2 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 500,
-                        damping: 30,
-                      }}
-                      className={`absolute top-0.5 w-5 h-5 rounded-full shadow-sm ${n.value ? "bg-orange-400" : "bg-zinc-500"}`}
-                    />
-                  </button>
+                  <div className="relative w-11 h-6 rounded-full border bg-zinc-800 border-zinc-700/40 shrink-0">
+                    <div className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-zinc-500" />
+                  </div>
                 </div>
               ))}
             </div>
@@ -677,7 +732,61 @@ export default function SettingsPage() {
       {/* Colonne aperçu persistante */}
       <div className="xl:w-80 w-full flex flex-col gap-3 xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto xl:pb-4">
         <p className="text-xs text-zinc-500 uppercase tracking-wide font-medium">Aperçu en direct</p>
-        {template === 'influencer' ? (
+        {template === 'restaurant' ? (
+          <div style={{ '--accent': accent } as React.CSSProperties} className="flex flex-col gap-2">
+            <CardFrontRestaurant
+              card={{
+                id: 'preview',
+                slug: 'preview',
+                name: name || 'Le Botaniste',
+                tagline: title || 'Cuisine végane · Paris 11e',
+                photo: photo || '/noname-spirit.jpg',
+                contact: {
+                  phone: phone || '+33 1 23 45 67 89',
+                  website: website || 'https://lebotaniste.fr',
+                  address: '14 rue Oberkampf',
+                  hours: '12h–22h · Lun–Sam',
+                },
+                menu: [
+                  { id: '1', name: 'Soupe du jour', price: 8, category: 'Entrées', available: true, emoji: '🍲' },
+                  { id: '2', name: 'Buddha Bowl', price: 14, category: 'Plats', available: true, emoji: '🥗' },
+                  { id: '3', name: 'Burger Végé', price: 16, category: 'Plats', available: false, emoji: '🍔' },
+                  { id: '4', name: 'Tiramisu Coco', price: 7, category: 'Desserts', available: true, emoji: '🍮' },
+                  { id: '5', name: 'Kombucha', price: 5, category: 'Boissons', available: true, emoji: '🥤' },
+                ],
+                accentColor: accent,
+              }}
+              theme="dark"
+              language="fr"
+              onSaveContact={() => {}}
+              onMenuOpen={() => setMenuOpen(!menuOpen)}
+            />
+            <AnimatePresence>
+              {menuOpen && (
+                <RestaurantMenuPanel
+                  card={{
+                    id: 'preview',
+                    slug: 'preview',
+                    name: name || 'Le Botaniste',
+                    tagline: title || 'Cuisine végane · Paris 11e',
+                    photo: photo || '/noname-spirit.jpg',
+                    contact: { phone: phone || undefined, website: website || undefined },
+                    menu: [
+                      { id: '1', name: 'Soupe du jour', price: 8, category: 'Entrées', available: true, emoji: '🍲' },
+                      { id: '2', name: 'Buddha Bowl', price: 14, category: 'Plats', available: true, emoji: '🥗' },
+                      { id: '3', name: 'Burger Végé', price: 16, category: 'Plats', available: false, emoji: '🍔' },
+                      { id: '4', name: 'Tiramisu Coco', price: 7, category: 'Desserts', available: true, emoji: '🍮' },
+                      { id: '5', name: 'Kombucha', price: 5, category: 'Boissons', available: true, emoji: '🥤' },
+                    ],
+                    accentColor: accent,
+                  }}
+                  theme="dark"
+                  language="fr"
+                />
+              )}
+            </AnimatePresence>
+          </div>
+        ) : template === 'influencer' ? (
           <div style={{ '--accent': accent } as React.CSSProperties} className="flex flex-col gap-2">
             <CardFrontInfluencer
               card={{
@@ -699,7 +808,7 @@ export default function SettingsPage() {
               card={{ ...previewCard, template: 'influencer' }}
               theme="dark"
               language="fr"
-              locked
+              locked={!userPlan || userPlan === 'free'}
             />
           </div>
         ) : (
@@ -714,7 +823,7 @@ export default function SettingsPage() {
               card={previewCard}
               theme={template === 'light' ? 'light' : 'dark'}
               language="fr"
-              locked
+              locked={!userPlan || userPlan === 'free'}
             />
           </div>
         )}

@@ -30,7 +30,7 @@ const labels = {
     errorRequired: 'Nom et contact sont obligatoires.',
     errorServer: 'Une erreur est survenue. Réessayez.',
     errorCamera: 'Impossible d\'accéder à la caméra.',
-    proBadge: 'Pro',
+    proBadge: 'Starter',
     scanBtn: 'Scanner QR',
     scanTitle: 'Scanner une vCard',
     scanHintLoading: 'Chargement de la caméra...',
@@ -52,7 +52,7 @@ const labels = {
     errorRequired: 'Name and contact are required.',
     errorServer: 'Something went wrong. Please retry.',
     errorCamera: 'Could not access the camera.',
-    proBadge: 'Pro',
+    proBadge: 'Starter',
     scanBtn: 'Scan QR',
     scanTitle: 'Scan a vCard',
     scanHintLoading: 'Loading camera...',
@@ -74,7 +74,7 @@ const labels = {
     errorRequired: 'กรุณากรอกชื่อและช่องทางติดต่อ',
     errorServer: 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง',
     errorCamera: 'ไม่สามารถเข้าถึงกล้องได้',
-    proBadge: 'Pro',
+    proBadge: 'Starter',
     scanBtn: 'สแกน QR',
     scanTitle: 'สแกน vCard',
     scanHintLoading: 'กำลังโหลดกล้อง...',
@@ -141,6 +141,7 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
   const dark = theme === 'dark';
   const l = labels[language];
   const accent = card.accentColor || '#f97316';
+  const planBadgeLabel = card.plan === 'business' ? 'Business' : card.plan === 'pro' ? 'Pro' : l.proBadge;
 
   const title = card.captureForm?.title || l.defaultTitle;
   const subtitle = card.captureForm?.subtitle || l.defaultSubtitle;
@@ -346,7 +347,7 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
               color: accent,
             }}
           >
-            {l.proBadge}
+            {planBadgeLabel}
           </span>
         </div>
 

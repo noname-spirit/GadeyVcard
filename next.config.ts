@@ -14,7 +14,7 @@ const cspHeader = `
     https://*.supabase.co
     https://accounts.google.com
     https://api.stripe.com;
-  frame-src https://accounts.google.com https://js.stripe.com https://hooks.stripe.com;
+  frame-src https://accounts.google.com https://js.stripe.com https://hooks.stripe.com https://calendly.com https://tr.ee https://linktr.ee;
   frame-ancestors 'none';
   upgrade-insecure-requests;
 `;

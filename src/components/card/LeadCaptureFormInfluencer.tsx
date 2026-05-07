@@ -33,7 +33,7 @@ const labels = {
     success: 'Reçu ! Je vous réponds sous 48h.',
     errorRequired: 'Nom, entreprise et contact sont obligatoires.',
     errorServer: 'Une erreur est survenue. Réessayez.',
-    proBadge: 'Pro',
+    proBadge: 'Starter',
   },
   en: {
     title: 'Propose a collaboration',
@@ -49,7 +49,7 @@ const labels = {
     success: "Got it! I'll reply within 48h.",
     errorRequired: 'Name, company and contact are required.',
     errorServer: 'Something went wrong. Please retry.',
-    proBadge: 'Pro',
+    proBadge: 'Starter',
   },
   th: {
     title: 'เสนอความร่วมมือ',
@@ -65,7 +65,7 @@ const labels = {
     success: 'ได้รับแล้ว! ผมจะตอบกลับภายใน 48 ชม.',
     errorRequired: 'กรุณากรอกชื่อ บริษัท และช่องทางติดต่อ',
     errorServer: 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง',
-    proBadge: 'Pro',
+    proBadge: 'Starter',
   },
 };
 
@@ -103,6 +103,7 @@ export function LeadCaptureFormInfluencer({ card, theme, language, locked = fals
   const dark = theme === 'dark';
   const l = labels[language];
   const accent = card.accentColor || '#a855f7';
+  const planBadgeLabel = card.plan === 'business' ? 'Business' : card.plan === 'pro' ? 'Pro' : l.proBadge;
 
   const cardBg = dark
     ? 'from-zinc-900/70 via-zinc-900/50 to-black/80 border-zinc-800/40'
@@ -233,7 +234,7 @@ export function LeadCaptureFormInfluencer({ card, theme, language, locked = fals
               color: accent,
             }}
           >
-            {l.proBadge}
+            {planBadgeLabel}
           </span>
         </div>
 
