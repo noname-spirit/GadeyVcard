@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/supabase/AuthProvider';
 import { getCardsByUid } from '@/lib/supabase/cards';
 import { getCardStats } from '@/lib/supabase/events';
 import { getProfile } from '@/lib/supabase/profile';
+import { getLeadsByCardId } from '@/lib/supabase/leads';
 
 const HOURS = ['0h', '2h', '4h', '6h', '8h', '10h', '12h', '14h', '16h', '18h', '20h', '22h'];
 const MOCK_HOURLY = [2, 1, 0, 0, 4, 12, 18, 24, 31, 28, 19, 14];
@@ -35,7 +36,7 @@ const MOCK_DOMAINS = [
 ];
 
 const maxHourly = Math.max(...MOCK_HOURLY);
-const maxWeekly = Math.max(...MOCK_WEEKLY.map((d) => d.views));
+const DAYS_SHORT = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 const maxLinks = Math.max(...MOCK_LINKS.map((l) => l.clicks));
 
 export default function AnalyticsPage() {
@@ -43,6 +44,7 @@ export default function AnalyticsPage() {
   const [views, setViews] = useState(0);
   const [clicks, setClicks] = useState(0);
   const [userPlan, setUserPlan] = useState<'free' | 'starter' | 'pro' | 'business'>('free');
+  const [weeklyStats, setWeeklyStats] = useState<{ day: string; leads: number; views: number }[]>(MOCK_WEEKLY);
 
   const isPro = userPlan === 'pro' || userPlan === 'business';
   const isStarter = userPlan !== 'free';
@@ -55,13 +57,27 @@ export default function AnalyticsPage() {
     ]).then(async ([cards, profile]) => {
       if (profile) setUserPlan(profile.plan ?? 'free');
       if (!cards.length) return;
-      const stats = await getCardStats(cards[0].id);
+      const [stats, leads] = await Promise.all([
+        getCardStats(cards[0].id),
+        getLeadsByCardId(cards[0].id),
+      ]);
       setViews(stats.views);
       setClicks(stats.clicks);
+      const today = new Date();
+      setWeeklyStats(Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(today);
+        d.setDate(today.getDate() - 6 + i);
+        return {
+          day: DAYS_SHORT[d.getDay()],
+          leads: leads.filter((l) => l.created_at && new Date(l.created_at).toDateString() === d.toDateString()).length,
+          views: 0,
+        };
+      }));
     }).catch(() => {});
   }, [uid]);
 
   const conversionRate = views > 0 ? ((clicks / views) * 100).toFixed(1) : '0';
+  const maxWeekly = Math.max(...weeklyStats.map((d) => d.views), 1);
 
   return (
     <DashboardLayout active="Analytics">
@@ -131,7 +147,7 @@ export default function AnalyticsPage() {
                   <h3 className="text-sm font-semibold text-zinc-300">Évolution 7 jours</h3>
                 </div>
                 <div className="flex items-end gap-2 h-28">
-                  {MOCK_WEEKLY.map((d) => (
+                  {weeklyStats.map((d) => (
                     <div key={d.day} className="flex-1 flex flex-col items-center gap-1">
                       <div className="w-full flex flex-col gap-0.5">
                         <div className="w-full bg-orange-500/30 rounded-t-sm"
@@ -239,7 +255,7 @@ export default function AnalyticsPage() {
               <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-3">
                 <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Évolution 7 jours</p>
                 <div className="flex items-end gap-2 h-20">
-                  {MOCK_WEEKLY.map((d) => (
+                  {weeklyStats.map((d) => (
                     <div key={d.day} className="flex-1 flex flex-col items-center gap-0.5">
                       <div className="w-full bg-orange-500/30 rounded-t-sm" style={{ height: `${(d.views / maxWeekly) * 60}px` }} />
                       <span className="text-[9px] text-zinc-600">{d.day}</span>

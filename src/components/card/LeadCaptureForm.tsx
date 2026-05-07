@@ -141,6 +141,7 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
   const dark = theme === 'dark';
   const l = labels[language];
   const accent = card.accentColor || '#f97316';
+  const planBadgeLabel = card.plan === 'business' ? 'Business' : card.plan === 'pro' ? 'Pro' : l.proBadge;
 
   const title = card.captureForm?.title || l.defaultTitle;
   const subtitle = card.captureForm?.subtitle || l.defaultSubtitle;
@@ -346,7 +347,7 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
               color: accent,
             }}
           >
-            {l.proBadge}
+            {planBadgeLabel}
           </span>
         </div>
 

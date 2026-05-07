@@ -10,7 +10,25 @@ export async function submitLead(lead: Lead): Promise<{ error: string | null }> 
     phone: lead.phone ?? null,
     domain: lead.domain ?? null,
     message: lead.message ?? null,
+    status: lead.status ?? null,
+    notes: lead.notes ?? null,
+    source: lead.source ?? null,  
   }]);
+  if (error) return { error: error.message };
+  return { error: null };
+}
+
+export async function updateLead(
+  id: string,
+  fields: { status?: string | null; notes?: string | null; source?: string | null }
+): Promise<{ error: string | null }> {
+  const supabase = createClient();
+  const dbFields: Record<string, string | null | undefined> = {};
+  if ('status' in fields) dbFields['status'] = fields.status ?? null;
+  if ('notes' in fields) dbFields['notes'] = fields.notes ?? null;
+  if ('source' in fields) dbFields['source'] = fields.source ?? null;
+  console.log(dbFields,"fields",fields.status);
+  const { error } = await supabase.from('leads').update(dbFields).eq('id', id);
   if (error) return { error: error.message };
   return { error: null };
 }

@@ -103,6 +103,7 @@ export function LeadCaptureFormInfluencer({ card, theme, language, locked = fals
   const dark = theme === 'dark';
   const l = labels[language];
   const accent = card.accentColor || '#a855f7';
+  const planBadgeLabel = card.plan === 'business' ? 'Business' : card.plan === 'pro' ? 'Pro' : l.proBadge;
 
   const cardBg = dark
     ? 'from-zinc-900/70 via-zinc-900/50 to-black/80 border-zinc-800/40'
@@ -233,7 +234,7 @@ export function LeadCaptureFormInfluencer({ card, theme, language, locked = fals
               color: accent,
             }}
           >
-            {l.proBadge}
+            {planBadgeLabel}
           </span>
         </div>
 
