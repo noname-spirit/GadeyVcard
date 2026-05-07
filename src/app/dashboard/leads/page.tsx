@@ -139,7 +139,7 @@ export default function LeadsPage() {
             <LeadsTable leads={MOCK_LEADS} />
           </LockedFeature>
         ) : (
-          <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} onUpdate={handleUpdate} />
+          <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} />
         )}
 
       </div>
