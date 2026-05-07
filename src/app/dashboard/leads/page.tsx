@@ -49,8 +49,8 @@ export default function LeadsPage() {
         })));
       }
       setLoading(false);
-    }
-    load();
+    })
+    // load();
   }, [uid]);
 
   const handleDelete = async (id: string) => {
@@ -58,9 +58,9 @@ export default function LeadsPage() {
     setLeads((prev) => prev.filter((l) => l.id !== id));
   };
 
-  const handleUpdate = async (id: string, fields: { statut?: string; notes?: string; source?: string }) => {
+  const handleUpdate = async (id: string, fields: { status?: string; notes?: string; source?: string }) => {
     await updateLead(id, fields);
-    setLeads((prev) => prev.map((l) => l.id === id ? { ...l, ...fields, statut: fields.statut as LeadRow['statut'] } : l));
+    setLeads((prev) => prev.map((l) => l.id === id ? { ...l, ...fields, status: fields.status as LeadRow['status'] } : l));
   };
 
   const handleExport = () => {
