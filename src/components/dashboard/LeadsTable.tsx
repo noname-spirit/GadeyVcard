@@ -14,17 +14,14 @@ export interface LeadRow {
   domaine: string;
   source: string;
   createdAt: string;
-  status?: string;
+  status?: 'new' | 'contacted' | 'converted';
   notes?: string;
 }
-
-type UpdateFields = { statut?: string; notes?: string; source?: string };
 
 interface LeadsTableProps {
   leads: LeadRow[];
   onDelete?: (id: string) => void;
   onExport?: () => void;
-  onUpdate?: (id: string, fields: UpdateFields) => void;
 }
 
 type LeadStatus = 'new' | 'contacted' | 'converted';
@@ -36,30 +33,13 @@ const STATUS = {
 };
 
 const STATUS_CYCLE: (LeadStatus | undefined)[] = [undefined, 'new', 'contacted', 'converted'];
-
 const SOURCE_OPTIONS = ['formulaire', 'qr code', 'téléphone', 'email', 'référence', 'autre'];
 
-function initStatuses(rows: LeadRow[]): Record<string, LeadStatus | undefined> {
-  const s: Record<string, LeadStatus | undefined> = {};
-  rows.forEach((l) => { if (l.statut) s[l.id] = l.statut as LeadStatus; });
-  return s;
-}
-function initNotes(rows: LeadRow[]): Record<string, string> {
-  const n: Record<string, string> = {};
-  rows.forEach((l) => { if (l.notes) n[l.id] = l.notes; });
-  return n;
-}
-function initSources(rows: LeadRow[]): Record<string, string> {
-  const src: Record<string, string> = {};
-  rows.forEach((l) => { if (l.source) src[l.id] = l.source; });
-  return src;
-}
-
-export function LeadsTable({ leads, onDelete, onExport, onUpdate }: LeadsTableProps) {
+export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
   const [search, setSearch] = useState('');
   const [statuses, setStatuses] = useState<Record<string, LeadStatus | undefined>>(() => {
     const s: Record<string, LeadStatus | undefined> = {};
-    leads.forEach((l) => { if (l.status) s[l.id] = l.status as LeadStatus; });
+    leads.forEach((l) => { if (l.status) s[l.id] = l.status; });
     return s;
   });
   const [notes, setNotes] = useState<Record<string, string>>(() => {
@@ -67,39 +47,39 @@ export function LeadsTable({ leads, onDelete, onExport, onUpdate }: LeadsTablePr
     leads.forEach((l) => { if (l.notes) n[l.id] = l.notes; });
     return n;
   });
+  const [sources, setSources] = useState<Record<string, string>>(() => {
+    const src: Record<string, string> = {};
+    leads.forEach((l) => { if (l.source) src[l.id] = l.source; });
+    return src;
+  });
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [draftNote, setDraftNote] = useState('');
 
   useEffect(() => {
-    
     const s: Record<string, LeadStatus | undefined> = {};
     const n: Record<string, string> = {};
+    const src: Record<string, string> = {};
     leads.forEach((l) => {
-      if (l.status && ['new', 'contacted', 'converted'].includes(l.status)) {
-        s[l.id] = l.status as LeadStatus;
-      }
+      if (l.status && STATUS_CYCLE.includes(l.status)) s[l.id] = l.status;
       if (l.notes) n[l.id] = l.notes;
+      if (l.source) src[l.id] = l.source;
     });
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setStatuses(s);
     setNotes(n);
+    setSources(src);
   }, [leads]);
 
   const saveStatus = useCallback((id: string, status: LeadStatus | undefined) => {
     setStatuses((prev) => ({ ...prev, [id]: status }));
-    console.log('saveStatus', { id, status });
     updateLead(id, { status: status ?? '' });
   }, []);
 
   const cycleStatus = useCallback((id: string) => {
-    // console.log('cycleStatus', { id, statuses, saveStatus });
     const current = statuses[id];
-     console.log(current);
     const idx = STATUS_CYCLE.indexOf(current);
     const next = STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length];
-    console.log('cycleStatus', next);
     saveStatus(id, next);
-    // updateLead(id, { status: next ?? '' });
   }, [statuses, saveStatus]);
 
   const openNote = (id: string) => {
@@ -112,6 +92,11 @@ export function LeadsTable({ leads, onDelete, onExport, onUpdate }: LeadsTablePr
     setEditingNote(null);
     updateLead(id, { notes: draftNote });
   }, [draftNote]);
+
+  const changeSource = useCallback((id: string, value: string) => {
+    setSources((prev) => ({ ...prev, [id]: value }));
+    updateLead(id, { source: value });
+  }, []);
 
   const filtered = leads.filter((l) =>
     [l.nom, l.email, l.telephone, l.message, l.domaine].some((v) =>
