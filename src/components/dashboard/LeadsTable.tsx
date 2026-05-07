@@ -18,10 +18,13 @@ export interface LeadRow {
   notes?: string;
 }
 
+type UpdateFields = { statut?: string; notes?: string; source?: string };
+
 interface LeadsTableProps {
   leads: LeadRow[];
   onDelete?: (id: string) => void;
   onExport?: () => void;
+  onUpdate?: (id: string, fields: UpdateFields) => void;
 }
 
 type LeadStatus = 'new' | 'contacted' | 'converted';
@@ -34,7 +37,25 @@ const STATUS = {
 
 const STATUS_CYCLE: (LeadStatus | undefined)[] = [undefined, 'new', 'contacted', 'converted'];
 
-export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
+const SOURCE_OPTIONS = ['formulaire', 'qr code', 'téléphone', 'email', 'référence', 'autre'];
+
+function initStatuses(rows: LeadRow[]): Record<string, LeadStatus | undefined> {
+  const s: Record<string, LeadStatus | undefined> = {};
+  rows.forEach((l) => { if (l.statut) s[l.id] = l.statut as LeadStatus; });
+  return s;
+}
+function initNotes(rows: LeadRow[]): Record<string, string> {
+  const n: Record<string, string> = {};
+  rows.forEach((l) => { if (l.notes) n[l.id] = l.notes; });
+  return n;
+}
+function initSources(rows: LeadRow[]): Record<string, string> {
+  const src: Record<string, string> = {};
+  rows.forEach((l) => { if (l.source) src[l.id] = l.source; });
+  return src;
+}
+
+export function LeadsTable({ leads, onDelete, onExport, onUpdate }: LeadsTableProps) {
   const [search, setSearch] = useState('');
   const [statuses, setStatuses] = useState<Record<string, LeadStatus | undefined>>(() => {
     const s: Record<string, LeadStatus | undefined> = {};
@@ -159,14 +180,15 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={[
-                        'px-2 py-0.5 text-xs rounded-full border font-medium',
-                        lead.source === 'qd code'
-                          ? 'bg-violet-500/10 text-violet-400 border-violet-500/30'
-                          : 'bg-zinc-800 text-zinc-400 border-zinc-700/40',
-                      ].join(' ')}>
-                        {lead.source}
-                      </span>
+                      <select
+                        value={sources[lead.id] ?? lead.source}
+                        onChange={(e) => changeSource(lead.id, e.target.value)}
+                        className="px-2 py-0.5 text-xs rounded-full border bg-zinc-800 text-zinc-400 border-zinc-700/40 outline-none focus:border-orange-500/50 cursor-pointer"
+                      >
+                        {SOURCE_OPTIONS.map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                      </select>
                     </td>
                     <td className="px-4 py-3">
                       <button

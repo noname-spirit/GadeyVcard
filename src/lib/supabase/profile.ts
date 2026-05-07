@@ -42,3 +42,11 @@ export async function updateProfile(fields: Partial<Pick<Profile, 'full_name' | 
   const { error } = await supabase.from('profiles').update(fields).eq('id', user.id);
   if (error) console.error('updateProfile:', error.message);
 }
+
+export async function updatePlan(plan: Profile['plan']): Promise<void> {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  const { error } = await supabase.from('profiles').update({ plan }).eq('id', user.id);
+  if (error) console.error('updatePlan:', error.message);
+}

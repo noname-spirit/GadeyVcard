@@ -174,3 +174,9 @@ export async function upsertCard(uid: string, card: {
   if (error) { console.error(error); return null; }
   return data;
 }
+
+export async function updateCardPlan(uid: string, plan: string): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase.from('cards').update({ plan }).eq('user_id', uid);
+  if (error) console.error('updateCardPlan:', error.message);
+}

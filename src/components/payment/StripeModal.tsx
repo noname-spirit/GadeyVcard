@@ -11,6 +11,9 @@ import {
   useElements,
 } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/Button';
+import { updatePlan } from '@/lib/supabase/profile';
+import { updateCardPlan } from '@/lib/supabase/cards';
+import { useAuth } from '@/lib/supabase/AuthProvider';
 
 const STRIPE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = STRIPE_KEY ? loadStripe(STRIPE_KEY) : null;
@@ -47,14 +50,16 @@ const stripeAppearance = {
 interface CheckoutFormProps {
   amount: number;
   planName: string;
+  planId: string;
   billing: string;
   onSuccess: () => void;
   onClose: () => void;
 }
 
-function CheckoutForm({ amount, planName, billing, onSuccess, onClose }: CheckoutFormProps) {
+function CheckoutForm({ amount, planName, planId, billing, onSuccess, onClose }: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
+  const { uid } = useAuth();
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState('');
 
@@ -95,6 +100,8 @@ function CheckoutForm({ amount, planName, billing, onSuccess, onClose }: Checkou
       setError(confirmError.message ?? 'Paiement refusé');
       setPaying(false);
     } else {
+      await updatePlan(planId as 'free' | 'starter' | 'pro' | 'business');
+      if (uid) await updateCardPlan(uid, planId);
       onSuccess();
     }
   };
@@ -160,11 +167,12 @@ function CheckoutForm({ amount, planName, billing, onSuccess, onClose }: Checkou
 interface StripeModalContentProps {
   onClose: () => void;
   planName: string;
+  planId: string;
   amount: number;
   billing: string;
 }
 
-function StripeModalContent({ onClose, planName, amount, billing }: StripeModalContentProps) {
+function StripeModalContent({ onClose, planName, planId, amount, billing }: StripeModalContentProps) {
   const [clientSecret, setClientSecret] = useState('');
   const [loadingIntent, setLoadingIntent] = useState(true);
   const [success, setSuccess] = useState(false);
@@ -213,6 +221,7 @@ function StripeModalContent({ onClose, planName, amount, billing }: StripeModalC
       <CheckoutForm
         amount={amount}
         planName={planName}
+        planId={planId}
         billing={billing}
         onSuccess={() => setSuccess(true)}
         onClose={onClose}
@@ -225,11 +234,12 @@ interface StripeModalProps {
   open: boolean;
   onClose: () => void;
   planName: string;
+  planId: string;
   amount: number;
   billing: string;
 }
 
-export function StripeModal({ open, onClose, planName, amount, billing }: StripeModalProps) {
+export function StripeModal({ open, onClose, planName, planId, amount, billing }: StripeModalProps) {
   return (
     <AnimatePresence>
       {open && (
@@ -269,6 +279,7 @@ export function StripeModal({ open, onClose, planName, amount, billing }: Stripe
               <StripeModalContent
                 onClose={onClose}
                 planName={planName}
+                planId={planId}
                 amount={amount}
                 billing={billing}
               />

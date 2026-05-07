@@ -104,6 +104,7 @@ export default function CardPage() {
 
     getCardBySlug(slugFormatted).then((match) => {
       if (match) {
+        console.log('Card found for slug:', slugFormatted, match);
         setCard(supabaseCardToCardData(match));
         setTheme(match.template === 'light' ? 'light' : 'dark');
         trackCardEvent(match.id, 'view');

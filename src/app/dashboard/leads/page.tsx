@@ -33,7 +33,7 @@ export default function LeadsPage() {
     if (!uid) { Promise.resolve().then(() => setLoading(false)); return; }
     getCardsByUid(uid).then(async (cards) => {
       if (!cards.length) { setLoading(false); return; }
-      const dbLeads = await getLeadsByCardId(cards[0].id);
+      const dbLeads = await getLeadsByCardId(cards[0].id).catch(() => []);
       if (dbLeads.length > 0) {
         setLeads(dbLeads.map((l) => ({
           id: l.id ?? crypto.randomUUID(),
@@ -48,12 +48,19 @@ export default function LeadsPage() {
           createdAt: l.created_at ?? '',
         })));
       }
-    }).catch(() => {}).finally(() => setLoading(false));
+      setLoading(false);
+    }
+    load();
   }, [uid]);
 
   const handleDelete = async (id: string) => {
     await deleteLead(id);
     setLeads((prev) => prev.filter((l) => l.id !== id));
+  };
+
+  const handleUpdate = async (id: string, fields: { statut?: string; notes?: string; source?: string }) => {
+    await updateLead(id, fields);
+    setLeads((prev) => prev.map((l) => l.id === id ? { ...l, ...fields, statut: fields.statut as LeadRow['statut'] } : l));
   };
 
   const handleExport = () => {
@@ -125,7 +132,7 @@ export default function LeadsPage() {
             <LeadsTable leads={MOCK_LEADS} />
           </LockedFeature>
         ) : (
-          <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} />
+          <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} onUpdate={handleUpdate} />
         )}
 
       </div>
