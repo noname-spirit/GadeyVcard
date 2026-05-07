@@ -10,7 +10,7 @@ import type { LeadRow } from '@/components/dashboard/LeadsTable';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/lib/supabase/AuthProvider';
 import { getCardsByUid } from '@/lib/supabase/cards';
-import { getLeadsByCardId, deleteLead } from '@/lib/supabase/leads';
+import { getLeadsByCardId, deleteLead, updateLead } from '@/lib/supabase/leads';
 import { getCardStats } from '@/lib/supabase/events';
 import { getProfile } from '@/lib/supabase/profile';
 import { LockedFeature } from '@/components/ui/LockedFeature';
@@ -133,7 +133,7 @@ const [dbLeads, stats] = await Promise.all([
               <LeadsTable leads={MOCK_LEADS} />
             </LockedFeature>
           ) : (
-            <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} />
+            <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} onUpdate={handleUpdate} />
           )}
         </div>
 

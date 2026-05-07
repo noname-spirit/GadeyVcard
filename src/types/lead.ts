@@ -7,7 +7,7 @@ export interface Lead {
   phone?: string;
   domain?: string;
   message?: string;
-  statut?: 'new' | 'contacted' | 'converted';
+  status?: 'new' | 'contacted' | 'converted';
   notes?: string;
   source?: string;
   created_at?: string;
