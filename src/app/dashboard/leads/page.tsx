@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Users, Download } from 'lucide-react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { LeadsTable } from '@/components/dashboard/LeadsTable';
@@ -11,12 +11,14 @@ import { getLeadsByCardId, deleteLead, updateLead } from '@/lib/supabase/leads';
 import { getProfile } from '@/lib/supabase/profile';
 import { LockedFeature } from '@/components/ui/LockedFeature';
 
+const NOW = Date.now();
+
 const MOCK_LEADS: LeadRow[] = [
-  { id: '1', nom: 'Sophie Martin', email: 'sophie@cafe.fr', telephone: '+33612345678', domaine: 'Café', source: 'formulaire', createdAt: '2026-04-15T10:00:00Z' },
-  { id: '2', nom: 'Maxime Nguyen', email: 'max@studio.com', telephone: '+33698765432', domaine: 'Marketing', source: 'qd code', createdAt: '2026-04-14T14:30:00Z' },
-  { id: '3', nom: 'Léa Dupont', email: 'lea@villa.com', telephone: '+33611223344', domaine: 'Immobilier', source: 'formulaire', createdAt: '2026-04-13T09:15:00Z' },
-  { id: '4', nom: 'Thomas Bernard', email: 'thomas@tech.io', telephone: '+33622334455', domaine: 'Tech', source: 'formulaire', createdAt: '2026-04-12T16:00:00Z' },
-  { id: '5', nom: 'Emma Rousseau', email: 'emma@design.fr', telephone: undefined, domaine: 'Design', source: 'qd code', createdAt: '2026-04-11T11:30:00Z' },
+  { id: '1', nom: 'Contact A', email: 'contact@exemple.com', telephone: '+33 6 •• •• •• ••', domaine: 'Café', source: 'formulaire', createdAt: '2026-04-15T10:00:00Z' },
+  { id: '2', nom: 'Contact B', email: 'contact@exemple.com', telephone: '+33 6 •• •• •• ••', domaine: 'Marketing', source: 'qd code', createdAt: '2026-04-14T14:30:00Z' },
+  { id: '3', nom: 'Contact C', email: 'contact@exemple.com', telephone: '+33 6 •• •• •• ••', domaine: 'Immobilier', source: 'formulaire', createdAt: '2026-04-13T09:15:00Z' },
+  { id: '4', nom: 'Contact D', email: 'contact@exemple.com', telephone: '+33 6 •• •• •• ••', domaine: 'Tech', source: 'formulaire', createdAt: '2026-04-12T16:00:00Z' },
+  { id: '5', nom: 'Contact E', email: 'contact@exemple.com', telephone: undefined, domaine: 'Design', source: 'qd code', createdAt: '2026-04-11T11:30:00Z' },
 ];
 
 export default function LeadsPage() {
@@ -27,11 +29,9 @@ export default function LeadsPage() {
   const canExport = userPlan !== 'free';
 
   useEffect(() => {
-    async function load() {
-      const profile = await getProfile().catch(() => null);
-      if (profile) setUserPlan(profile.plan ?? 'free');
-      if (!uid) { setLoading(false); return; }
-      const cards = await getCardsByUid(uid).catch(() => []);
+    getProfile().then((p) => { if (p) setUserPlan(p.plan ?? 'free'); }).catch(() => {});
+    if (!uid) { Promise.resolve().then(() => setLoading(false)); return; }
+    getCardsByUid(uid).then(async (cards) => {
       if (!cards.length) { setLoading(false); return; }
       const dbLeads = await getLeadsByCardId(cards[0].id).catch(() => []);
       if (dbLeads.length > 0) {
@@ -43,7 +43,7 @@ export default function LeadsPage() {
           message: l.message ?? undefined,
           domaine: l.domain ?? '',
           source: l.source ?? 'formulaire',
-          statut: (l.statut as LeadRow['statut']) ?? undefined,
+          status: l.status ?? undefined,
           notes: l.notes ?? undefined,
           createdAt: l.created_at ?? '',
         })));
@@ -74,9 +74,10 @@ export default function LeadsPage() {
     URL.revokeObjectURL(url);
   };
 
-  const now = new Date();
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000);
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
+  const { thisMonth, thisWeek } = useMemo(() => ({
+    thisMonth: leads.filter((l) => new Date(l.createdAt) > new Date(NOW - 30 * 86400000)).length,
+    thisWeek: leads.filter((l) => new Date(l.createdAt) > new Date(NOW - 7 * 86400000)).length,
+  }), [leads]);
 
   return (
     <DashboardLayout active="Leads">
@@ -107,8 +108,8 @@ export default function LeadsPage() {
         <div className="grid grid-cols-3 gap-3">
           {[
             { label: 'Total', value: leads.length, icon: Users, color: 'text-orange-400 bg-orange-500/10' },
-            { label: 'Ce mois', value: leads.filter((l) => new Date(l.createdAt) > thirtyDaysAgo).length, icon: Users, color: 'text-emerald-400 bg-emerald-500/10' },
-            { label: 'Cette semaine', value: leads.filter((l) => new Date(l.createdAt) > sevenDaysAgo).length, icon: Users, color: 'text-blue-400 bg-blue-500/10' },
+            { label: 'Ce mois', value: thisMonth, icon: Users, color: 'text-emerald-400 bg-emerald-500/10' },
+            { label: 'Cette semaine', value: thisWeek, icon: Users, color: 'text-blue-400 bg-blue-500/10' },
           ].map((s) => (
             <div key={s.label} className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-4 flex flex-col gap-2">
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${s.color}`}>
@@ -126,6 +127,10 @@ export default function LeadsPage() {
           <div className="flex items-center justify-center py-12">
             <div className="w-6 h-6 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
           </div>
+        ) : userPlan === 'free' ? (
+          <LockedFeature plan="starter" label="Capture de leads" desc="Recevez et gérez les contacts qui visitent votre carte">
+            <LeadsTable leads={MOCK_LEADS} />
+          </LockedFeature>
         ) : (
           <LeadsTable leads={leads} onDelete={handleDelete} onExport={canExport ? handleExport : undefined} onUpdate={handleUpdate} />
         )}

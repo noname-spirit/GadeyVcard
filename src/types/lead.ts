@@ -1,4 +1,5 @@
 export interface Lead {
+  status: undefined;
   id?: string;
   card_id: string;
   name: string;
@@ -6,7 +7,7 @@ export interface Lead {
   phone?: string;
   domain?: string;
   message?: string;
-  statut?: string;
+  status?: 'new' | 'contacted' | 'converted';
   notes?: string;
   source?: string;
   created_at?: string;

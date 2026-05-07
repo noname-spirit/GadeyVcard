@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { useParams } from 'next/navigation';
 import { Sun, Moon, CalendarDays, X } from 'lucide-react';
 import { VCard } from '@/components/card';
 import { Watermark } from '@/components/card/Watermark';
 import { LeadCaptureForm } from '@/components/card/LeadCaptureForm';
 import { LeadCaptureFormInfluencer } from '@/components/card/LeadCaptureFormInfluencer';
+import { CardFrontRestaurant, RestaurantMenuPanel } from '@/components/card/CardFrontRestaurant';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 import { getCardBySlug, supabaseCardToCardData } from '@/lib/supabase/cards';
 import { trackCardEvent } from '@/lib/supabase/events';
@@ -92,6 +94,7 @@ export default function CardPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [cardLoading, setCardLoading] = useState(true);
   const [showCalendly, setShowCalendly] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const dark = theme === 'dark';
 
   useEffect(() => {
@@ -200,31 +203,89 @@ export default function CardPage() {
           </div>
         )}
 
-        {/* VCard + formulaire groupés avec le même écart que le bouton interne (mt-2) */}
+        {/* Rendu selon le template */}
         <div className="flex flex-col w-full max-w-md gap-2">
-          <VCard
-            card={card}
-            theme={theme}
-            language={language}
-            onSaveContact={handleSaveContact}
-            isSaving={isSaving}
-            onCalendlyClick={card.calendlyUrl && card.plan === 'pro' ? () => { trackCardEvent(card.id, 'calendly'); setShowCalendly(true); } : undefined}
-          />
-
-          {card.template === 'influencer' ? (
-            <LeadCaptureFormInfluencer
-              card={card}
-              theme={theme}
-              language={language}
-              locked={!card.plan}
-            />
+          {card.template === 'restaurant' ? (
+            <div style={{ '--accent': card.accentColor || '#22c55e' } as React.CSSProperties} className="flex flex-col gap-2 w-full">
+              <CardFrontRestaurant
+                card={{
+                  id: card.id,
+                  slug: card.slug,
+                  name: card.name,
+                  tagline: card.title || 'Cuisine · Ambiance · Saveurs',
+                  photo: card.photo || '/noname-spirit.jpg',
+                  contact: {
+                    phone: card.contact?.phone,
+                    website: card.socials?.website,
+                    address: undefined,
+                    hours: undefined,
+                  },
+                  menu: [
+                    { id: '1', name: 'Soupe du jour', price: 8, category: 'Entrées', available: true, emoji: '🍲' },
+                    { id: '2', name: 'Buddha Bowl', price: 14, category: 'Plats', available: true, emoji: '🥗' },
+                    { id: '3', name: 'Burger Végé', price: 16, category: 'Plats', available: false, emoji: '🍔' },
+                    { id: '4', name: 'Tiramisu Coco', price: 7, category: 'Desserts', available: true, emoji: '🍮' },
+                    { id: '5', name: 'Kombucha', price: 5, category: 'Boissons', available: true, emoji: '🥤' },
+                  ],
+                  accentColor: card.accentColor,
+                }}
+                theme={theme}
+                language={language}
+                isSaving={isSaving}
+                onSaveContact={handleSaveContact}
+                onMenuOpen={() => setMenuOpen(!menuOpen)}
+              />
+              <AnimatePresence>
+                {menuOpen && (
+                  <RestaurantMenuPanel
+                    card={{
+                      id: card.id,
+                      slug: card.slug,
+                      name: card.name,
+                      tagline: card.title || '',
+                      photo: card.photo || '/noname-spirit.jpg',
+                      contact: { phone: card.contact?.phone, website: card.socials?.website },
+                      menu: [
+                        { id: '1', name: 'Soupe du jour', price: 8, category: 'Entrées', available: true, emoji: '🍲' },
+                        { id: '2', name: 'Buddha Bowl', price: 14, category: 'Plats', available: true, emoji: '🥗' },
+                        { id: '3', name: 'Burger Végé', price: 16, category: 'Plats', available: false, emoji: '🍔' },
+                        { id: '4', name: 'Tiramisu Coco', price: 7, category: 'Desserts', available: true, emoji: '🍮' },
+                        { id: '5', name: 'Kombucha', price: 5, category: 'Boissons', available: true, emoji: '🥤' },
+                      ],
+                      accentColor: card.accentColor,
+                    }}
+                    theme={theme}
+                    language={language}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
           ) : (
-            <LeadCaptureForm
-              card={card}
-              theme={theme}
-              language={language}
-              locked={false}
-            />
+            <>
+              <VCard
+                card={card}
+                theme={theme}
+                language={language}
+                onSaveContact={handleSaveContact}
+                isSaving={isSaving}
+                onCalendlyClick={card.calendlyUrl && (card.plan === 'pro' || card.plan === 'business') ? () => { trackCardEvent(card.id, 'calendly'); setShowCalendly(true); } : undefined}
+              />
+              {card.template === 'influencer' ? (
+                <LeadCaptureFormInfluencer
+                  card={card}
+                  theme={theme}
+                  language={language}
+                  locked={!card.plan || card.plan === 'free'}
+                />
+              ) : (
+                <LeadCaptureForm
+                  card={card}
+                  theme={theme}
+                  language={language}
+                  locked={!card.plan || card.plan === 'free'}
+                />
+              )}
+            </>
           )}
         </div>
 
@@ -233,7 +294,7 @@ export default function CardPage() {
           <CalendlyModal url={card.calendlyUrl} onClose={() => setShowCalendly(false)} />
         )}
 
-        <Watermark plan={card.plan && card.plan !== 'free' ? 'pro' : 'free'} />
+        <Watermark plan={!card.plan || card.plan === 'free' ? 'free' : 'pro'} />
       </div>
     </div>
   );
