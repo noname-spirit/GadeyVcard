@@ -55,7 +55,9 @@ const [dbLeads, stats] = await Promise.all([
         telephone: l.phone ?? undefined,
         message: l.message ?? undefined,
         domaine: l.domain ?? '',
-        source: 'formulaire',
+        source: l.source ?? 'formulaire',
+        status: (l.status as LeadRow['status']) ?? undefined,
+        notes: l.notes ?? undefined,
         createdAt: l.created_at ?? '',
       })));
     }).catch(() => {});
@@ -65,6 +67,7 @@ const [dbLeads, stats] = await Promise.all([
     await deleteLead(id);
     setLeads((prev) => prev.filter((l) => l.id !== id));
   };
+
 
   const handleExport = () => {
     const csv = ['Nom,Email,Téléphone,Message,Domaine,Source,Date',

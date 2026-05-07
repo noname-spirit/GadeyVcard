@@ -106,6 +106,7 @@ export async function updateCard(id: string, card: {
 }): Promise<boolean> {
   const supabase = createClient();
   const { contact, socials, ...rest } = card;
+  console.log('Updating card with id:', id, 'and data:', card,contact, socials, rest);
   const { error } = await supabase
     .from('cards')
     .update({
@@ -120,6 +121,11 @@ export async function updateCard(id: string, card: {
       website: socials?.website ?? null,
       tiktok: socials?.tiktok ?? null,
       twitter: socials?.twitter ?? null,
+       accent_color: card.accent_color,
+       template: card.template,
+       calendly_url: card.calendly_url ?? null,
+       availability_status: card.availability_status ?? null,
+       availability_text: card.availability_text ?? null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', id);

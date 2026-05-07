@@ -1,15 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Users, Download } from 'lucide-react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { LeadsTable } from '@/components/dashboard/LeadsTable';
 import type { LeadRow } from '@/components/dashboard/LeadsTable';
 import { useAuth } from '@/lib/supabase/AuthProvider';
 import { getCardsByUid } from '@/lib/supabase/cards';
-import { getLeadsByCardId, deleteLead } from '@/lib/supabase/leads';
+import { getLeadsByCardId, deleteLead, updateLead } from '@/lib/supabase/leads';
 import { getProfile } from '@/lib/supabase/profile';
 import { LockedFeature } from '@/components/ui/LockedFeature';
+
+const NOW = Date.now();
 
 const MOCK_LEADS: LeadRow[] = [
   { id: '1', nom: 'Contact A', email: 'contact@exemple.com', telephone: '+33 6 •• •• •• ••', domaine: 'Café', source: 'formulaire', createdAt: '2026-04-15T10:00:00Z' },
@@ -28,7 +30,7 @@ export default function LeadsPage() {
 
   useEffect(() => {
     getProfile().then((p) => { if (p) setUserPlan(p.plan ?? 'free'); }).catch(() => {});
-    if (!uid) { setLoading(false); return; }
+    if (!uid) { Promise.resolve().then(() => setLoading(false)); return; }
     getCardsByUid(uid).then(async (cards) => {
       if (!cards.length) { setLoading(false); return; }
       const dbLeads = await getLeadsByCardId(cards[0].id);
@@ -40,7 +42,9 @@ export default function LeadsPage() {
           telephone: l.phone ?? undefined,
           message: l.message ?? undefined,
           domaine: l.domain ?? '',
-          source: 'formulaire',
+          source: l.source ?? 'formulaire',
+          status: l.status ?? undefined,
+          notes: l.notes ?? undefined,
           createdAt: l.created_at ?? '',
         })));
       }
@@ -62,6 +66,11 @@ export default function LeadsPage() {
     a.href = url; a.download = 'leads.csv'; a.click();
     URL.revokeObjectURL(url);
   };
+
+  const { thisMonth, thisWeek } = useMemo(() => ({
+    thisMonth: leads.filter((l) => new Date(l.createdAt) > new Date(NOW - 30 * 86400000)).length,
+    thisWeek: leads.filter((l) => new Date(l.createdAt) > new Date(NOW - 7 * 86400000)).length,
+  }), [leads]);
 
   return (
     <DashboardLayout active="Leads">
@@ -92,8 +101,8 @@ export default function LeadsPage() {
         <div className="grid grid-cols-3 gap-3">
           {[
             { label: 'Total', value: leads.length, icon: Users, color: 'text-orange-400 bg-orange-500/10' },
-            { label: 'Ce mois', value: leads.filter((l) => new Date(l.createdAt) > new Date(Date.now() - 30 * 86400000)).length, icon: Users, color: 'text-emerald-400 bg-emerald-500/10' },
-            { label: 'Cette semaine', value: leads.filter((l) => new Date(l.createdAt) > new Date(Date.now() - 7 * 86400000)).length, icon: Users, color: 'text-blue-400 bg-blue-500/10' },
+            { label: 'Ce mois', value: thisMonth, icon: Users, color: 'text-emerald-400 bg-emerald-500/10' },
+            { label: 'Cette semaine', value: thisWeek, icon: Users, color: 'text-blue-400 bg-blue-500/10' },
           ].map((s) => (
             <div key={s.label} className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-4 flex flex-col gap-2">
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${s.color}`}>

@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
       phone: telephone?.trim() || undefined,
       domain: domaine?.trim() || undefined,
       message: message?.trim() || undefined,
+      status: undefined
     };
 
     const { error } = await submitLead(lead);
