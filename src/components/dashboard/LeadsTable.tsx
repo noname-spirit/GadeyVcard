@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Download, Trash2, Search, StickyNote, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { updateLead } from '@/lib/supabase/leads';
 
 export interface LeadRow {
   id: string;
@@ -13,7 +14,7 @@ export interface LeadRow {
   domaine: string;
   source: string;
   createdAt: string;
-  status?: 'new' | 'contacted' | 'converted';
+  status?: string;
   notes?: string;
 }
 
@@ -35,38 +36,61 @@ const STATUS_CYCLE: (LeadStatus | undefined)[] = [undefined, 'new', 'contacted',
 
 export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
   const [search, setSearch] = useState('');
-  const [statuses, setStatuses] = useState<Record<string, LeadStatus | undefined>>({});
-  const [notes, setNotes] = useState<Record<string, string>>({});
+  const [statuses, setStatuses] = useState<Record<string, LeadStatus | undefined>>(() => {
+    const s: Record<string, LeadStatus | undefined> = {};
+    leads.forEach((l) => { if (l.status) s[l.id] = l.status as LeadStatus; });
+    return s;
+  });
+  const [notes, setNotes] = useState<Record<string, string>>(() => {
+    const n: Record<string, string> = {};
+    leads.forEach((l) => { if (l.notes) n[l.id] = l.notes; });
+    return n;
+  });
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [draftNote, setDraftNote] = useState('');
 
   useEffect(() => {
+    
     const s: Record<string, LeadStatus | undefined> = {};
     const n: Record<string, string> = {};
     leads.forEach((l) => {
-      if (l.status) s[l.id] = l.status;
+      if (l.status && ['new', 'contacted', 'converted'].includes(l.status)) {
+        s[l.id] = l.status as LeadStatus;
+      }
       if (l.notes) n[l.id] = l.notes;
     });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStatuses(s);
     setNotes(n);
   }, [leads]);
 
-  const cycleStatus = (id: string) => {
+  const saveStatus = useCallback((id: string, status: LeadStatus | undefined) => {
+    setStatuses((prev) => ({ ...prev, [id]: status }));
+    console.log('saveStatus', { id, status });
+    updateLead(id, { status: status ?? '' });
+  }, []);
+
+  const cycleStatus = useCallback((id: string) => {
+    // console.log('cycleStatus', { id, statuses, saveStatus });
     const current = statuses[id];
+     console.log(current);
     const idx = STATUS_CYCLE.indexOf(current);
     const next = STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length];
-    setStatuses((prev) => ({ ...prev, [id]: next }));
-  };
+    console.log('cycleStatus', next);
+    saveStatus(id, next);
+    // updateLead(id, { status: next ?? '' });
+  }, [statuses, saveStatus]);
 
   const openNote = (id: string) => {
     setDraftNote(notes[id] ?? '');
     setEditingNote(id);
   };
 
-  const saveNote = (id: string) => {
+  const saveNote = useCallback((id: string) => {
     setNotes((prev) => ({ ...prev, [id]: draftNote }));
     setEditingNote(null);
-  };
+    updateLead(id, { notes: draftNote });
+  }, [draftNote]);
 
   const filtered = leads.filter((l) =>
     [l.nom, l.email, l.telephone, l.message, l.domaine].some((v) =>
@@ -76,7 +100,6 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Toolbar */}
       <div className="flex items-center gap-3">
         <div className="flex-1 relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
@@ -96,12 +119,11 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
         )}
       </div>
 
-      {/* Table */}
       <div className="rounded-2xl border border-zinc-800/60 overflow-x-auto">
         <table className="w-full text-sm min-w-275">
           <thead>
             <tr className="border-b border-zinc-800/60 bg-zinc-900/60">
-              {['Nom', 'Email', 'Téléphone', 'Message', 'Domaine', 'Source', 'Statut', 'Notes', 'Date', ''].map((h) => (
+              {['Nom', 'Email', 'Tel', 'Message', 'Domaine', 'Source', 'Statut', 'Notes', 'Date', ''].map((h) => (
                 <th key={h} className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">
                   {h}
                 </th>
@@ -125,9 +147,11 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
                     <td className="px-4 py-3 text-zinc-400">{lead.email}</td>
                     <td className="px-4 py-3 text-zinc-400">{lead.telephone || <span className="text-zinc-700">—</span>}</td>
                     <td className="px-4 py-3 text-zinc-400 max-w-36">
-                      {lead.message
-                        ? <span className="block truncate" title={lead.message}>{lead.message}</span>
-                        : <span className="text-zinc-700">—</span>}
+                      {lead.message ? (
+                        <span className="block truncate" title={lead.message}>{lead.message}</span>
+                      ) : (
+                        <span className="text-zinc-700">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <span className="px-2 py-0.5 text-xs rounded-full bg-zinc-800 border border-zinc-700/40 text-zinc-400">
@@ -164,10 +188,13 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
                             type="text"
                             value={draftNote}
                             onChange={(e) => setDraftNote(e.target.value)}
-                            onKeyDown={(e) => { if (e.key === 'Enter') saveNote(lead.id); if (e.key === 'Escape') setEditingNote(null); }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') saveNote(lead.id);
+                              if (e.key === 'Escape') setEditingNote(null);
+                            }}
                             className="w-32 px-2 py-1 text-xs bg-zinc-800 border border-zinc-700/40 rounded-lg text-zinc-100 outline-none focus:border-orange-500/50"
                           />
-                          <button onClick={() => saveNote(lead.id)} className="p-1 text-emerald-400 hover:text-emerald-300">✓</button>
+                          <button onClick={() => saveNote(lead.id)} className="p-1 text-emerald-400 hover:text-emerald-300">&#x2713;</button>
                           <button onClick={() => setEditingNote(null)} className="p-1 text-zinc-500 hover:text-zinc-300"><X size={11} /></button>
                         </div>
                       ) : (
