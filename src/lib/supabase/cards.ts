@@ -91,6 +91,48 @@ export async function getCardsByUid(uid: string): Promise<SupabaseCard[]> {
   return (data ?? []) as SupabaseCard[];
 }
 
+export async function updateCard(id: string, card: {
+  slug?: string;
+  name?: string;
+  title?: string;
+  photo?: string;
+  contact?: { phone?: string | null; email?: string | null; whatsapp?: string | null; line?: string | null };
+  socials?: { instagram?: string | null; youtube?: string | null; linkedin?: string | null; website?: string | null; tiktok?: string | null; twitter?: string | null };
+  accent_color?: string;
+  template?: string;
+  calendly_url?: string | null;
+  availability_status?: string | null;
+  availability_text?: string | null;
+}): Promise<boolean> {
+  const supabase = createClient();
+  const { contact, socials, ...rest } = card;
+  console.log('Updating card with id:', id, 'and data:', card,contact, socials, rest);
+  const { error } = await supabase
+    .from('cards')
+    .update({
+      ...rest,
+      phone: contact?.phone ?? null,
+      email: contact?.email ?? null,
+      whatsapp: contact?.whatsapp ?? null,
+      line_contact: contact?.line ?? null,
+      instagram: socials?.instagram ?? null,
+      youtube: socials?.youtube ?? null,
+      linkedin: socials?.linkedin ?? null,
+      website: socials?.website ?? null,
+      tiktok: socials?.tiktok ?? null,
+      twitter: socials?.twitter ?? null,
+       accent_color: card.accent_color,
+       template: card.template,
+       calendly_url: card.calendly_url ?? null,
+       availability_status: card.availability_status ?? null,
+       availability_text: card.availability_text ?? null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id);
+  if (error) { console.error('updateCard:', error.message); return false; }
+  return true;
+}
+
 export async function upsertCard(uid: string, card: {
   slug: string;
   name: string;
