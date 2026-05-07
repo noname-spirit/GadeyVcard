@@ -255,14 +255,23 @@
   .spec-card.food       { border-color: #22c55e; box-shadow: 0 0 0 1px #22c55e15, 0 8px 24px #22c55e10; }
   .spec-card.restaurant { border-color: #8b5cf6; box-shadow: 0 0 0 1px #8b5cf615, 0 8px 24px #8b5cf610; }
   .spec-card.event      { border-color: #06b6d4; box-shadow: 0 0 0 1px #06b6d415, 0 8px 24px #06b6d410; }
+  .spec-card.artist     { border-color: #ec4899; box-shadow: 0 0 0 1px #ec489915, 0 8px 24px #ec489910; }
+  .spec-card.immo       { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f615, 0 8px 24px #3b82f610; }
+  .spec-card.photo      { border-color: #f59e0b; box-shadow: 0 0 0 1px #f59e0b15, 0 8px 24px #f59e0b10; }
 
   .badge.food       { background: #22c55e10; color: #4ade80; border: 1px solid #22c55e25; }
   .badge.restaurant { background: #8b5cf610; color: #a78bfa; border: 1px solid #8b5cf625; }
   .badge.event      { background: #06b6d410; color: #22d3ee; border: 1px solid #06b6d425; }
+  .badge.artist     { background: #ec489910; color: #f472b6; border: 1px solid #ec489925; }
+  .badge.immo       { background: #3b82f610; color: #60a5fa; border: 1px solid #3b82f625; }
+  .badge.photo      { background: #f59e0b10; color: #fbbf24; border: 1px solid #f59e0b25; }
 
   .food       .dot { background: #22c55e; }
   .restaurant .dot { background: #8b5cf6; }
   .event      .dot { background: #06b6d4; }
+  .artist     .dot { background: #ec4899; }
+  .immo       .dot { background: #3b82f6; }
+  .photo      .dot { background: #f59e0b; }
 
   /* ── LEGEND ── */
   .legend {
@@ -305,7 +314,7 @@
 <div class="header">
   <h1>Smart vCard — Schéma des Plans</h1>
   <p>Autorisations & fonctionnalités débloquées par abonnement</p>
-  <span class="updated">Mis à jour — 30 avril 2026</span>
+  <span class="updated">Mis à jour — 7 mai 2026</span>
 </div>
 
 <!-- TRACK INDIVIDUEL -->
@@ -520,6 +529,70 @@
       </div>
     </div>
 
+    <!-- ARTISTE -->
+    <div class="spec-card artist">
+      <div><span class="badge artist">🎵 Artiste</span></div>
+      <div class="plan-icon">🎤</div>
+      <div>
+        <div class="plan-price"><span class="amount">12 €</span><span class="period">/mois</span></div>
+        <div class="plan-name">Artistes indépendants · Musiciens · DJs</div>
+      </div>
+      <div class="features">
+        <div class="feature"><span class="dot"></span>Template Artist premium (dark/accent)</div>
+        <div class="feature"><span class="dot"></span>Liens streaming (Spotify, Apple Music, Deezer, SoundCloud, Bandcamp)</div>
+        <div class="feature"><span class="dot"></span>Embed lecteur (1 track Spotify ou SoundCloud)</div>
+        <div class="feature"><span class="dot"></span>EPK digital : bio, genre(s), PDF rider uploadable</div>
+        <div class="feature"><span class="dot"></span>Formulaire booking pro (organisateur, date, ville, budget)</div>
+        <div class="feature"><span class="dot"></span>Galerie press 6 photos</div>
+        <div class="feature"><span class="dot"></span>QR code HD (impression flyers / affiches)</div>
+        <div class="feature"><span class="dot"></span>Stats scans par event</div>
+        <div class="feature"><span class="dot"></span>Export .vcf → booker sauvegarde le contact</div>
+      </div>
+      <div class="divider"></div>
+      <div class="locked">Dashboard multi-artistes (label)</div>
+    </div>
+
+    <!-- IMMOBILIER -->
+    <div class="spec-card immo">
+      <div><span class="badge immo">🏠 Immobilier</span></div>
+      <div class="plan-icon">🔑</div>
+      <div>
+        <div class="plan-price"><span class="amount">29 €</span><span class="period">/mois</span></div>
+        <div class="plan-name">Agents indépendants · IAD · Safti · CapiFrance</div>
+      </div>
+      <div class="features">
+        <div class="feature"><span class="dot"></span>Template Immo classique & premium</div>
+        <div class="feature"><span class="dot"></span>QR code HD carré (imprimable sur panneau "En vente")</div>
+        <div class="feature"><span class="dot"></span>Liens listings (SeLoger, LeBonCoin, site agence)</div>
+        <div class="feature"><span class="dot"></span>Formulaires séparés : contact acheteur / vendeur</div>
+        <div class="feature"><span class="dot"></span>Calendly visite intégré</div>
+        <div class="feature"><span class="dot"></span>Badge disponibilité temps réel</div>
+        <div class="feature"><span class="dot"></span>Zone de service / secteur géographique</div>
+        <div class="feature"><span class="dot"></span>Numéro carte T (agrément affiché)</div>
+        <div class="feature"><span class="dot"></span>Analytics avancés · Leads illimités</div>
+      </div>
+    </div>
+
+    <!-- PHOTO / VIDÉO -->
+    <div class="spec-card photo">
+      <div><span class="badge photo">📸 Photo · Vidéo</span></div>
+      <div class="plan-icon">🎬</div>
+      <div>
+        <div class="plan-price"><span class="amount">19 €</span><span class="period">/mois</span></div>
+        <div class="plan-name">Photographes · Vidéastes · Créatifs</div>
+      </div>
+      <div class="features">
+        <div class="feature"><span class="dot"></span>Galerie portfolio 12 photos (lightbox sur la carte)</div>
+        <div class="feature"><span class="dot"></span>Embed showreel (Vimeo ou YouTube)</div>
+        <div class="feature"><span class="dot"></span>Formulaire devis structuré (type, date, lieu, budget)</div>
+        <div class="feature"><span class="dot"></span>Spécialité affichée (mariage, corporate, portrait…)</div>
+        <div class="feature"><span class="dot"></span>Liens Instagram · Behance · Vimeo</div>
+        <div class="feature"><span class="dot"></span>QR code HD (dos de carte physique, book papier)</div>
+        <div class="feature"><span class="dot"></span>Calendly disponibilités</div>
+        <div class="feature"><span class="dot"></span>1 000 leads/mois · Stats clics</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -531,6 +604,9 @@
   <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Pro Food</div>
   <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div>Restaurant</div>
   <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div>Événement</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ec4899"></div>Artiste</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Immobilier</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Photo · Vidéo</div>
   <div class="legend-item"><span style="font-size:0.65rem">🔒 = Fonctionnalité verrouillée</span></div>
   <div class="legend-item"><span style="font-size:0.65rem;color:#f97316">✓ = Starter+</span></div>
   <div class="legend-item"><span style="font-size:0.65rem;color:#eab308">✓ = Pro uniquement</span></div>
