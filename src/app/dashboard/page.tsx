@@ -32,6 +32,7 @@ export default function DashboardPage() {
   const [leads, setLeads] = useState<LeadRow[]>([]);
   const [views, setViews] = useState(0);
   const [clicks, setClicks] = useState(0);
+  const [conversionRate, setConversionRate] = useState('0');
   const [userPlan, setUserPlan] = useState<'free' | 'starter' | 'pro' | 'business'>('free');
   const canExport = userPlan !== 'free';
 
@@ -46,8 +47,10 @@ const [dbLeads, stats] = await Promise.all([
         getLeadsByCardId(cards[0].id),
         getCardStats(cards[0].id),
       ]);
-      setViews(stats.views);
-      setClicks(stats.clicks);
+      setViews(stats.views.length);
+      setClicks(stats.clicks.length);
+      const converted = dbLeads.filter((l) => l.status === 'converted').length;
+      setConversionRate(dbLeads.length > 0 ? ((converted / dbLeads.length) * 100).toFixed(1) : '0');
       setLeads(dbLeads.map((l) => ({
         id: l.id ?? crypto.randomUUID(),
         nom: l.name,
@@ -115,10 +118,10 @@ const [dbLeads, stats] = await Promise.all([
           )}
           {userPlan === 'free' ? (
             <LockedFeature plan="starter" label="Taux de conversion" desc="Vues → Leads">
-              <StatCard label="Taux conversion" value="3.2%" sub="Vues → Leads" icon={TrendingUp} trend={{ value: -2, label: 'vs mois dernier' }} />
+              <StatCard label="Taux conversion" value={`${conversionRate}%`} sub="Vues → Leads" icon={TrendingUp} trend={{ value: -2, label: 'vs mois dernier' }} />
             </LockedFeature>
           ) : (
-            <StatCard label="Taux conversion" value="3.2%" sub="Vues → Leads" icon={TrendingUp} trend={{ value: -2, label: 'vs mois dernier' }} />
+            <StatCard label="Taux conversion" value={`${conversionRate}%`} sub="Vues → Leads" icon={TrendingUp} trend={{ value: -2, label: 'vs mois dernier' }} />
           )}
         </div>
 

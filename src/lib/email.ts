@@ -1,8 +1,14 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://smartvcard.app';
 const FROM = 'Smart vCard <noreply@smartvcard.app>';
+
+// Instanciation lazy pour éviter l'erreur au chargement du module
+// quand RESEND_API_KEY n'est pas encore injecté
+function getResend() {
+  if (!process.env.RESEND_API_KEY) throw new Error('RESEND_API_KEY is not set');
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 export interface LeadNotificationOptions {
   to: string;
@@ -90,7 +96,7 @@ export async function sendLeadNotificationEmail(opts: LeadNotificationOptions): 
 </body>
 </html>`;
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: `🔔 Nouveau lead — ${lead.name}`,
@@ -148,7 +154,7 @@ export async function sendLeadConfirmationEmail(opts: LeadConfirmationOptions): 
 </body>
 </html>`;
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: fr ? `✅ Message bien reçu — ${ownerName}` : `✅ Message received — ${ownerName}`,

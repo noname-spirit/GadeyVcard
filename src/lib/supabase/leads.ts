@@ -27,7 +27,6 @@ export async function updateLead(
   if ('status' in fields) dbFields['status'] = fields.status ?? null;
   if ('notes' in fields) dbFields['notes'] = fields.notes ?? null;
   if ('source' in fields) dbFields['source'] = fields.source ?? null;
-  console.log(dbFields,"fields",fields.status);
   const { error } = await supabase.from('leads').update(dbFields).eq('id', id);
   if (error) return { error: error.message };
   return { error: null };

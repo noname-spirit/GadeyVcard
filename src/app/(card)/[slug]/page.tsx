@@ -11,7 +11,7 @@ import { LeadCaptureFormInfluencer } from '@/components/card/LeadCaptureFormInfl
 import { CardFrontRestaurant, RestaurantMenuPanel } from '@/components/card/CardFrontRestaurant';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 import { getCardBySlug, supabaseCardToCardData } from '@/lib/supabase/cards';
-import { trackCardEvent } from '@/lib/supabase/events';
+import { LinkType, trackCardEvent } from '@/lib/supabase/events';
 import Link from 'next/link';
 
 const BASE_CARD: CardData = {
@@ -96,7 +96,15 @@ export default function CardPage() {
   const [showCalendly, setShowCalendly] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const dark = theme === 'dark';
+function getDeviceType() {
+  const ua = navigator.userAgent;
 
+  if (/tablet|ipad|playbook|silk/i.test(ua)) return "Tablet";
+  if (/mobile|iphone|ipod|android|blackberry|opera mini|iemobile/i.test(ua)) return "Mobile";
+  return "Desktop";
+}
+
+console.log(getDeviceType());
   useEffect(() => {
     const formatName = (str: string) =>
       decodeURIComponent(str).toLowerCase().replace(/\s+/g, '-');
@@ -108,6 +116,7 @@ export default function CardPage() {
         setCard(supabaseCardToCardData(match));
         setTheme(match.template === 'light' ? 'light' : 'dark');
         trackCardEvent(match.id, 'view');
+        trackCardEvent(match.id, getDeviceType().toLowerCase() as LinkType);
       }
     }).finally(() => setCardLoading(false));
   }, [slug]);

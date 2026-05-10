@@ -35,6 +35,9 @@ const labels = {
     scanTitle: 'Scanner une vCard',
     scanHintLoading: 'Chargement de la caméra...',
     scanHint: 'Pointez la caméra vers un QR code ou une vCard',
+    industryPopupTitle: 'Secteur manquant',
+    industryPopupMessage: 'Veuillez sélectionner votre secteur d\'activité avant d\'envoyer.',
+    industryPopupCta: 'Sélectionner',
   },
   en: {
     defaultTitle: "Let's stay in touch",
@@ -57,6 +60,9 @@ const labels = {
     scanTitle: 'Scan a vCard',
     scanHintLoading: 'Loading camera...',
     scanHint: 'Point the camera at a QR code or vCard',
+    industryPopupTitle: 'Industry missing',
+    industryPopupMessage: 'Please select your industry before sending.',
+    industryPopupCta: 'Select',
   },
   th: {
     defaultTitle: 'ติดต่อกันไว้นะ',
@@ -79,6 +85,9 @@ const labels = {
     scanTitle: 'สแกน vCard',
     scanHintLoading: 'กำลังโหลดกล้อง...',
     scanHint: 'ชี้กล้องไปที่ QR โค้ดหรือ vCard',
+    industryPopupTitle: 'ไม่ได้เลือกประเภทธุรกิจ',
+    industryPopupMessage: 'กรุณาเลือกประเภทธุรกิจก่อนส่งข้อมูล',
+    industryPopupCta: 'เลือก',
   },
 };
 
@@ -132,6 +141,7 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
   const [form, setForm] = useState<LeadFormData>(EMPTY_FORM);
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [showIndustryPopup, setShowIndustryPopup] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [scannerReady, setScannerReady] = useState(false);
   const scannerRef = useRef<HTMLDivElement>(null);
@@ -245,10 +255,14 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
       return;
     }
 
+    if (!form.domaine.trim()) {
+      setShowIndustryPopup(true);
+      return;
+    }
+
     setIsLoading(true);
     try {
       const domaineValue = form.domaine === 'Autre' ? form.domaineCustom : form.domaine;
-      console.log(form, domaineValue, "form submit");
       const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -257,7 +271,7 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
           nom: form.nom,
           contact: form.contact,
           telephone: form.telephone,
-          domaine: form.domaine,
+          domaine: domaineValue,
           message: form.message,
         }),
       });
@@ -492,6 +506,52 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
           style={{ background: `linear-gradient(to right, transparent, color-mix(in srgb, ${accent} 20%, transparent), transparent)` }}
         />
       </div>
+
+      {/* Modal industrie manquante */}
+      <AnimatePresence>
+        {showIndustryPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-6"
+            onClick={() => setShowIndustryPopup(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 12 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 12 }}
+              transition={{ duration: 0.2 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`${modalBg} rounded-2xl border p-6 w-full max-w-xs shadow-2xl`}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <h3 className={`text-sm font-bold ${modalTitle} flex items-center gap-2`}>
+                  <AlertCircle size={16} style={{ color: accent }} />
+                  {l.industryPopupTitle}
+                </h3>
+                <button
+                  onClick={() => setShowIndustryPopup(false)}
+                  className={`p-1.5 rounded-lg transition-all ${closeBtn}`}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              <p className={`${modalHint} text-sm mb-5`}>{l.industryPopupMessage}</p>
+              <button
+                onClick={() => setShowIndustryPopup(false)}
+                className="w-full py-2.5 rounded-xl font-semibold text-sm text-white transition-all"
+                style={{
+                  background: `linear-gradient(to right, ${accent}, color-mix(in srgb, ${accent} 75%, black))`,
+                  boxShadow: `0 6px 20px color-mix(in srgb, ${accent} 25%, transparent)`,
+                }}
+              >
+                {l.industryPopupCta}
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Modal scanner QR */}
       <AnimatePresence>
