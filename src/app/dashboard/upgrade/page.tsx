@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Check, Zap, ArrowLeft, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { StripeModal } from '@/components/payment/StripeModal';
+import Link from 'next/link';
 
 type Billing = 'monthly' | 'yearly';
 
@@ -62,9 +63,9 @@ export default function UpgradePage() {
 
         {/* Header */}
         <div className="flex items-center gap-4">
-          <a href="/dashboard" className="p-2 rounded-xl text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-all">
+          <Link href="/dashboard" className="p-2 rounded-xl text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-all">
             <ArrowLeft size={18} />
-          </a>
+          </Link>
           <div>
             <h1 className="text-2xl font-bold text-white">Passer à un plan supérieur</h1>
             <p className="text-zinc-500 text-sm mt-0.5">Plan actuel : <span className="text-zinc-300 font-medium">Free</span></p>
@@ -188,6 +189,7 @@ export default function UpgradePage() {
         open={showModal}
         onClose={() => setShowModal(false)}
         planName={selectedPlan.name}
+        planId={selected}
         amount={amount}
         billing={billing}
       />

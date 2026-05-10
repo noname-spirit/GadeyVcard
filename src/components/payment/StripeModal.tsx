@@ -48,6 +48,7 @@ const stripeAppearance = {
 };
 
 interface CheckoutFormProps {
+  clientSecret: string;
   amount: number;
   planName: string;
   planId: string;
@@ -56,7 +57,7 @@ interface CheckoutFormProps {
   onClose: () => void;
 }
 
-function CheckoutForm({ amount, planName, planId, billing, onSuccess, onClose }: CheckoutFormProps) {
+function CheckoutForm({ clientSecret, amount, planName, planId, billing, onSuccess, onClose }: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const { uid } = useAuth();
@@ -72,19 +73,6 @@ function CheckoutForm({ amount, planName, planId, billing, onSuccess, onClose }:
     const { error: submitError } = await elements.submit();
     if (submitError) {
       setError(submitError.message ?? 'Erreur de paiement');
-      setPaying(false);
-      return;
-    }
-
-    const res = await fetch('/api/stripe/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount, planName, billing }),
-    });
-
-    const { clientSecret, error: apiError } = await res.json();
-    if (apiError || !clientSecret) {
-      setError(apiError ?? 'Impossible de créer le paiement');
       setPaying(false);
       return;
     }
@@ -219,6 +207,7 @@ function StripeModalContent({ onClose, planName, planId, amount, billing }: Stri
   return (
     <Elements stripe={stripePromise} options={{ clientSecret, appearance: stripeAppearance }}>
       <CheckoutForm
+        clientSecret={clientSecret}
         amount={amount}
         planName={planName}
         planId={planId}
