@@ -175,6 +175,13 @@ export async function upsertCard(uid: string, card: {
   return data;
 }
 
+export async function getAllCards(): Promise<{ id: string; user_id: string }[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase.from('cards').select('id, user_id');
+  if (error) { console.error('getAllCards:', error.message); return []; }
+  return (data ?? []) as { id: string; user_id: string }[];
+}
+
 export async function updateCardPlan(uid: string, plan: string): Promise<void> {
   const supabase = createClient();
   const { error } = await supabase.from('cards').update({ plan }).eq('user_id', uid);
