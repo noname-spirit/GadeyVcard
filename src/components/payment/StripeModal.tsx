@@ -88,8 +88,8 @@ function CheckoutForm({ clientSecret, amount, planName, planId, billing, onSucce
       setError(confirmError.message ?? 'Paiement refusé');
       setPaying(false);
     } else {
-      await updatePlan(planId as 'free' | 'starter' | 'pro' | 'business');
-      if (uid) await updateCardPlan(uid, planId);
+      // await updatePlan(planId as 'free' | 'starter' | 'pro' | 'business');
+      // if (uid) await updateCardPlan(uid, planId);
       onSuccess();
     }
   };
@@ -164,12 +164,12 @@ function StripeModalContent({ onClose, planName, planId, amount, billing }: Stri
   const [clientSecret, setClientSecret] = useState('');
   const [loadingIntent, setLoadingIntent] = useState(true);
   const [success, setSuccess] = useState(false);
-
+   const { uid } = useAuth();
   useEffect(() => {
     fetch('/api/stripe/intent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount, planName, billing }),
+      body: JSON.stringify({ amount, planName, billing, planId, uid}),
     })
       .then((r) => r.json())
       .then(({ clientSecret: cs }) => { if (cs) setClientSecret(cs); })
@@ -229,6 +229,7 @@ interface StripeModalProps {
 }
 
 export function StripeModal({ open, onClose, planName, planId, amount, billing }: StripeModalProps) {
+
   return (
     <AnimatePresence>
       {open && (

@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Users, CreditCard, TrendingUp, Activity, Search, MoreHorizontal, Shield, Ban, Eye, LogOut } from 'lucide-react';
+import { Users, CreditCard, TrendingUp, Activity, Search, MoreHorizontal, Ban, Eye } from 'lucide-react';
 import { AdminRoute } from '@/components/AdminRoute';
+import { AdminSidebar } from '@/components/AdminSidebar';
 import { StatCard } from '@/components/dashboard/StatCard';
-import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/lib/supabase/profile';
 
 const PLAN_COLORS: Record<string, string> = {
@@ -27,7 +26,6 @@ const TABS = ['Utilisateurs', 'Revenus', 'Cartes', 'Logs'] as const;
 type Tab = typeof TABS[number];
 
 export default function AdminPage() {
-  const router = useRouter();
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState<Tab>('Utilisateurs');
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -68,55 +66,7 @@ export default function AdminPage() {
     <AdminRoute>
       <div className="min-h-screen bg-zinc-950 text-zinc-100 flex">
 
-        {/* Sidebar */}
-        <aside className="w-56 min-h-screen bg-zinc-900 border-r border-zinc-800/60 flex flex-col p-4 gap-6 fixed top-0 left-0">
-          <div className="pt-2 flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <Shield size={14} className="text-orange-400" />
-              <h1 className="text-base font-bold text-white">Super Admin</h1>
-            </div>
-            <p className="text-xs text-zinc-600">Smart vCard</p>
-          </div>
-
-          <nav className="flex flex-col gap-1">
-            {[
-              { label: 'Dashboard', icon: Activity, active: true },
-              { label: 'Utilisateurs', icon: Users },
-              { label: 'Revenus', icon: CreditCard },
-              { label: 'Cartes', icon: Eye },
-            ].map((item) => (
-              <button
-                key={item.label}
-                className={[
-                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left',
-                  item.active
-                    ? 'bg-orange-500/15 text-orange-400 border border-orange-500/20'
-                    : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50',
-                ].join(' ')}
-              >
-                <item.icon size={15} />
-                {item.label}
-              </button>
-            ))}
-          </nav>
-
-          <div className="mt-auto flex flex-col gap-3">
-            <div className="bg-zinc-800/40 border border-zinc-700/40 rounded-xl p-3 text-xs text-zinc-500">
-              <p className="font-semibold text-zinc-400 mb-1">Santé système</p>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Tous les services actifs</span>
-              </div>
-            </div>
-            <button
-              onClick={async () => { await createClient().auth.signOut(); router.push('/admin/login'); }}
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all w-full"
-            >
-              <LogOut size={16} />
-              Se déconnecter
-            </button>
-          </div>
-        </aside>
+        <AdminSidebar />
 
         {/* Main */}
         <main className="flex-1 ml-56 p-8 flex flex-col gap-8">

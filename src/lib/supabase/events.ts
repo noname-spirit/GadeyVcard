@@ -38,6 +38,6 @@ export async function getCardStats(cardId: string): Promise<CardStats> {
   if (error || !data) return { views: [], clicks: [] };
   // Sépare les vues de page des clics sur les liens
   const views = data.filter((e) => e.link_type === 'view') as CardEvent[];
-  const clicks = data.filter((e) => e.link_type !== 'view') as CardEvent[];
+  const clicks = data.filter((e) => e.link_type !== 'view' ) as CardEvent[];
   return { views, clicks };
 }

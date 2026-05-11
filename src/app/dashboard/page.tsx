@@ -47,8 +47,10 @@ const [dbLeads, stats] = await Promise.all([
         getLeadsByCardId(cards[0].id),
         getCardStats(cards[0].id),
       ]);
+          const forbidden = ["desktop", "mobile", "tablet", "save"];
+      const hasNone = stats.clicks.filter((c) => !forbidden.includes(c.link_type));
       setViews(stats.views.length);
-      setClicks(stats.clicks.length);
+      setClicks(hasNone.length);
       const converted = dbLeads.filter((l) => l.status === 'converted').length;
       setConversionRate(dbLeads.length > 0 ? ((converted / dbLeads.length) * 100).toFixed(1) : '0');
       setLeads(dbLeads.map((l) => ({
