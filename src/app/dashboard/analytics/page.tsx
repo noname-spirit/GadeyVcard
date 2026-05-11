@@ -81,9 +81,11 @@ export default function AnalyticsPage() {
         getLeadsByCardId(cards[0].id),
       ]);
       // stats.views et stats.clicks sont des CARD_EVENT[] — on compte les éléments
+      const forbidden = ["desktop", "mobile", "tablet", "save"];
+      const hasNone = stats.clicks.filter((c) => !forbidden.includes(c.link_type));
       setViews(stats.views.length);
-      setClicks(stats.clicks.length);
-
+      setClicks(hasNone.length);
+  
       // Heure de pointe : on parcourt les views et on incrémente la case
       // correspondant à la tranche de 2h (heure / 2 arrondie)
       // Résultat : 12 cases [0h-2h, 2h-4h, …, 22h-24h]

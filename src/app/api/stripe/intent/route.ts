@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const stripe = new Stripe(key, { apiVersion: '2026-03-25.dahlia' });
 
   try {
-    const { amount } = await req.json();
+    const { amount, planId, uid } = await req.json();
 
     if (!amount || amount <= 0) {
       return NextResponse.json({ error: 'Montant invalide' }, { status: 400 });
@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // centimes
       currency: 'eur',
+        metadata: { userId: uid, planId },  // ← ajouter ça
       automatic_payment_methods: { enabled: true },
     });
 

@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Zap, ArrowLeft, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { StripeModal } from '@/components/payment/StripeModal';
 import Link from 'next/link';
+import { useAuth } from '@/lib/supabase/AuthProvider';
+import { getProfile } from '@/lib/supabase/profile';
 
 type Billing = 'monthly' | 'yearly';
 
@@ -50,13 +52,36 @@ const PLANS = [
 ];
 
 export default function UpgradePage() {
+   const { uid } = useAuth();
   const [billing, setBilling] = useState<Billing>('monthly');
   const [selected, setSelected] = useState('pro');
+  const [currPlan, setCurrPlan] = useState<'free' | 'starter' | 'pro' | 'business'>('free');
   const [showModal, setShowModal] = useState(false);
 
   const selectedPlan = PLANS.find((p) => p.id === selected)!;
   const amount = billing === 'yearly' ? selectedPlan.price.yearlyTotal : selectedPlan.price.monthly;
 
+  useEffect(() => {
+    // Reset selection when billing changes
+   getProfile().then((p) => {
+    console.log(p);
+      if (p) {
+        setCurrPlan(p.plan ?? 'free');
+        if (p.plan === 'free') {
+          setSelected('pro');
+        } else if (p.plan === 'starter') {
+          setSelected('pro');
+        } else if (p.plan === 'pro') {
+          setSelected('pro');
+        } else if (p.plan === 'business') {
+          setSelected('business');
+        }
+
+      }
+    });
+  }, []);
+
+console.log(selectedPlan.id, uid);
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-2xl flex flex-col gap-8">
@@ -68,7 +93,7 @@ export default function UpgradePage() {
           </Link>
           <div>
             <h1 className="text-2xl font-bold text-white">Passer à un plan supérieur</h1>
-            <p className="text-zinc-500 text-sm mt-0.5">Plan actuel : <span className="text-zinc-300 font-medium">Free</span></p>
+            <p className="text-zinc-500 text-sm mt-0.5">Plan actuel : <span className="text-zinc-300 font-medium">{currPlan}</span></p>
           </div>
         </div>
 
