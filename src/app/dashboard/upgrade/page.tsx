@@ -6,7 +6,6 @@ import { Check, Zap, ArrowLeft, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { StripeModal } from '@/components/payment/StripeModal';
 import Link from 'next/link';
-import { useAuth } from '@/lib/supabase/AuthProvider';
 import { getProfile } from '@/lib/supabase/profile';
 
 type Billing = 'monthly' | 'yearly';
@@ -52,7 +51,6 @@ const PLANS = [
 ];
 
 export default function UpgradePage() {
-   const { uid } = useAuth();
   const [billing, setBilling] = useState<Billing>('monthly');
   const [selected, setSelected] = useState('pro');
   const [currPlan, setCurrPlan] = useState<'free' | 'starter' | 'pro' | 'business'>('free');
@@ -64,7 +62,6 @@ export default function UpgradePage() {
   useEffect(() => {
     // Reset selection when billing changes
    getProfile().then((p) => {
-    console.log(p);
       if (p) {
         setCurrPlan(p.plan ?? 'free');
         if (p.plan === 'free') {
@@ -81,7 +78,6 @@ export default function UpgradePage() {
     });
   }, []);
 
-console.log(selectedPlan.id, uid);
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-2xl flex flex-col gap-8">

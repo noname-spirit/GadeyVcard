@@ -66,17 +66,13 @@ export function supabaseCardToCardData(c: SupabaseCard): CardData {
 }
 
 export async function getCardBySlug(slug: string): Promise<SupabaseCard | null> {
-  console.log(slug, "slug in getCardBySlug");
   const supabase = createClient();
   const { data, error } = await supabase
     .from('cards')
     .select('*')
     .eq('slug', slug)
     .maybeSingle();
-  if (error) {
-    console.log('getCardBySlug error:', error.message, data);
-    return null;
-  }
+  if (error) return null;
   return data as SupabaseCard | null;
 }
 
@@ -106,7 +102,6 @@ export async function updateCard(id: string, card: {
 }): Promise<boolean> {
   const supabase = createClient();
   const { contact, socials, ...rest } = card;
-  console.log('Updating card with id:', id, 'and data:', card,contact, socials, rest);
   const { error } = await supabase
     .from('cards')
     .update({
