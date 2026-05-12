@@ -17,8 +17,7 @@ export async function POST(req: NextRequest) {
 
   if (event.type === 'payment_intent.succeeded') {
     const intent = event.data.object as Stripe.PaymentIntent;
-    const { userId, planId } = intent.metadata; // ← on récupère les infos
-   console.log(userId, planId, '<-- webhook data');
+    const { userId, planId } = intent.metadata;
     const supabase = createAdminClient();
     await supabase.from('profiles').update({ plan: planId }).eq('id', userId);
     await supabase.from('cards').update({ plan: planId }).eq('user_id', userId);

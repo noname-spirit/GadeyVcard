@@ -104,7 +104,6 @@ function getDeviceType() {
   return "Desktop";
 }
 
-console.log(getDeviceType());
   useEffect(() => {
     const formatName = (str: string) =>
       decodeURIComponent(str).toLowerCase().replace(/\s+/g, '-');
@@ -112,7 +111,6 @@ console.log(getDeviceType());
 
     getCardBySlug(slugFormatted).then((match) => {
       if (match) {
-        console.log('Card found for slug:', slugFormatted, match);
         setCard(supabaseCardToCardData(match));
         setTheme(match.template === 'light' ? 'light' : 'dark');
         trackCardEvent(match.id, 'view');

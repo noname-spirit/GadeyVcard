@@ -221,7 +221,6 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
           setScannerReady(false);
 
           const parsed = parseQrPayload(decodedText);
-               console.log(parsed, "parsed QR data");
           try {
             await fetch('/api/leads', {
               method: 'POST',

@@ -31,17 +31,21 @@ export default function AdminPage() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [cardCountByUser, setCardCountByUser] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
+  const [mrr, setMrr] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch('/api/admin/data')
-      .then((r) => r.json())
-      .then(({ profiles: allProfiles, cards: allCards }) => {
+    Promise.all([
+      fetch('/api/admin/data').then((r) => r.json()),
+      fetch('/api/admin/revenue').then((r) => r.json()),
+    ])
+      .then(([{ profiles: allProfiles, cards: allCards }, revenueData]) => {
         setProfiles(allProfiles ?? []);
         const counts: Record<string, number> = {};
         (allCards ?? []).forEach((c: { user_id: string }) => {
           counts[c.user_id] = (counts[c.user_id] ?? 0) + 1;
         });
         setCardCountByUser(counts);
+        if (revenueData?.mrr !== undefined) setMrr(revenueData.mrr);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -86,7 +90,7 @@ export default function AdminPage() {
           {/* Stats KPIs */}
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
             <StatCard label="Utilisateurs total" value={loading ? '…' : String(totalUsers)} sub="Tous plans confondus" icon={Users} trend={{ value: 0, label: '' }} />
-            <StatCard label="MRR" value="—" sub="Monthly Recurring Revenue" icon={CreditCard} trend={{ value: 0, label: '' }} />
+            <StatCard label="MRR" value={loading ? '…' : mrr !== null ? `${mrr}€` : '—'} sub="Monthly Recurring Revenue" icon={CreditCard} trend={{ value: 0, label: '' }} />
             <StatCard label="Cartes actives" value={loading ? '…' : String(totalCards)} sub="Cartes créées" icon={Activity} trend={{ value: 0, label: '' }} />
             <StatCard label="Taux conversion" value={loading ? '…' : `${conversionRate}%`} sub="Free → payant" icon={TrendingUp} trend={{ value: 0, label: '' }} />
           </div>
