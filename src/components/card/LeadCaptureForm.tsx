@@ -442,14 +442,14 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 py-2.5 rounded-2xl font-semibold text-sm text-white flex items-center justify-center gap-2 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
+              className="flex-1 py-2.5 rounded-2xl font-semibold text-sm text-white relative flex items-center px-4 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
               style={{
                 background: `linear-gradient(to right, ${accent}, color-mix(in srgb, ${accent} 75%, black))`,
                 boxShadow: `0 8px 24px color-mix(in srgb, ${accent} 25%, transparent)`,
               }}
             >
-              <Send size={15} className={`transition-transform duration-300 ${isLoading ? 'animate-spin' : 'group-hover:translate-x-0.5'}`} />
-              {isLoading ? l.loading : ctaLabel}
+              <Send size={15} className={`absolute left-4 shrink-0 transition-transform duration-300 ${isLoading ? 'animate-spin' : 'group-hover:translate-x-0.5'}`} />
+              <span className="w-full text-center pl-6 pr-6">{isLoading ? l.loading : ctaLabel}</span>
             </button>
 
             <button
