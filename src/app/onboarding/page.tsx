@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
 import type { OnboardingData } from "@/components/onboarding/OnboardingWizard";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -68,11 +69,9 @@ export default function OnboardingPage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-linear-to-br from-zinc-950 via-black to-zinc-950 flex flex-col items-center justify-center px-4 py-12">
-        <div className="mb-10 text-center">
-          <h1 className="text-2xl font-bold bg-linear-to-r from-white to-zinc-400 bg-clip-text text-transparent">
-            Smart vCard
-          </h1>
-          <p className="text-zinc-500 text-sm mt-1">
+        <div className="mb-6 flex flex-col items-center gap-2">
+          <Image src="/logo/logo-vertical-white.svg" alt="vCard" width={200} height={200} className="h-44 w-auto" priority />
+          <p className="text-zinc-500 text-sm">
             Créez votre carte digitale en 2 minutes
           </p>
         </div>

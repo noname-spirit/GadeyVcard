@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Users, CreditCard, TrendingUp, Activity, Search, MoreHorizontal, Shield, Ban, Eye } from 'lucide-react';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { StatCard } from '@/components/dashboard/StatCard';
+import Image from 'next/image';
 
 const MOCK_STATS = [
   { label: 'Utilisateurs total', value: '1 847', sub: 'Tous plans confondus', icon: Users, trend: { value: 18, label: 'ce mois' } },
@@ -45,12 +46,12 @@ export default function AdminPage() {
 
       {/* Sidebar */}
       <aside className="w-56 min-h-screen bg-zinc-900 border-r border-zinc-800/60 flex flex-col p-4 gap-6 fixed top-0 left-0">
-        <div className="pt-2 flex flex-col gap-1">
+        <div className="pt-2 flex flex-col gap-2">
+          <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={180} height={52} className="h-13 w-auto" priority />
           <div className="flex items-center gap-2">
             <Shield size={14} className="text-orange-400" />
-            <h1 className="text-base font-bold text-white">Super Admin</h1>
+            <h1 className="text-xs font-bold text-white tracking-wider uppercase">Super Admin</h1>
           </div>
-          <p className="text-xs text-zinc-600">Smart vCard</p>
         </div>
 
         <nav className="flex flex-col gap-1">
