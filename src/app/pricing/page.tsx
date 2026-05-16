@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Check, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
@@ -95,6 +96,14 @@ export default function PricingPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center flex flex-col items-center gap-4"
         >
+          <Image
+            src="/logo/logo-vertical-white.svg"
+            alt="vCard"
+            width={200}
+            height={200}
+            className="h-32 w-auto mb-2"
+            priority
+          />
           <span className="text-xs font-semibold tracking-widest text-orange-400 uppercase bg-orange-500/10 border border-orange-500/20 px-4 py-1.5 rounded-full">
             Tarifs simples
           </span>

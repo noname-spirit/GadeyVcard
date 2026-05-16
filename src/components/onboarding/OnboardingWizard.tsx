@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import NextImage from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Check, User, Link, Palette, Image, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -246,11 +247,20 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       </div>
 
       {/* Step title */}
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-white">
-          {STEPS[step - 1].label}
-        </h2>
-        <p className="text-zinc-500 text-sm">Étape {step} sur {STEPS.length}</p>
+      <div className="mb-6 flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-bold text-white">
+            {STEPS[step - 1].label}
+          </h2>
+          <p className="text-zinc-500 text-sm">Étape {step} sur {STEPS.length}</p>
+        </div>
+        <NextImage
+          src="/logo/logo-icon-white.svg"
+          alt="vCard"
+          width={48}
+          height={48}
+          className="h-12 w-12 opacity-60"
+        />
       </div>
 
       {/* Step content */}

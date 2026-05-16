@@ -68,6 +68,15 @@ export function CardFront({ card, theme, language, isSaving, freshnessBadge, onS
   return (
     <div className={`w-full h-full bg-linear-to-br ${cardBg} rounded-3xl px-4 py-6 border backdrop-blur-2xl ${cardShadow} flex flex-col items-center justify-center gap-5 transition-colors duration-300 relative`}>
 
+      {/* Logo brand discret */}
+      <Image
+        src={dark ? '/logo/logo-icon-white.svg' : '/logo/logo-icon-black.svg'}
+        alt="vCard"
+        width={80}
+        height={80}
+        className="absolute top-3 right-3 w-20 h-20 opacity-50 hover:opacity-90 transition-opacity"
+      />
+
       {/* Decorative lines — accent dynamique */}
       <div
         className="absolute top-0 left-12 right-12 h-px"
