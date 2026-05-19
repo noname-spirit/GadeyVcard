@@ -164,7 +164,7 @@ export default function CardPage() {
             alt="vCard"
             width={260}
             height={84}
-            className="h-20 w-auto"
+            className="h-12 sm:h-16 w-auto"
             priority
           />
           <div className={`flex gap-1 ${langBg} rounded-full px-1.5 py-1 border backdrop-blur-xl transition-colors duration-300`}>

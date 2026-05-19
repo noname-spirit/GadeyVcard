@@ -101,7 +101,7 @@ export default function PricingPage() {
             alt="vCard"
             width={200}
             height={200}
-            className="h-32 w-auto mb-2"
+            className="h-20 sm:h-32 w-auto mb-2"
             priority
           />
           <span className="text-xs font-semibold tracking-widest text-orange-400 uppercase bg-orange-500/10 border border-orange-500/20 px-4 py-1.5 rounded-full">
@@ -218,7 +218,7 @@ export default function PricingPage() {
               </span>
             </div>
             <p className="text-zinc-400 text-sm">{EVENT_PLAN.description}</p>
-            <div className="flex gap-4 mt-2">
+            <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
               {EVENT_PLAN.features.map((f) => (
                 <div key={f} className="flex items-center gap-1.5 text-xs text-zinc-400">
                   <Check size={12} className="text-emerald-400" />

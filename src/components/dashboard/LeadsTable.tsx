@@ -125,8 +125,94 @@ export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
         )}
       </div>
 
-      <div className="rounded-2xl border border-zinc-800/60 overflow-x-auto">
-        <table className="w-full text-sm min-w-275">
+      {/* Mobile card view */}
+      <div className="sm:hidden flex flex-col gap-2">
+        {filtered.length === 0 ? (
+          <div className="rounded-2xl border border-zinc-800/60 px-4 py-12 text-center text-zinc-500 text-sm">
+            Aucun lead pour l&#39;instant.
+          </div>
+        ) : (
+          filtered.map((lead) => {
+            const status = statuses[lead.id];
+            const note = notes[lead.id];
+            return (
+              <div key={lead.id} className="bg-zinc-900/60 border border-zinc-800/60 rounded-2xl p-4 flex flex-col gap-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex flex-col gap-0.5 min-w-0">
+                    <span className="font-medium text-zinc-200 text-sm truncate">{lead.nom}</span>
+                    <span className="text-xs text-zinc-500 truncate">{lead.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => cycleStatus(lead.id)}
+                      className={[
+                        'px-2.5 py-0.5 text-xs rounded-full font-medium border transition-all whitespace-nowrap',
+                        status ? STATUS[status].color : 'bg-zinc-800 text-zinc-500 border-zinc-700/40',
+                      ].join(' ')}
+                    >
+                      {status ? STATUS[status].label : '—'}
+                    </button>
+                    {onDelete && (
+                      <button
+                        onClick={() => onDelete(lead.id)}
+                        className="p-1.5 rounded-lg text-zinc-600 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2 py-0.5 text-xs rounded-full bg-zinc-800 border border-zinc-700/40 text-zinc-400">{lead.domaine}</span>
+                  <select
+                    value={sources[lead.id] ?? lead.source}
+                    onChange={(e) => changeSource(lead.id, e.target.value)}
+                    className="px-2 py-0.5 text-xs rounded-full border bg-zinc-800 text-zinc-400 border-zinc-700/40 outline-none cursor-pointer"
+                  >
+                    {SOURCE_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                  </select>
+                  <span className="text-xs text-zinc-600 ml-auto">{new Date(lead.createdAt).toLocaleDateString('fr-FR')}</span>
+                </div>
+                {lead.telephone && (
+                  <span className="text-xs text-zinc-500">{lead.telephone}</span>
+                )}
+                {lead.message && (
+                  <span className="text-xs text-zinc-500 line-clamp-2">{lead.message}</span>
+                )}
+                {editingNote === lead.id ? (
+                  <div className="flex items-center gap-1">
+                    <input
+                      autoFocus
+                      type="text"
+                      value={draftNote}
+                      onChange={(e) => setDraftNote(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') saveNote(lead.id);
+                        if (e.key === 'Escape') setEditingNote(null);
+                      }}
+                      className="flex-1 px-2 py-1 text-xs bg-zinc-800 border border-zinc-700/40 rounded-lg text-zinc-100 outline-none focus:border-orange-500/50"
+                    />
+                    <button onClick={() => saveNote(lead.id)} className="p-1 text-emerald-400">&#x2713;</button>
+                    <button onClick={() => setEditingNote(null)} className="p-1 text-zinc-500"><X size={11} /></button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => openNote(lead.id)}
+                    className="flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-300 transition-colors text-left"
+                  >
+                    <StickyNote size={12} className={note ? 'text-amber-400' : ''} />
+                    <span className="truncate">{note || 'Ajouter une note…'}</span>
+                  </button>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden sm:block rounded-2xl border border-zinc-800/60 overflow-x-auto">
+        <table className="w-full text-sm min-w-175">
           <thead>
             <tr className="border-b border-zinc-800/60 bg-zinc-900/60">
               {['Nom', 'Email', 'Tel', 'Message', 'Domaine', 'Source', 'Statut', 'Notes', 'Date', ''].map((h) => (
