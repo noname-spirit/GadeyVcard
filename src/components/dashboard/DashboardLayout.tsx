@@ -34,7 +34,7 @@ function Sidebar({ active, slug, onClose, onLogout,profil }: { active?: string; 
   return (
     <div className="flex flex-col h-full p-4 gap-6">
       <div className="flex items-center justify-between pt-2">
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link href="/dashboard" className="flex w-full justify-between items-center gap-2">
           <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={200} height={64} className="h-16 w-auto" priority />
           <span className="text-xs text-zinc-500">Dashboard</span>
         </Link>
