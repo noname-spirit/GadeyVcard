@@ -37,6 +37,7 @@ const SOURCE_OPTIONS = ['formulaire', 'qr code', 'téléphone', 'email', 'réfé
 
 export function LeadsTable({ leads, onDelete, onExport }: LeadsTableProps) {
   const [search, setSearch] = useState('');
+  
   const [statuses, setStatuses] = useState<Record<string, LeadStatus | undefined>>(() => {
     const s: Record<string, LeadStatus | undefined> = {};
     leads.forEach((l) => { if (l.status) s[l.id] = l.status; });
