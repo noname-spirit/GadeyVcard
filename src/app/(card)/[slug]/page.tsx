@@ -13,6 +13,7 @@ import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 import { getCardBySlug, supabaseCardToCardData } from '@/lib/supabase/cards';
 import { LinkType, trackCardEvent } from '@/lib/supabase/events';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const BASE_CARD: CardData = {
   id: 'demo',
@@ -165,9 +166,14 @@ function getDeviceType() {
           >
             ← Accueil
           </Link>
-          <h1 className={`text-xl font-bold bg-linear-to-r ${titleGradient} bg-clip-text text-transparent tracking-tight`}>
-            Smart vCard
-          </h1>
+          <Image
+            src={dark ? '/logo/logo-horizontal-white.svg' : '/logo/logo-horizontal-color.svg'}
+            alt="vCard"
+            width={260}
+            height={84}
+            className="h-20 w-auto"
+            priority
+          />
           <div className={`flex gap-1 ${langBg} rounded-full px-1.5 py-1 border backdrop-blur-xl transition-colors duration-300`}>
             <select
               value={language}

@@ -11,6 +11,7 @@ import { useAuth } from '@/lib/supabase/AuthProvider';
 import { getCardsByUid } from '@/lib/supabase/cards';
 import { getProfile, Profile } from '@/lib/supabase/profile';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const BASE_NAV = [
   { label: 'Aperçu', icon: Eye, href: '/dashboard' },
@@ -33,10 +34,10 @@ function Sidebar({ active, slug, onClose, onLogout,profil }: { active?: string; 
   return (
     <div className="flex flex-col h-full p-4 gap-6">
       <div className="flex items-center justify-between pt-2">
-        <div>
-          <h1 className="text-lg font-bold bg-linear-to-r from-white to-zinc-400 bg-clip-text text-transparent">Smart vCard</h1>
-          <p className="text-xs text-zinc-500 mt-0.5">Dashboard</p>
-        </div>
+        <Link href="/dashboard" className="flex w-full justify-between items-center gap-2">
+          <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={200} height={64} className="h-16 w-auto" priority />
+          <span className="text-xs text-zinc-500">Dashboard</span>
+        </Link>
         {onClose && (
           <button onClick={onClose} className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-all lg:hidden">
             <X size={18} />
@@ -126,7 +127,7 @@ export function DashboardLayout({ children, active }: DashboardLayoutProps) {
             <button onClick={() => setOpen(true)} className="p-2 rounded-xl text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-all">
               <Menu size={20} />
             </button>
-            <span className="text-sm font-bold bg-linear-to-r from-white to-zinc-400 bg-clip-text text-transparent">Smart vCard</span>
+            <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={160} height={48} className="h-12 w-auto" priority />
             {profil?.plan !== 'pro' && profil?.plan !== 'business' ? (
               <Link href="/dashboard/upgrade" className="p-2 rounded-xl text-zinc-400 hover:text-orange-400 transition-all">
                 <CreditCard size={18} />

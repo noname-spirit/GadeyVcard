@@ -64,13 +64,20 @@ export default function LeadsPage() {
   };
 
   const handleExport = () => {
-    const csv = ['Nom,Email,Téléphone,Message,Domaine,Source,Date',
+    const exportDate = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const csv = [
+      '# vCard — Export Leads',
+      `# Généré le ${exportDate}`,
+      `# Total : ${leads.length} contact${leads.length > 1 ? 's' : ''}`,
+      '# https://vcard.app',
+      '',
+      'Nom,Email,Téléphone,Message,Domaine,Source,Date',
       ...leads.map((l) => `"${l.nom}","${l.email}","${l.telephone || ''}","${l.message || ''}","${l.domaine}","${l.source}","${l.createdAt}"`),
     ].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'leads.csv'; a.click();
+    a.href = url; a.download = `vcard-leads-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
     URL.revokeObjectURL(url);
   };
 

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
+import Image from 'next/image';
 import type { CardTheme, CardLanguage } from '@/types/card';
 
 const labels = {
@@ -28,7 +29,17 @@ export function CardBack({ qrUrl, theme, language }: CardBackProps) {
   const qrSubtext = dark ? 'text-zinc-500' : 'text-zinc-400';
 
   return (
-    <div className={`w-full h-full bg-linear-to-br ${cardBg} rounded-3xl p-10 border backdrop-blur-2xl ${cardShadow} flex flex-col items-center justify-center gap-6 transition-colors duration-300`}>
+    <div className={`w-full h-full bg-linear-to-br ${cardBg} rounded-3xl p-10 border backdrop-blur-2xl ${cardShadow} flex flex-col items-center justify-center gap-6 transition-colors duration-300 relative`}>
+
+      {/* Logo brand discret en coin (sceau) */}
+      <Image
+        src={dark ? '/logo/logo-icon-white.svg' : '/logo/logo-icon-black.svg'}
+        alt="vCard"
+        width={80}
+        height={80}
+        className="absolute top-3 right-3 w-20 h-20 opacity-50 hover:opacity-90 transition-opacity"
+      />
+
       <motion.p
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
