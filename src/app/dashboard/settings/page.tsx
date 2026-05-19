@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Save,
   ExternalLink,
+  Eye,
+  X,
   Palette,
   User,
   Link2,
@@ -165,6 +167,7 @@ export default function SettingsPage() {
   const [copiedSignature, setCopiedSignature] = useState(false);
   const [cardId, setCardId] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const [userPlan, setUserPlan] = useState<'free' | 'starter' | 'pro' | 'business'>('free');
   const isPro = userPlan === 'pro' || userPlan === 'business';
   const canExportQr = userPlan !== 'free';
@@ -271,7 +274,7 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout active="Paramètres">
-      <div className="flex flex-col xl:flex-row gap-8 items-start">
+      <div className="flex flex-col xl:flex-row gap-8 xl:items-start">
 
       {/* Colonne formulaire */}
       <div className="flex-1 min-w-0 flex flex-col gap-6">
@@ -297,15 +300,24 @@ export default function SettingsPage() {
               vcard.app/{slug}
             </Link>
           </div>
-          <Button
-            onClick={handleSave}
-            loading={saving}
-            size="sm"
-            className="flex items-center gap-2 self-start sm:self-auto"
-          >
-            <Save size={14} />
-            {saved ? "Sauvegardé ✓" : saveError ? "Erreur — réessayer" : "Sauvegarder"}
-          </Button>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <button
+              onClick={() => setShowPreview(!showPreview)}
+              className="xl:hidden flex items-center gap-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-100 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700/40 px-3 py-2 rounded-xl transition-all"
+            >
+              <Eye size={13} />
+              {showPreview ? 'Masquer' : 'Aperçu'}
+            </button>
+            <Button
+              onClick={handleSave}
+              loading={saving}
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Save size={14} />
+              {saved ? "Sauvegardé ✓" : saveError ? "Erreur — réessayer" : "Sauvegarder"}
+            </Button>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -729,9 +741,31 @@ export default function SettingsPage() {
         </motion.div>
       </div>{/* fin colonne formulaire */}
 
-      {/* Colonne aperçu persistante */}
-      <div className="xl:w-80 w-full flex flex-col gap-3 xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto xl:pb-4">
-        <p className="text-xs text-zinc-500 uppercase tracking-wide font-medium">Aperçu en direct</p>
+      {/* Backdrop mobile */}
+      {showPreview && (
+        <div
+          className="xl:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          onClick={() => setShowPreview(false)}
+        />
+      )}
+
+      {/* Colonne aperçu — bottom sheet sur mobile, sidebar sur xl */}
+      <div className={
+        showPreview
+          ? 'flex flex-col gap-3 fixed bottom-0 left-0 right-0 z-50 bg-zinc-950 rounded-t-3xl border-t border-zinc-800/60 px-4 pt-3 pb-8 max-h-[88vh] overflow-y-auto xl:z-auto xl:rounded-none xl:border-0 xl:px-0 xl:pt-0 xl:pb-4 xl:bg-transparent xl:w-80 xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)]'
+          : 'hidden xl:flex xl:flex-col xl:gap-3 xl:w-80 xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto xl:pb-4'
+      }>
+        {/* En-tête mobile avec fermeture */}
+        <div className="xl:hidden flex items-center justify-between shrink-0 pb-2 border-b border-zinc-800/40 mb-1">
+          <p className="text-xs text-zinc-500 uppercase tracking-wide font-medium">Aperçu en direct</p>
+          <button
+            onClick={() => setShowPreview(false)}
+            className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-all"
+          >
+            <X size={14} />
+          </button>
+        </div>
+        <p className="hidden xl:block text-xs text-zinc-500 uppercase tracking-wide font-medium">Aperçu en direct</p>
         {template === 'restaurant' ? (
           <div style={{ '--accent': accent } as React.CSSProperties} className="flex flex-col gap-2">
             <CardFrontRestaurant

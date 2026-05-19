@@ -27,9 +27,9 @@ export default function LandingPage() {
     <div className="min-h-screen bg-zinc-950 text-white overflow-x-hidden">
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800/40">
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800/40">
         <a href="/" className="flex items-center">
-          <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={200} height={56} className="h-14 w-auto" priority />
+          <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={200} height={56} className="h-9 sm:h-14 w-auto" priority />
         </a>
         <div className="hidden md:flex items-center gap-6 text-sm text-zinc-400">
           <a href="#features" className="hover:text-white transition-colors">Fonctionnalités</a>
@@ -109,7 +109,7 @@ export default function LandingPage() {
           <motion.div
             animate={{ y: [0, -8, 0] }}
             transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
-            className="absolute -right-4 top-8 bg-zinc-900 border border-zinc-800/60 rounded-2xl px-3 py-2 text-xs shadow-xl"
+            className="hidden sm:block absolute -right-4 top-8 bg-zinc-900 border border-zinc-800/60 rounded-2xl px-3 py-2 text-xs shadow-xl"
           >
             <span className="text-emerald-400 font-semibold">+12</span>
             <span className="text-zinc-500 ml-1">leads ce mois</span>
@@ -117,7 +117,7 @@ export default function LandingPage() {
           <motion.div
             animate={{ y: [0, 8, 0] }}
             transition={{ repeat: Infinity, duration: 3.5, ease: 'easeInOut' }}
-            className="absolute -left-4 bottom-12 bg-zinc-900 border border-zinc-800/60 rounded-2xl px-3 py-2 text-xs shadow-xl"
+            className="hidden sm:block absolute -left-4 bottom-12 bg-zinc-900 border border-zinc-800/60 rounded-2xl px-3 py-2 text-xs shadow-xl"
           >
             <span className="text-orange-400 font-semibold">1 284</span>
             <span className="text-zinc-500 ml-1">vues</span>
@@ -246,7 +246,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-zinc-800/60 py-10 px-6 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-zinc-600">
-        <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={280} height={80} className="h-20 w-auto opacity-80" />
+        <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={280} height={80} className="h-10 sm:h-16 w-auto opacity-80" />
         <div className="flex gap-4">
           <a href="/pricing" className="hover:text-zinc-400 transition-colors">Tarifs</a>
           <a href="/privacy" className="hover:text-zinc-400 transition-colors">Confidentialité</a>
