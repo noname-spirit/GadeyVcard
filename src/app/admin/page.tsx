@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Users, CreditCard, TrendingUp, Activity, Search, MoreHorizontal, Ban, Eye } from 'lucide-react';
+import { Users, CreditCard, TrendingUp, Activity, Search, MoreHorizontal, Ban, Eye, Shield} from 'lucide-react';
 import { AdminRoute } from '@/components/AdminRoute';
 import { AdminSidebar } from '@/components/AdminSidebar';
 import { StatCard } from '@/components/dashboard/StatCard';
 import type { Profile } from '@/lib/supabase/profile';
-
+import Image from 'next/image';
 const PLAN_COLORS: Record<string, string> = {
   free:     'text-zinc-400 bg-zinc-800 border-zinc-700/40',
   starter:  'text-blue-400 bg-blue-500/10 border-blue-500/20',
@@ -71,7 +71,16 @@ export default function AdminPage() {
       <div className="min-h-screen bg-zinc-950 text-zinc-100 flex">
 
         <AdminSidebar />
-
+      {/* Sidebar */}
+      <aside className="w-56 min-h-screen bg-zinc-900 border-r border-zinc-800/60 flex flex-col p-4 gap-6 fixed top-0 left-0">
+        <div className="pt-2 flex flex-col gap-2">
+          <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={180} height={52} className="h-13 w-auto" priority />
+          <div className="flex items-center gap-2">
+            <Shield size={14} className="text-orange-400" />
+            <h1 className="text-xs font-bold text-white tracking-wider uppercase">Super Admin</h1>
+          </div>
+        </div>
+            </aside>
         {/* Main */}
         <main className="flex-1 ml-56 p-8 flex flex-col gap-8">
 

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Check, Zap, ArrowRight, QrCode, BarChart3, Smartphone, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import Image from 'next/image';
 
 const FEATURES = [
   { icon: Smartphone, title: 'Carte digitale premium', desc: 'Flip card 3D, photo, liens, QR code. Design dark ou light selon votre style.' },
@@ -27,9 +28,9 @@ export default function LandingPage() {
 
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800/40">
-        <span className="text-lg font-bold bg-linear-to-r from-white to-zinc-400 bg-clip-text text-transparent">
-          Smart vCard
-        </span>
+        <a href="/" className="flex items-center">
+          <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={200} height={56} className="h-14 w-auto" priority />
+        </a>
         <div className="hidden md:flex items-center gap-6 text-sm text-zinc-400">
           <a href="#features" className="hover:text-white transition-colors">Fonctionnalités</a>
           <a href="#pricing" className="hover:text-white transition-colors">Tarifs</a>
@@ -244,14 +245,14 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-800/60 py-8 px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-600">
-        <span className="font-semibold text-zinc-500">Smart vCard</span>
+      <footer className="border-t border-zinc-800/60 py-10 px-6 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-zinc-600">
+        <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={280} height={80} className="h-20 w-auto opacity-80" />
         <div className="flex gap-4">
           <a href="/pricing" className="hover:text-zinc-400 transition-colors">Tarifs</a>
           <a href="/privacy" className="hover:text-zinc-400 transition-colors">Confidentialité</a>
           <a href="/terms" className="hover:text-zinc-400 transition-colors">CGU</a>
         </div>
-        <span>© 2026 Smart vCard</span>
+        <span>© 2026</span>
       </footer>
 
     </div>

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, User, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { createProfile } from '@/lib/supabase/profile';
 import { useRouter } from 'next/navigation';
@@ -81,10 +82,10 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-zinc-950 via-black to-zinc-950 flex items-center justify-center px-4 py-12">
-      <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm flex flex-col items-center gap-8">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold bg-linear-to-r from-white to-zinc-400 bg-clip-text text-transparent">Smart vCard</h1>
-          <p className="text-zinc-500 text-sm mt-1">Créez votre carte en 2 minutes</p>
+      <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm flex flex-col items-center gap-6">
+        <div className="flex flex-col items-center gap-2">
+          <Image src="/logo/logo-vertical-white.svg" alt="vCard" width={200} height={200} className="h-44 w-auto" priority />
+          <p className="text-zinc-500 text-sm">Créez votre carte en 2 minutes</p>
         </div>
 
         <div className="w-full bg-zinc-900 border border-zinc-800/60 rounded-2xl p-6 shadow-[0_8px_40px_rgba(0,0,0,0.6)] flex flex-col gap-5">

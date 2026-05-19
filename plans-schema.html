@@ -252,19 +252,22 @@
   }
   .spec-card:hover { transform: translateY(-4px); }
 
-  .spec-card.restaurant { border-color: #8b5cf6; box-shadow: 0 0 0 1px #8b5cf615, 0 8px 24px #8b5cf610; }
+  .spec-card.restaurant     { border-color: #8b5cf6; box-shadow: 0 0 0 1px #8b5cf615, 0 8px 24px #8b5cf610; }
+  .spec-card.restaurant-pro { border-color: #a855f7; box-shadow: 0 0 0 1px #a855f720, 0 8px 32px #a855f720; }
   .spec-card.event      { border-color: #06b6d4; box-shadow: 0 0 0 1px #06b6d415, 0 8px 24px #06b6d410; }
   .spec-card.artist     { border-color: #ec4899; box-shadow: 0 0 0 1px #ec489915, 0 8px 24px #ec489910; }
   .spec-card.immo       { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f615, 0 8px 24px #3b82f610; }
   .spec-card.photo      { border-color: #f59e0b; box-shadow: 0 0 0 1px #f59e0b15, 0 8px 24px #f59e0b10; }
 
-  .badge.restaurant { background: #8b5cf610; color: #a78bfa; border: 1px solid #8b5cf625; }
+  .badge.restaurant     { background: #8b5cf610; color: #a78bfa; border: 1px solid #8b5cf625; }
+  .badge.restaurant-pro { background: #a855f710; color: #c084fc; border: 1px solid #a855f725; }
   .badge.event      { background: #06b6d410; color: #22d3ee; border: 1px solid #06b6d425; }
   .badge.artist     { background: #ec489910; color: #f472b6; border: 1px solid #ec489925; }
   .badge.immo       { background: #3b82f610; color: #60a5fa; border: 1px solid #3b82f625; }
   .badge.photo      { background: #f59e0b10; color: #fbbf24; border: 1px solid #f59e0b25; }
 
-  .restaurant .dot { background: #8b5cf6; }
+  .restaurant     .dot { background: #8b5cf6; }
+  .restaurant-pro .dot { background: #a855f7; }
   .event      .dot { background: #06b6d4; }
   .artist     .dot { background: #ec4899; }
   .immo       .dot { background: #3b82f6; }
@@ -364,7 +367,7 @@
       <div class="feature"><span class="dot"></span>Photo profil HD</div>
       <div class="feature"><span class="dot"></span>Galerie photos (6 photos HD)</div>
       <div class="feature"><span class="dot"></span>WhatsApp Business 1-click</div>
-      <div class="feature"><span class="dot"></span>Leads capturés + dashboard</div>
+      <div class="feature"><span class="dot"></span>Leads capturés + dashboard <strong style="color:#f97316">(500 max)</strong></div>
       <div class="feature"><span class="dot"></span>Export CSV ✓</div>
       <div class="feature"><span class="dot"></span>Analytics basiques (vues, clics, conversion)</div>
       <div class="feature"><span class="dot"></span>CRM léger (statuts + notes)</div>
@@ -394,6 +397,7 @@
       <div class="plan-name">Consultants, coaches, commerciaux</div>
     </div>
     <div class="features">
+      <div class="feature"><span class="dot"></span>Leads stockés <strong style="color:#eab308">(2 000 max)</strong></div>
       <div class="feature"><span class="dot"></span>Tous les templates (dont Influenceur)</div>
       <div class="feature"><span class="dot"></span>Couleur accent personnalisée</div>
       <div class="feature"><span class="dot"></span>Analytics avancés (heure, semaine, device, liens)</div>
@@ -428,6 +432,7 @@
       <tr class="row-section"><td colspan="4">Aperçu (dashboard home)</td></tr>
       <tr><td>Vues totales + Clics liens</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
       <tr><td>Leads captés (stat)</td><td><span class="cross">🔒</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
+      <tr><td>Leads stockés (plafond)</td><td><span class="cross">0</span></td><td><span class="check">500</span></td><td><span class="check-pro">2 000</span></td></tr>
       <tr><td>Taux de conversion (stat)</td><td><span class="cross">🔒</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
       <tr><td>Tableau leads récents</td><td><span class="cross">🔒</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
       <tr><td>Export CSV</td><td><span class="cross">🔒</span></td><td><span class="check">✓</span></td><td><span class="check-pro">✓</span></td></tr>
@@ -485,6 +490,31 @@
         <div class="feature"><span class="dot"></span>5 000 leads/mois</div>
         <div class="feature"><span class="dot"></span>Analytics avancés · Notifs push</div>
         <div class="feature"><span class="dot"></span>Support dédié 24h</div>
+      </div>
+      <div class="divider"></div>
+      <div class="locked">Prise de commande à table</div>
+      <div class="locked">Dashboard commandes temps réel</div>
+    </div>
+
+    <!-- RESTAURANT PRO -->
+    <div class="spec-card restaurant-pro">
+      <div><span class="badge restaurant-pro">⚡ Restaurant Pro</span></div>
+      <div class="plan-icon">🧾</div>
+      <div>
+        <div class="plan-price">
+          <span class="amount">59 €</span><span class="period">/mois</span>
+          <span class="yearly" style="color:#71717a;font-size:0.65rem;display:block;width:100%;margin-top:2px;">Tout Restaurant inclus +</span>
+        </div>
+        <div class="plan-name">Food trucks, comptoirs, fast casual</div>
+      </div>
+      <div class="features">
+        <div class="feature"><span class="dot"></span>Prise de commande directe depuis la carte</div>
+        <div class="feature"><span class="dot"></span>Numéro de commande ou QR généré automatiquement</div>
+        <div class="feature"><span class="dot"></span>Dashboard commandes temps réel (Supabase Realtime)</div>
+        <div class="feature"><span class="dot"></span>Statuts : Reçue → En préparation → Prête</div>
+        <div class="feature"><span class="dot"></span>Paiement au comptoir — aucune intégration CB</div>
+        <div class="feature"><span class="dot"></span>Historique commandes (30 jours)</div>
+        <div class="feature"><span class="dot"></span>Notif sonore nouvelle commande (dashboard)</div>
       </div>
     </div>
 
@@ -581,6 +611,7 @@
   <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div>Starter</div>
   <div class="legend-item"><div class="legend-dot" style="background:#eab308"></div>Pro</div>
   <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div>Restaurant</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#a855f7"></div>Restaurant Pro</div>
   <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div>Événement</div>
   <div class="legend-item"><div class="legend-dot" style="background:#ec4899"></div>Artiste</div>
   <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Immobilier</div>

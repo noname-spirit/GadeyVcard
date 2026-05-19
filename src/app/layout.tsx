@@ -14,6 +14,16 @@ export const metadata: Metadata = {
   description:
     'Graphiste Logo & Web | Branding - Partage élégant de coordonnées',
   keywords: ['vCard', 'contact', 'graphiste', 'logo', 'branding', 'web'],
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'vCard',
+  },
+  icons: {
+    icon: '/icon.svg',
+    apple: '/logo/logo-icon-color.png',
+  },
   openGraph: {
     title: 'Nonames-spirit | Graphiste Logo & Web',
     description: 'Graphiste Logo & Web | Branding',
