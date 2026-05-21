@@ -9,6 +9,7 @@ import { Watermark } from '@/components/card/Watermark';
 import { LeadCaptureForm } from '@/components/card/LeadCaptureForm';
 import { LeadCaptureFormInfluencer } from '@/components/card/LeadCaptureFormInfluencer';
 import { CardFrontRestaurant, RestaurantMenuPanel } from '@/components/card/CardFrontRestaurant';
+import { CardFrontInfluencer } from '@/components/card/CardFrontInfluencer';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 import { getCardBySlug, supabaseCardToCardData } from '@/lib/supabase/cards';
 import { LinkType, trackCardEvent } from '@/lib/supabase/events';
@@ -235,6 +236,13 @@ function getDeviceType() {
                     address: undefined,
                     hours: undefined,
                   },
+                  socials: {
+                    instagram: card.socials?.instagram,
+                    youtube: card.socials?.youtube,
+                    tiktok: card.socials?.tiktok,
+                    linkedin: card.socials?.linkedin,
+                    twitter: card.socials?.twitter,
+                  },
                   menu: [
                     { id: '1', name: 'Soupe du jour', price: 8, category: 'Entrées', available: true, emoji: '🍲' },
                     { id: '2', name: 'Buddha Bowl', price: 14, category: 'Plats', available: true, emoji: '🥗' },
@@ -274,7 +282,49 @@ function getDeviceType() {
                   />
                 )}
               </AnimatePresence>
-              <CardFooter theme={theme} />
+              <CardFooter theme={theme} accentColor={card.accentColor} />
+            </div>
+          ) : card.template === 'influencer' ? (
+            <div
+              style={{ '--accent': card.accentColor || '#a855f7' } as React.CSSProperties}
+              className="flex flex-col gap-2 w-full"
+            >
+              <CardFrontInfluencer
+                card={{
+                  id: card.id,
+                  slug: card.slug,
+                  name: card.name,
+                  handle: `@${card.slug}`,
+                  niche: card.title || '',
+                  photo: card.photo || '/noname-spirit.jpg',
+                  stats: {
+                    followers: card.stats?.followers || '—',
+                    engagement: card.stats?.engagement || '—',
+                    collab: card.stats?.collab || '—',
+                  },
+                  links: {
+                    instagram: card.socials?.instagram,
+                    youtube: card.socials?.youtube,
+                    tiktok: card.socials?.tiktok,
+                    linkedin: card.socials?.linkedin,
+                    twitter: card.socials?.twitter,
+                    website: card.socials?.website,
+                  },
+                  accentColor: card.accentColor,
+                  updatedAt: card.updatedAt,
+                }}
+                theme={theme}
+                language={language}
+                isSaving={isSaving}
+                onSaveContact={handleSaveContact}
+              />
+              <LeadCaptureFormInfluencer
+                card={card}
+                theme={theme}
+                language={language}
+                locked={!card.plan || card.plan === 'free'}
+              />
+              <CardFooter theme={theme} accentColor={card.accentColor} />
             </div>
           ) : (
             <>
@@ -286,22 +336,13 @@ function getDeviceType() {
                 isSaving={isSaving}
                 onCalendlyClick={card.calendlyUrl && (card.plan === 'pro' || card.plan === 'business') ? () => { trackCardEvent(card.id, 'calendly'); setShowCalendly(true); } : undefined}
               />
-              {card.template === 'influencer' ? (
-                <LeadCaptureFormInfluencer
-                  card={card}
-                  theme={theme}
-                  language={language}
-                  locked={!card.plan || card.plan === 'free'}
-                />
-              ) : (
-                <LeadCaptureForm
-                  card={card}
-                  theme={theme}
-                  language={language}
-                  locked={!card.plan || card.plan === 'free'}
-                />
-              )}
-              <CardFooter theme={theme} />
+              <LeadCaptureForm
+                card={card}
+                theme={theme}
+                language={language}
+                locked={!card.plan || card.plan === 'free'}
+              />
+              <CardFooter theme={theme} accentColor={card.accentColor} />
             </>
           )}
         </div>

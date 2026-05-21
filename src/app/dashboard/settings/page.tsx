@@ -163,6 +163,9 @@ export default function SettingsPage() {
   const [calendlyUrl, setCalendlyUrl] = useState("");
   const [availabilityStatus, setAvailabilityStatus] = useState("");
   const [availabilityText, setAvailabilityText] = useState("");
+  const [statFollowers, setStatFollowers] = useState("");
+  const [statEngagement, setStatEngagement] = useState("");
+  const [statCollab, setStatCollab] = useState("");
   const [copiedSignature, setCopiedSignature] = useState(false);
   const [cardId, setCardId] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -215,6 +218,9 @@ export default function SettingsPage() {
       setCalendlyUrl(c.calendly_url ?? "");
       setAvailabilityStatus(c.availability_status ?? "");
       setAvailabilityText(c.availability_text ?? "");
+      setStatFollowers(c.stat_followers ?? "");
+      setStatEngagement(c.stat_engagement ?? "");
+      setStatCollab(c.stat_collab ?? "");
     }).catch(() => {});
   }, [uid]);
 
@@ -233,6 +239,9 @@ export default function SettingsPage() {
       calendly_url: calendlyUrl || null,
       availability_status: availabilityStatus || null,
       availability_text: availabilityText || null,
+      stat_followers: statFollowers || null,
+      stat_engagement: statEngagement || null,
+      stat_collab: statCollab || null,
     };
     try {
       let ok: boolean;
@@ -508,6 +517,34 @@ export default function SettingsPage() {
                   ))}
                 </div>
               </div>
+
+              {template === 'influencer' && (
+                <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
+                  <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Stats Influenceur</h3>
+                  <p className="text-xs text-zinc-500">Laisse vide pour afficher « — »</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <Field
+                      label="Abonnés"
+                      value={statFollowers}
+                      onChange={setStatFollowers}
+                      placeholder="128K"
+                    />
+                    <Field
+                      label="Engagement"
+                      value={statEngagement}
+                      onChange={setStatEngagement}
+                      placeholder="4.2%"
+                    />
+                    <Field
+                      label="Collabs"
+                      value={statCollab}
+                      onChange={setStatCollab}
+                      placeholder="50+"
+                    />
+                  </div>
+                </div>
+              )}
+
               {isPro ? (
                 <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-3">
                   <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Couleur d&apos;accent</h3>
@@ -781,6 +818,13 @@ export default function SettingsPage() {
                   address: '14 rue Oberkampf',
                   hours: '12h–22h · Lun–Sam',
                 },
+                socials: {
+                  instagram: instagram || undefined,
+                  youtube: youtube || undefined,
+                  tiktok: tiktok || undefined,
+                  linkedin: linkedin || undefined,
+                  twitter: twitter || undefined,
+                },
                 menu: [
                   { id: '1', name: 'Soupe du jour', price: 8, category: 'Entrées', available: true, emoji: '🍲' },
                   { id: '2', name: 'Buddha Bowl', price: 14, category: 'Plats', available: true, emoji: '🥗' },
@@ -819,20 +863,31 @@ export default function SettingsPage() {
                 />
               )}
             </AnimatePresence>
-            <CardFooter theme="dark" />
+            <CardFooter theme="dark" accentColor={accent} />
           </div>
         ) : template === 'influencer' ? (
           <div style={{ '--accent': accent } as React.CSSProperties} className="flex flex-col gap-2">
             <CardFrontInfluencer
               card={{
                 id: 'preview',
-                slug: 'preview',
+                slug: slug || 'preview',
                 name,
                 handle: `@${slug || 'votre-pseudo'}`,
                 niche: title || 'Votre niche · Lifestyle · Créatif',
-                photo: '/noname-spirit.jpg',
-                stats: { followers: '—', engagement: '—', collab: '—' },
-                links: { instagram: instagram || undefined, website: website || undefined },
+                photo: photo || '/noname-spirit.jpg',
+                stats: {
+                  followers: statFollowers || '—',
+                  engagement: statEngagement || '—',
+                  collab: statCollab || '—',
+                },
+                links: {
+                  instagram: instagram || undefined,
+                  youtube: youtube || undefined,
+                  tiktok: tiktok || undefined,
+                  linkedin: linkedin || undefined,
+                  twitter: twitter || undefined,
+                  website: website || undefined,
+                },
                 accentColor: accent,
               }}
               theme="dark"
@@ -845,7 +900,7 @@ export default function SettingsPage() {
               language="fr"
               locked={!userPlan || userPlan === 'free'}
             />
-            <CardFooter theme="dark" />
+            <CardFooter theme="dark" accentColor={accent} />
           </div>
         ) : (
           <div className="flex flex-col gap-2">
@@ -861,7 +916,7 @@ export default function SettingsPage() {
               language="fr"
               locked={!userPlan || userPlan === 'free'}
             />
-            <CardFooter theme={template === 'light' ? 'light' : 'dark'} />
+            <CardFooter theme={template === 'light' ? 'light' : 'dark'} accentColor={accent} />
           </div>
         )}
         <a

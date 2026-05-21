@@ -2,9 +2,10 @@
 
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Download, Phone, Globe, MapPin, Clock, Utensils, X, ChevronRight } from 'lucide-react';
+import { Download, Phone, Globe, MapPin, Clock, Utensils, X, ChevronRight, Instagram, Youtube, Linkedin } from 'lucide-react';
 import { useState } from 'react';
 import type { CardTheme, CardLanguage } from '@/types/card';
+import { TikTokIcon, XIcon } from './SocialIcons';
 
 export interface MenuItem {
   id: string;
@@ -26,6 +27,13 @@ export interface RestaurantCardData {
     website?: string;
     address?: string;
     hours?: string;
+  };
+  socials?: {
+    instagram?: string;
+    youtube?: string;
+    tiktok?: string;
+    linkedin?: string;
+    twitter?: string;
   };
   menu: MenuItem[];
   accentColor?: string;
@@ -139,6 +147,17 @@ export function CardFrontRestaurant({ card, theme, language, isSaving, onSaveCon
   const actionBtn = dark
     ? 'bg-zinc-800/50 hover:bg-emerald-500/15 border-zinc-700/30 hover:border-emerald-500/40 text-zinc-300 hover:text-emerald-400'
     : 'bg-zinc-100 hover:bg-emerald-500/10 border-zinc-200 hover:border-emerald-500/40 text-zinc-600 hover:text-emerald-500';
+  const socialBtn = dark
+    ? 'bg-zinc-800/50 border-zinc-700/30 text-zinc-300'
+    : 'bg-zinc-100 border-zinc-200 text-zinc-500';
+
+  const socials = [
+    card.socials?.instagram && { href: card.socials.instagram, icon: Instagram, label: 'Instagram' },
+    card.socials?.youtube && { href: card.socials.youtube, icon: Youtube, label: 'YouTube' },
+    card.socials?.tiktok && { href: card.socials.tiktok, icon: TikTokIcon, label: 'TikTok' },
+    card.socials?.linkedin && { href: card.socials.linkedin, icon: Linkedin, label: 'LinkedIn' },
+    card.socials?.twitter && { href: card.socials.twitter, icon: XIcon, label: 'Twitter' },
+  ].filter(Boolean) as { href: string; icon: React.ElementType; label: string }[];
 
   // Menu overlay styles
   const overlayBg = dark ? 'bg-zinc-950' : 'bg-zinc-50';
@@ -249,6 +268,29 @@ export function CardFrontRestaurant({ card, theme, language, isSaving, onSaveCon
               </a>
             )}
           </motion.div>
+
+          {/* Réseaux sociaux */}
+          {socials.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.31, duration: 0.5 }}
+              className="flex justify-center gap-3"
+            >
+              {socials.map((s) => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`p-1.5 rounded-full ${socialBtn} border transition-all duration-300 hover:opacity-80`}
+                  aria-label={s.label}
+                >
+                  <s.icon size={18} />
+                </a>
+              ))}
+            </motion.div>
+          )}
 
           {/* Bouton Notre menu */}
           {card.menu.length > 0 && (

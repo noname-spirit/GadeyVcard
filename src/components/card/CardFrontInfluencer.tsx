@@ -2,8 +2,9 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Download, Instagram, Youtube, Globe, TrendingUp } from 'lucide-react';
+import { Download, Instagram, Youtube, Globe, Linkedin, TrendingUp } from 'lucide-react';
 import type { CardTheme, CardLanguage } from '@/types/card';
+import { TikTokIcon, XIcon } from './SocialIcons';
 
 export interface InfluencerCardData {
   id: string;
@@ -22,6 +23,8 @@ export interface InfluencerCardData {
     instagram?: string;
     youtube?: string;
     tiktok?: string;
+    linkedin?: string;
+    twitter?: string;
     website?: string;
     mediaKit?: string;    // PDF press kit
   };
@@ -81,6 +84,9 @@ export function CardFrontInfluencer({ card, theme, language, isSaving, onSaveCon
   const socialLinks = [
     card.links.instagram && { href: card.links.instagram, icon: Instagram, label: 'Instagram' },
     card.links.youtube && { href: card.links.youtube, icon: Youtube, label: 'YouTube' },
+    card.links.tiktok && { href: card.links.tiktok, icon: TikTokIcon, label: 'TikTok' },
+    card.links.linkedin && { href: card.links.linkedin, icon: Linkedin, label: 'LinkedIn' },
+    card.links.twitter && { href: card.links.twitter, icon: XIcon, label: 'Twitter' },
     card.links.website && { href: card.links.website, icon: Globe, label: 'Site' },
   ].filter(Boolean) as { href: string; icon: React.ElementType; label: string }[];
 
@@ -182,20 +188,33 @@ export function CardFrontInfluencer({ card, theme, language, isSaving, onSaveCon
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.4 }}
-            className="flex gap-2"
+            className={socialLinks.length > 3 ? 'flex justify-center gap-3 flex-wrap' : 'flex gap-2'}
           >
-            {socialLinks.map((s) => (
-              <a
-                key={s.label}
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border text-xs font-medium transition-all duration-200 ${linkBtn}`}
-              >
-                <s.icon size={13} />
-                {s.label}
-              </a>
-            ))}
+            {socialLinks.map((s) =>
+              socialLinks.length > 3 ? (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`p-2 rounded-full border transition-all duration-200 hover:opacity-80 ${linkBtn}`}
+                  aria-label={s.label}
+                >
+                  <s.icon size={16} />
+                </a>
+              ) : (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border text-xs font-medium transition-all duration-200 ${linkBtn}`}
+                >
+                  <s.icon size={13} />
+                  {s.label}
+                </a>
+              )
+            )}
           </motion.div>
         )}
 
