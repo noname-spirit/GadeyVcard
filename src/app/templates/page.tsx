@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { VCard } from '@/components/card';
+import { useRouter } from 'next/navigation';
+import { VCard, CardFooter } from '@/components/card';
 import { CardFrontRestaurant } from '@/components/card/CardFrontRestaurant';
 import { CardFrontInfluencer } from '@/components/card/CardFrontInfluencer';
 import { LeadCaptureForm } from '@/components/card/LeadCaptureForm';
@@ -96,6 +97,7 @@ const TEMPLATES = [
 ];
 
 export default function TemplatesPage() {
+  const router = useRouter();
   const [active, setActive] = useState('freelance-dark');
   const current = TEMPLATES.find((t) => t.id === active)!;
 
@@ -108,7 +110,7 @@ export default function TemplatesPage() {
           <h1 className="text-xl font-bold text-white">Templates</h1>
           <p className="text-zinc-500 text-sm mt-0.5">Sélectionne un template pour le prévisualiser</p>
         </div>
-        <a href="/" className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors">← Accueil</a>
+        <button type="button" onClick={() => router.push('/')} className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors">← Accueil</button>
       </div>
 
       <div className="flex flex-1 min-h-0 flex-col lg:flex-row">
@@ -188,6 +190,8 @@ export default function TemplatesPage() {
                   language="fr"
                 />
               )}
+
+              <CardFooter theme={active === 'freelance-light' ? 'light' : 'dark'} />
             </div>
           </div>
 

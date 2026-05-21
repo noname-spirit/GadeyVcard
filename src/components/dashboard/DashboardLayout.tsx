@@ -10,7 +10,6 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/lib/supabase/AuthProvider';
 import { getCardsByUid } from '@/lib/supabase/cards';
 import { getProfile, Profile } from '@/lib/supabase/profile';
-import Link from 'next/link';
 import Image from 'next/image';
 
 const BASE_NAV = [
@@ -26,6 +25,7 @@ interface DashboardLayoutProps {
 }
 
 function Sidebar({ active, slug, onClose, onLogout,profil }: { active?: string; slug: string; onClose?: () => void; onLogout: () => void; profil: Profile | null }) {
+  const router = useRouter();
   const nav = [
     ...BASE_NAV.slice(0, 1),
     { label: 'Ma carte', icon: ExternalLink, href: `/${slug}` },
@@ -34,10 +34,14 @@ function Sidebar({ active, slug, onClose, onLogout,profil }: { active?: string; 
   return (
     <div className="flex flex-col h-full p-4 gap-6">
       <div className="flex items-center justify-between pt-2">
-        <Link href="/dashboard" className="flex w-full justify-between items-center gap-2">
+        <button
+          type="button"
+          onClick={() => router.push('/dashboard')}
+          className="flex w-full justify-between items-center gap-2"
+        >
           <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={200} height={64} className="h-16 w-auto" priority />
           <span className="text-xs text-zinc-500">Dashboard</span>
-        </Link>
+        </button>
         {onClose && (
           <button onClick={onClose} className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-all lg:hidden">
             <X size={18} />
@@ -47,12 +51,18 @@ function Sidebar({ active, slug, onClose, onLogout,profil }: { active?: string; 
 
       <nav className="flex flex-col gap-1">
         {nav.map((item) => (
-          <a key={item.label} href={item.href} onClick={onClose}
-            className={['flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
+          <button
+            key={item.label}
+            type="button"
+            onClick={() => {
+              router.push(item.href);
+              onClose?.();
+            }}
+            className={['flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left',
               active === item.label ? 'bg-orange-500/15 text-orange-400 border border-orange-500/20' : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50',
             ].join(' ')}>
             <item.icon size={16} />{item.label}
-          </a>
+          </button>
         ))}
       </nav>
 
@@ -63,11 +73,13 @@ function Sidebar({ active, slug, onClose, onLogout,profil }: { active?: string; 
             <span className="text-xs font-semibold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">{profil?.plan}</span>
           </div>
           {profil?.plan !== 'pro' && profil?.plan !== 'business' && (
-            <Link href="/dashboard/upgrade">
-              <Button size="sm" className="w-full text-xs flex items-center justify-center gap-1.5">
-                <Zap size={11} />Passer Pro
-              </Button>
-            </Link>
+            <Button
+              size="sm"
+              className="w-full text-xs flex items-center justify-center gap-1.5"
+              onClick={() => router.push('/dashboard/upgrade')}
+            >
+              <Zap size={11} />Passer Pro
+            </Button>
           )}
         </div>
         <button onClick={onLogout}
@@ -129,9 +141,13 @@ export function DashboardLayout({ children, active }: DashboardLayoutProps) {
             </button>
             <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={160} height={48} className="h-12 w-auto" priority />
             {profil?.plan !== 'pro' && profil?.plan !== 'business' ? (
-              <Link href="/dashboard/upgrade" className="p-2 rounded-xl text-zinc-400 hover:text-orange-400 transition-all">
+              <button
+                type="button"
+                onClick={() => router.push('/dashboard/upgrade')}
+                className="p-2 rounded-xl text-zinc-400 hover:text-orange-400 transition-all"
+              >
                 <CreditCard size={18} />
-              </Link>
+              </button>
             ) : (
               <div className="p-2 w-9" />
             )}

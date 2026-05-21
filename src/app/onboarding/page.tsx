@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
 import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
 import type { OnboardingData } from "@/components/onboarding/OnboardingWizard";
@@ -82,12 +81,13 @@ export default function OnboardingPage() {
 
         <p className="mt-8 text-xs text-zinc-600">
           Déjà un compte ?{" "}
-          <Link
-            href="/login"
+          <button
+            type="button"
+            onClick={() => router.push('/login')}
             className="text-orange-500 hover:text-orange-400 transition-colors"
           >
             Se connecter
-          </Link>
+          </button>
         </p>
       </div>
     </ProtectedRoute>
