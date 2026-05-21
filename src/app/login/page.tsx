@@ -95,7 +95,7 @@ function LoginForm() {
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
             <label className="text-sm text-zinc-400 font-medium">Mot de passe</label>
-            <a href="/forgot-password" className="text-xs text-zinc-500 hover:text-orange-400 transition-colors">Oublié ?</a>
+            <button type="button" onClick={() => router.push('/forgot-password')} className="text-xs text-zinc-500 hover:text-orange-400 transition-colors">Oublié ?</button>
           </div>
           <div className="relative">
             <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
@@ -114,6 +114,7 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-linear-to-br from-zinc-950 via-black to-zinc-950 flex items-center justify-center px-4">
       <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm flex flex-col items-center gap-6 py-12">
@@ -126,7 +127,7 @@ export default function LoginPage() {
         </Suspense>
         <p className="text-sm text-zinc-600">
           Pas encore de compte ?{' '}
-          <a href="/register" className="text-orange-500 hover:text-orange-400 transition-colors font-medium">Créer un compte</a>
+          <button type="button" onClick={() => router.push('/register')} className="text-orange-500 hover:text-orange-400 transition-colors font-medium">Créer un compte</button>
         </p>
       </motion.div>
     </div>

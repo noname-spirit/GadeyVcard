@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { createClient } from '@/lib/supabase/client';
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -27,9 +29,13 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
       <div className="w-full max-w-sm flex flex-col gap-6">
-        <a href="/login" className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-200 transition-colors w-fit">
+        <button
+          type="button"
+          onClick={() => router.push('/login')}
+          className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-200 transition-colors w-fit"
+        >
           <ArrowLeft size={14} />Retour à la connexion
-        </a>
+        </button>
         <div>
           <h1 className="text-2xl font-bold text-white">Mot de passe oublié</h1>
           <p className="text-zinc-500 text-sm mt-1">Entrez votre email et nous vous enverrons un lien de réinitialisation.</p>

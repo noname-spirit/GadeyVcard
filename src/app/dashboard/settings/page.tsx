@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -27,7 +26,7 @@ import {
 import { QRCodeCanvas } from 'qrcode.react';
 import { Button } from "@/components/ui/Button";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { VCard } from "@/components/card";
+import { VCard, CardFooter } from "@/components/card";
 import { CardFrontInfluencer } from "@/components/card/CardFrontInfluencer";
 import { CardFrontRestaurant, RestaurantMenuPanel } from "@/components/card/CardFrontRestaurant";
 import { LeadCaptureForm } from "@/components/card/LeadCaptureForm";
@@ -281,24 +280,25 @@ export default function SettingsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex flex-col gap-1">
-            <Link
-              href="/dashboard"
+            <button
+              type="button"
+              onClick={() => router.push('/dashboard')}
               className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-200 transition-colors w-fit"
             >
               <ArrowLeft size={13} />
               Retour au dashboard
-            </Link>
+            </button>
             <h2 className="text-xl lg:text-2xl font-bold text-white">
               Paramètres
             </h2>
-            <Link
-              href={`/${slug}`}
-              target="_blank"
+            <button
+              type="button"
+              onClick={() => window.open(`/${slug}`, '_blank')}
               className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-orange-400 transition-colors"
             >
               <ExternalLink size={11} />
               vcard.app/{slug}
-            </Link>
+            </button>
           </div>
           <div className="flex items-center gap-2 self-start sm:self-auto">
             <button
@@ -819,6 +819,7 @@ export default function SettingsPage() {
                 />
               )}
             </AnimatePresence>
+            <CardFooter theme="dark" />
           </div>
         ) : template === 'influencer' ? (
           <div style={{ '--accent': accent } as React.CSSProperties} className="flex flex-col gap-2">
@@ -844,6 +845,7 @@ export default function SettingsPage() {
               language="fr"
               locked={!userPlan || userPlan === 'free'}
             />
+            <CardFooter theme="dark" />
           </div>
         ) : (
           <div className="flex flex-col gap-2">
@@ -859,6 +861,7 @@ export default function SettingsPage() {
               language="fr"
               locked={!userPlan || userPlan === 'free'}
             />
+            <CardFooter theme={template === 'light' ? 'light' : 'dark'} />
           </div>
         )}
         <a

@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Sun, Moon, CalendarDays, X } from 'lucide-react';
-import { VCard } from '@/components/card';
+import { VCard, CardFooter } from '@/components/card';
 import { Watermark } from '@/components/card/Watermark';
 import { LeadCaptureForm } from '@/components/card/LeadCaptureForm';
 import { LeadCaptureFormInfluencer } from '@/components/card/LeadCaptureFormInfluencer';
@@ -89,6 +89,7 @@ function CalendlyModal({ url, onClose }: { url: string; onClose: () => void }) {
 
 export default function CardPage() {
   const { slug } = useParams<{ slug: string }>();
+  const router = useRouter();
   const [card, setCard] = useState<CardData>(BASE_CARD);
   const [theme, setTheme] = useState<CardTheme>('dark');
   const [language, setLanguage] = useState<CardLanguage>('en');
@@ -160,12 +161,13 @@ function getDeviceType() {
       <div className="flex flex-col items-center w-full max-w-md px-4 py-8 gap-6">
 
         <div className="flex items-center gap-3 justify-center w-full relative">
-          <Link
-            href="/dashboard"
+          <button
+            type="button"
+            onClick={() => router.push('/dashboard')}
             className={`absolute left-0 text-xs font-medium transition-colors ${dark ? 'text-zinc-600 hover:text-zinc-300' : 'text-zinc-400 hover:text-zinc-700'}`}
           >
             ← Accueil
-          </Link>
+          </button>
           <Image
             src={dark ? '/logo/logo-horizontal-white.svg' : '/logo/logo-horizontal-color.svg'}
             alt="vCard"
@@ -272,6 +274,7 @@ function getDeviceType() {
                   />
                 )}
               </AnimatePresence>
+              <CardFooter theme={theme} />
             </div>
           ) : (
             <>
@@ -298,6 +301,7 @@ function getDeviceType() {
                   locked={!card.plan || card.plan === 'free'}
                 />
               )}
+              <CardFooter theme={theme} />
             </>
           )}
         </div>

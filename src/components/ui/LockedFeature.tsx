@@ -1,6 +1,7 @@
 'use client';
 
 import { Lock } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 
 interface LockedFeatureProps {
@@ -11,6 +12,7 @@ interface LockedFeatureProps {
 }
 
 export function LockedFeature({ plan, label, desc, children }: LockedFeatureProps) {
+  const router = useRouter();
   const planLabel = plan === 'pro' ? 'Pro' : 'Starter';
   const accent = plan === 'pro' ? 'text-amber-400' : 'text-orange-400';
 
@@ -29,11 +31,9 @@ export function LockedFeature({ plan, label, desc, children }: LockedFeatureProp
           <p className="text-sm font-semibold text-zinc-200">{label}</p>
           {desc && <p className="text-xs text-zinc-500 mt-1 max-w-xs">{desc}</p>}
         </div>
-        <a href="/dashboard/upgrade">
-          <Button size="sm" className="text-xs">
-            Passer au plan {planLabel}
-          </Button>
-        </a>
+        <Button size="sm" className="text-xs" onClick={() => router.push('/dashboard/upgrade')}>
+          Passer au plan {planLabel}
+        </Button>
       </div>
     </div>
   );
