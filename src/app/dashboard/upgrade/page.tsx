@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Check, Zap, ArrowLeft, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -49,6 +50,7 @@ const PLANS = [
 ];
 
 export default function UpgradePage() {
+  const router = useRouter();
   const [billing, setBilling] = useState<Billing>('monthly');
   const [selected, setSelected] = useState('pro');
   const [showModal, setShowModal] = useState(false);
@@ -62,9 +64,9 @@ export default function UpgradePage() {
 
         {/* Header */}
         <div className="flex items-center gap-4">
-          <a href="/dashboard" className="p-2 rounded-xl text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-all">
+          <button type="button" onClick={() => router.push('/dashboard')} className="p-2 rounded-xl text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-all">
             <ArrowLeft size={18} />
-          </a>
+          </button>
           <div>
             <h1 className="text-2xl font-bold text-white">Passer à un plan supérieur</h1>
             <p className="text-zinc-500 text-sm mt-0.5">Plan actuel : <span className="text-zinc-300 font-medium">Free</span></p>

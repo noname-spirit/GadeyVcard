@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, User, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { createProfile } from '@/lib/supabase/profile';
@@ -74,7 +73,7 @@ export default function RegisterPage() {
               Un email de vérification a été envoyé à <span className="text-white font-medium">{email}</span>.
             </p>
           </div>
-          <Link href="/login" className="text-sm text-orange-500 hover:text-orange-400 transition-colors font-medium">Se connecter</Link>
+          <button type="button" onClick={() => router.push('/login')} className="text-sm text-orange-500 hover:text-orange-400 transition-colors font-medium">Se connecter</button>
         </motion.div>
       </div>
     );
@@ -169,16 +168,16 @@ export default function RegisterPage() {
             <Button type="submit" loading={loading} className="w-full mt-1">Créer mon compte</Button>
             <p className="text-xs text-zinc-600 text-center">
               En créant un compte, vous acceptez nos{' '}
-              <Link href="/terms" className="text-zinc-500 hover:text-zinc-300 transition-colors underline">CGU</Link>
+              <button type="button" onClick={() => router.push('/terms')} className="text-zinc-500 hover:text-zinc-300 transition-colors underline">CGU</button>
               {' '}et notre{' '}
-              <Link href="/privacy" className="text-zinc-500 hover:text-zinc-300 transition-colors underline">politique de confidentialité</Link>.
+              <button type="button" onClick={() => router.push('/privacy')} className="text-zinc-500 hover:text-zinc-300 transition-colors underline">politique de confidentialité</button>.
             </p>
           </form>
         </div>
 
         <p className="text-sm text-zinc-600">
           Déjà un compte ?{' '}
-          <Link href="/login" className="text-orange-500 hover:text-orange-400 transition-colors font-medium">Se connecter</Link>
+          <button type="button" onClick={() => router.push('/login')} className="text-orange-500 hover:text-orange-400 transition-colors font-medium">Se connecter</button>
         </p>
       </motion.div>
     </div>
