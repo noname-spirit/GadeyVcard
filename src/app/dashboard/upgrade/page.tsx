@@ -212,7 +212,7 @@ export default function UpgradePage() {
         open={showModal}
         onClose={() => setShowModal(false)}
         planName={selectedPlan.name}
-        planId={selected}
+        planId={selectedPlan.id}
         amount={amount}
         billing={billing}
       />

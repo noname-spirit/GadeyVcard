@@ -191,7 +191,16 @@ export default function TemplatesPage() {
                 />
               )}
 
-              <CardFooter theme={active === 'freelance-light' ? 'light' : 'dark'} />
+              <CardFooter
+                theme={active === 'freelance-light' ? 'light' : 'dark'}
+                accentColor={
+                  active === 'freelance-light' ? FREELANCE_LIGHT.accentColor
+                  : active === 'freelance-color' ? FREELANCE_COLOR.accentColor
+                  : active === 'restaurant' ? RESTAURANT.accentColor
+                  : active === 'influencer' ? INFLUENCER.accentColor
+                  : FREELANCE_DARK.accentColor
+                }
+              />
             </div>
           </div>
 
