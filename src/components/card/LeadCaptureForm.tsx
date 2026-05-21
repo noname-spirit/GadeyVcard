@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Check, AlertCircle, ScanLine, X, Lock } from 'lucide-react';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 import type { LeadFormData } from '@/types/lead';
-import Link from 'next/link';
 
 const SECTEURS = [
   'Café', 'Villa', 'E-commerce', 'Marketing', 'Coaching',
@@ -129,6 +129,7 @@ interface LeadCaptureFormProps {
 }
 
 export function LeadCaptureForm({ card, theme, language, locked = false }: LeadCaptureFormProps) {
+  const router = useRouter();
   const [form, setForm] = useState<LeadFormData>(EMPTY_FORM);
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -302,13 +303,14 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
                 <Lock size={18} className="text-zinc-400" />
               </div>
               <p className="text-sm font-semibold text-zinc-200">{ll.message}</p>
-              <Link
-                href="/dashboard/upgrade"
+              <button
+                type="button"
+                onClick={() => router.push('/dashboard/upgrade')}
                 className="mt-1 px-4 py-2 rounded-xl text-xs font-bold text-white transition-all"
                 style={{ background: `linear-gradient(to right, ${accent}, color-mix(in srgb, ${accent} 75%, black))` }}
               >
                 {ll.cta}
-              </Link>
+              </button>
             </div>
           </div>
         )}
