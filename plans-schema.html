@@ -307,6 +307,44 @@
     border-radius: 999px;
     padding: 4px 12px;
   }
+
+  /* ── AVAILABILITY BADGE (preview visible sur chaque carte) ── */
+  .availability-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+    width: fit-content;
+    background: #10b98115;
+    color: #34d399;
+    border: 1px solid #10b98130;
+  }
+  .availability-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b98180;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  .availability-badge.locked {
+    background: #27272a;
+    color: #52525b;
+    border-color: #3f3f46;
+  }
+  .availability-badge.locked::before {
+    background: #52525b;
+    box-shadow: none;
+    animation: none;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.85); }
+  }
 </style>
 </head>
 <body>
@@ -324,7 +362,10 @@
 
   <!-- FREE -->
   <div class="plan-card free">
-    <div><span class="badge free">🔓 Free</span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <span class="badge free">🔓 Free</span>
+      <span class="availability-badge locked">🔒 Statut</span>
+    </div>
     <div class="plan-icon">👤</div>
     <div>
       <div class="plan-price">
@@ -352,7 +393,10 @@
 
   <!-- STARTER -->
   <div class="plan-card starter">
-    <div><span class="badge starter">⭐ Starter</span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <span class="badge starter">⭐ Starter</span>
+      <span class="availability-badge locked">🔒 Statut</span>
+    </div>
     <div class="plan-icon">🚀</div>
     <div>
       <div class="plan-price">
@@ -387,7 +431,10 @@
 
   <!-- PRO -->
   <div class="plan-card pro">
-    <div><span class="badge pro">👑 Pro</span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <span class="badge pro">👑 Pro</span>
+      <span class="availability-badge">Disponible</span>
+    </div>
     <div class="plan-icon">💼</div>
     <div>
       <div class="plan-price">
@@ -475,7 +522,10 @@
 
     <!-- RESTAURANT -->
     <div class="spec-card restaurant">
-      <div><span class="badge restaurant">🏪 Restaurant</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <span class="badge restaurant">🏪 Restaurant</span>
+        <span class="availability-badge">Ouvert</span>
+      </div>
       <div class="plan-icon">🍽️</div>
       <div>
         <div class="plan-price"><span class="amount">39 €</span><span class="period">/mois</span></div>
@@ -484,6 +534,7 @@
       <div class="features">
         <div class="feature"><span class="dot"></span>QR codes par table × 30</div>
         <div class="feature"><span class="dot"></span>Menu illimité + épuisé temps réel</div>
+        <div class="feature"><span class="dot"></span>Statut disponibilité temps réel (ouvert · complet · fermé)</div>
         <div class="feature"><span class="dot"></span>Carte de fidélité QR (points)</div>
         <div class="feature"><span class="dot"></span>Lien réservation (TheFork…)</div>
         <div class="feature"><span class="dot"></span>Codes promo attribuables</div>
@@ -498,7 +549,10 @@
 
     <!-- RESTAURANT PRO -->
     <div class="spec-card restaurant-pro">
-      <div><span class="badge restaurant-pro">⚡ Restaurant Pro</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <span class="badge restaurant-pro">⚡ Restaurant Pro</span>
+        <span class="availability-badge">Service actif</span>
+      </div>
       <div class="plan-icon">🧾</div>
       <div>
         <div class="plan-price">
@@ -512,6 +566,7 @@
         <div class="feature"><span class="dot"></span>Numéro de commande ou QR généré automatiquement</div>
         <div class="feature"><span class="dot"></span>Dashboard commandes temps réel (Supabase Realtime)</div>
         <div class="feature"><span class="dot"></span>Statuts : Reçue → En préparation → Prête</div>
+        <div class="feature"><span class="dot"></span>Statut disponibilité temps réel (ouvert · complet · fermé)</div>
         <div class="feature"><span class="dot"></span>Paiement au comptoir — aucune intégration CB</div>
         <div class="feature"><span class="dot"></span>Historique commandes (30 jours)</div>
         <div class="feature"><span class="dot"></span>Notif sonore nouvelle commande (dashboard)</div>
@@ -520,7 +575,10 @@
 
     <!-- ÉVÉNEMENT -->
     <div class="spec-card event">
-      <div><span class="badge event">🎪 Événement</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <span class="badge event">🎪 Événement</span>
+        <span class="availability-badge">Présent</span>
+      </div>
       <div class="plan-icon">🤝</div>
       <div>
         <div class="plan-price"><span class="amount">79–499 €</span><span class="period">/ pack 30j</span></div>
@@ -530,6 +588,7 @@
         <div class="feature"><span class="dot"></span>vCard par participant (30j)</div>
         <div class="feature"><span class="dot"></span>QR code badge-style (format salon)</div>
         <div class="feature"><span class="dot"></span>Échange carte-à-carte en 1 scan</div>
+        <div class="feature"><span class="dot"></span>Statut disponibilité temps réel (présent · en pause · parti)</div>
         <div class="feature"><span class="dot"></span>Leads illimités pendant l'event</div>
         <div class="feature"><span class="dot"></span>Export CSV individuel + global</div>
         <div class="feature"><span class="dot"></span>Dashboard central organisateur</div>
@@ -540,7 +599,10 @@
 
     <!-- ARTISTE -->
     <div class="spec-card artist">
-      <div><span class="badge artist">🎵 Artiste</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <span class="badge artist">🎵 Artiste</span>
+        <span class="availability-badge">Dispo booking</span>
+      </div>
       <div class="plan-icon">🎤</div>
       <div>
         <div class="plan-price"><span class="amount">12 €</span><span class="period">/mois</span></div>
@@ -552,6 +614,7 @@
         <div class="feature"><span class="dot"></span>Embed lecteur (1 track Spotify ou SoundCloud)</div>
         <div class="feature"><span class="dot"></span>EPK digital : bio, genre(s), PDF rider uploadable</div>
         <div class="feature"><span class="dot"></span>Formulaire booking pro (organisateur, date, ville, budget)</div>
+        <div class="feature"><span class="dot"></span>Statut disponibilité temps réel (en tournée · dispo booking · studio)</div>
         <div class="feature"><span class="dot"></span>Galerie press 6 photos</div>
         <div class="feature"><span class="dot"></span>QR code HD (impression flyers / affiches)</div>
         <div class="feature"><span class="dot"></span>Stats scans par event</div>
@@ -563,7 +626,10 @@
 
     <!-- IMMOBILIER -->
     <div class="spec-card immo">
-      <div><span class="badge immo">🏠 Immobilier</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <span class="badge immo">🏠 Immobilier</span>
+        <span class="availability-badge">En visite</span>
+      </div>
       <div class="plan-icon">🔑</div>
       <div>
         <div class="plan-price"><span class="amount">29 €</span><span class="period">/mois</span></div>
@@ -584,7 +650,10 @@
 
     <!-- PHOTO / VIDÉO -->
     <div class="spec-card photo">
-      <div><span class="badge photo">📸 Photo · Vidéo</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <span class="badge photo">📸 Photo · Vidéo</span>
+        <span class="availability-badge">Dispo</span>
+      </div>
       <div class="plan-icon">🎬</div>
       <div>
         <div class="plan-price"><span class="amount">19 €</span><span class="period">/mois</span></div>
@@ -596,6 +665,7 @@
         <div class="feature"><span class="dot"></span>Formulaire devis structuré (type, date, lieu, budget)</div>
         <div class="feature"><span class="dot"></span>Spécialité affichée (mariage, corporate, portrait…)</div>
         <div class="feature"><span class="dot"></span>Liens Instagram · Behance · Vimeo</div>
+        <div class="feature"><span class="dot"></span>Statut disponibilité temps réel (dispo · en shoot · post-prod)</div>
         <div class="feature"><span class="dot"></span>QR code HD (dos de carte physique, book papier)</div>
         <div class="feature"><span class="dot"></span>Calendly disponibilités</div>
         <div class="feature"><span class="dot"></span>1 000 leads/mois · Stats clics</div>

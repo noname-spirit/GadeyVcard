@@ -38,11 +38,11 @@ import { getProfile } from "@/lib/supabase/profile";
 import { LockedFeature } from "@/components/ui/LockedFeature";
 
 const TABS = [
-  { id: "profile", label: "Profil", icon: User },
-  { id: "links", label: "Liens", icon: Link2 },
-  { id: "design", label: "Design", icon: Palette },
-  { id: "notifications", label: "Notifications", icon: Bell },
-  { id: "pro", label: "Pro", icon: Zap },
+  { id: "profile", label: "Profil", icon: User, hidden: false },
+  { id: "links", label: "Liens", icon: Link2, hidden: false },
+  { id: "design", label: "Design", icon: Palette, hidden: false },
+  { id: "notifications", label: "Notifications", icon: Bell, hidden: true },
+  { id: "pro", label: "Pro", icon: Zap, hidden: false },
 ] as const;
 
 type Tab = (typeof TABS)[number]["id"];
@@ -119,10 +119,11 @@ const TEMPLATES = [
   },
   {
     id: "restaurant",
-    label: "Restaurant",
-    bg: "from-emerald-700 to-emerald-900",
-    text: "text-white",
+    label: "Micro services",
+    bg: "from-zinc-700 to-zinc-900",
+    text: "text-zinc-400",
     pro: true,
+    comingSoon: true,
   },
 ] as const;
 
@@ -331,7 +332,7 @@ export default function SettingsPage() {
 
         {/* Tabs */}
         <div className="flex gap-1 bg-zinc-900 border border-zinc-800/60 rounded-2xl p-1 overflow-x-auto">
-          {TABS.map((t) => (
+          {TABS.filter((t) => !t.hidden).map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
@@ -497,24 +498,43 @@ export default function SettingsPage() {
               <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
                 <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Template</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {TEMPLATES.map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => (t.pro && !isPro) ? router.push('/dashboard/upgrade') : setTemplate(t.id as typeof template)}
-                      className={[
-                        `relative h-20 rounded-xl bg-linear-to-br ${t.bg} border-2 transition-all flex flex-col items-start justify-end p-2.5 overflow-hidden`,
-                        template === t.id ? 'border-orange-500 scale-105' : 'border-transparent opacity-70 hover:opacity-100',
-                      ].join(' ')}
-                    >
-                      <span className={`text-xs font-semibold ${t.text} leading-tight`}>{t.label}</span>
-                      {t.pro && !isPro && (
-                        <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-full px-2 py-0.5">
-                          <Lock size={9} className="text-amber-400" />
-                          <span className="text-[10px] font-bold text-amber-400">Pro</span>
-                        </div>
-                      )}
-                    </button>
-                  ))}
+                  {TEMPLATES.map((t) => {
+                    const comingSoon = 'comingSoon' in t && t.comingSoon;
+                    return (
+                      <button
+                        key={t.id}
+                        disabled={comingSoon}
+                        onClick={() => {
+                          if (comingSoon) return;
+                          if (t.pro && !isPro) {
+                            router.push('/dashboard/upgrade');
+                          } else {
+                            setTemplate(t.id as typeof template);
+                          }
+                        }}
+                        className={[
+                          `relative h-20 rounded-xl bg-linear-to-br ${t.bg} border-2 transition-all flex flex-col items-start justify-end p-2.5 overflow-hidden`,
+                          comingSoon
+                            ? 'border-transparent opacity-40 grayscale cursor-not-allowed'
+                            : template === t.id
+                            ? 'border-orange-500 scale-105'
+                            : 'border-transparent opacity-70 hover:opacity-100',
+                        ].join(' ')}
+                      >
+                        <span className={`text-xs font-semibold ${t.text} leading-tight`}>{t.label}</span>
+                        {comingSoon ? (
+                          <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/60 backdrop-blur-sm rounded-full px-2 py-0.5">
+                            <span className="text-[10px] font-bold text-zinc-300">Bientôt</span>
+                          </div>
+                        ) : t.pro && !isPro ? (
+                          <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-full px-2 py-0.5">
+                            <Lock size={9} className="text-amber-400" />
+                            <span className="text-[10px] font-bold text-amber-400">Pro</span>
+                          </div>
+                        ) : null}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
