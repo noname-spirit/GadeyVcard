@@ -458,7 +458,7 @@ export default function LandingPage() {
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800/40">
         <button type="button" onClick={() => router.push('/')} className="flex items-center">
-          <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={200} height={56} className="h-9 sm:h-14 w-auto" priority />
+          <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={280} height={80} className="h-14 sm:h-20 w-auto" priority />
         </button>
         <div className="hidden md:flex items-center gap-6 text-sm text-zinc-400">
           <a href="#features" className="hover:text-white transition-colors">Fonctionnalités</a>
@@ -480,13 +480,14 @@ export default function LandingPage() {
           className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"
         />
 
-        <motion.div {...fadeUp} className="flex flex-col items-center gap-6 max-w-3xl relative">
+        <motion.div {...fadeUp} className="flex flex-col items-center gap-6 max-w-5xl relative">
           <span className="text-xs font-semibold tracking-widest text-orange-400 uppercase bg-orange-500/10 border border-orange-500/20 px-4 py-1.5 rounded-full">
             Carte digitale + capture de leads
           </span>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight bg-linear-to-b from-white to-zinc-400 bg-clip-text text-transparent">
-            Transformez chaque rencontre<br />en opportunité business
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight bg-linear-to-b from-white to-zinc-400 bg-clip-text text-transparent">
+            <span className="block">Transformez chaque rencontre</span>
+            <span className="block">en opportunité business</span>
           </h1>
 
           <p className="text-lg text-zinc-400 max-w-xl">
@@ -971,7 +972,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-zinc-800/60 py-10 px-6 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-zinc-600">
-        <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={340} height={96} className="h-14 sm:h-20 w-auto opacity-90" />
+        <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={420} height={120} className="h-20 sm:h-28 w-auto opacity-90" />
         <div className="flex gap-4">
           <button type="button" onClick={() => router.push('/pricing')} className="hover:text-zinc-400 transition-colors">Tarifs</button>
           <button type="button" onClick={() => router.push('/privacy')} className="hover:text-zinc-400 transition-colors">Confidentialité</button>
