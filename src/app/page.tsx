@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Check, Zap, ArrowRight, QrCode, BarChart3, Smartphone, Globe, Sparkles, Share2, TrendingUp, Plus, Minus, X, FileX, EyeOff, Recycle, Eye, Bell, Instagram, Youtube, Linkedin, Phone, Mail, MessageCircle, Music2, Download } from 'lucide-react';
-
 import { Button } from '@/components/ui/Button';
 import { AmbientBackground } from '@/components/AmbientBackground';
 import Image from 'next/image';
@@ -464,7 +463,7 @@ export default function LandingPage() {
         <div className="hidden md:flex items-center gap-6 text-sm text-zinc-400">
           <a href="#features" className="hover:text-white transition-colors">Fonctionnalités</a>
           <a href="#pricing" className="hover:text-white transition-colors">Tarifs</a>
-          <button type="button" onClick={() => router.push('/demo')} className="hover:text-white transition-colors">Démo</button>
+          <button type="button" onClick={() => router.push('/templates')} className="hover:text-white transition-colors">Démo</button>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={() => router.push('/login')}>Connexion</Button>
@@ -522,8 +521,12 @@ export default function LandingPage() {
               Créer ma carte gratuitement
               <ArrowRight size={16} />
             </Button>
-            <Button variant="outline" size="lg" onClick={() => router.push('/demo')}>
-              Voir la démo
+          </form>
+          
+
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <Button variant="outline" size="md" onClick={() => router.push('/templates')}>
+              Voir la démo live
             </Button>
           </div>
 
@@ -590,7 +593,7 @@ export default function LandingPage() {
           <motion.div
             animate={{ y: [0, -8, 0] }}
             transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
-            className="hidden sm:block absolute -right-4 top-8 bg-zinc-900 border border-zinc-800/60 rounded-2xl px-3 py-2 text-xs shadow-xl"
+            className="hidden sm:flex absolute -right-4 top-16 items-center gap-1.5 bg-zinc-900 border border-zinc-800/60 rounded-2xl px-3 py-2 text-xs shadow-xl"
           >
             <Bell size={11} className="text-emerald-400" />
             <span className="text-emerald-400 font-semibold">+12</span>
@@ -599,7 +602,7 @@ export default function LandingPage() {
           <motion.div
             animate={{ y: [0, 8, 0] }}
             transition={{ repeat: Infinity, duration: 3.5, ease: 'easeInOut' }}
-            className="hidden sm:block absolute -left-4 bottom-12 bg-zinc-900 border border-zinc-800/60 rounded-2xl px-3 py-2 text-xs shadow-xl"
+            className="hidden sm:flex absolute -left-4 bottom-20 items-center gap-1.5 bg-zinc-900 border border-zinc-800/60 rounded-2xl px-3 py-2 text-xs shadow-xl"
           >
             <Eye size={11} className="text-orange-400" />
             <span className="text-orange-400 font-semibold">1 284</span>
@@ -903,7 +906,12 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
-              <Button variant={plan.highlight ? 'primary' : 'outline'} className="w-full" onClick={() => router.push('/register')}>
+              <Button
+                variant={plan.highlight ? 'primary' : 'outline'}
+                className="w-full"
+                disabled={plan.comingSoon}
+                onClick={() => !plan.comingSoon && router.push('/register')}
+              >
                 {plan.cta}
               </Button>
             </motion.div>
@@ -947,18 +955,32 @@ export default function LandingPage() {
           <h2 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-white to-zinc-400 bg-clip-text text-transparent">
             Votre première carte<br />en 2 minutes chrono
           </h2>
-          <p className="text-zinc-500">Rejoignez les professionnels qui ont déjà remplacé leur carte papier.</p>
-          <Button size="lg" className="flex items-center gap-2" onClick={() => router.push('/register')}>
-            Créer ma carte gratuitement
-            <ArrowRight size={16} />
-          </Button>
-          <p className="text-xs text-zinc-600">Aucune CB requise · 14 jours Pro offerts</p>
+          <p className="text-zinc-400 text-lg">
+            14 jours Pro offerts, sans carte bancaire. Annulation en 1 clic. Aucun risque, que des leads.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
+            <Button size="lg" className="flex items-center gap-2" onClick={() => router.push('/register')}>
+              Démarrer maintenant — c'est gratuit
+              <ArrowRight size={16} />
+            </Button>
+            <Button variant="outline" size="lg" onClick={() => router.push('/templates')}>
+              Voir un exemple
+            </Button>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-4 text-xs text-zinc-600">
+            <span className="flex items-center gap-1.5"><Check size={12} className="text-emerald-500" /> Sans CB</span>
+            <span className="flex items-center gap-1.5"><Check size={12} className="text-emerald-500" /> Annulation 1 clic</span>
+            <span className="flex items-center gap-1.5"><Check size={12} className="text-emerald-500" /> RGPD · Hébergement EU</span>
+            <span className="flex items-center gap-1.5"><Check size={12} className="text-emerald-500" /> Setup 2 min</span>
+          </div>
         </motion.div>
       </section>
 
       {/* Footer */}
       <footer className="border-t border-zinc-800/60 py-10 px-6 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-zinc-600">
-        <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={280} height={80} className="h-10 sm:h-16 w-auto opacity-80" />
+        <Image src="/logo/logo-horizontal-white.svg" alt="vCard" width={340} height={96} className="h-14 sm:h-20 w-auto opacity-90" />
         <div className="flex gap-4">
           <button type="button" onClick={() => router.push('/pricing')} className="hover:text-zinc-400 transition-colors">Tarifs</button>
           <button type="button" onClick={() => router.push('/privacy')} className="hover:text-zinc-400 transition-colors">Confidentialité</button>
