@@ -8,19 +8,32 @@ import { Button } from '@/components/ui/Button';
 
 type Billing = 'monthly' | 'yearly';
 
-const PLANS = [
+interface PricingPlan {
+  id: string;
+  name: string;
+  price: { monthly: number | null; yearly: number | null };
+  description: string;
+  features: string[];
+  missing: string[];
+  cta: string;
+  highlight: boolean;
+  comingSoon?: boolean;
+}
+
+const PLANS: PricingPlan[] = [
   {
     id: 'free',
     name: 'Free',
     price: { monthly: 0, yearly: 0 },
-    description: 'Pour tester sans engagement',
+    description: 'Testez sans engagement, à vie',
     features: [
-      '1 carte digitale',
-      'Template de base',
-      'QR code',
-      'Watermark vCard SaaS',
+      '1 carte digitale en ligne à vie',
+      'QR code partageable',
+      '3 liens sociaux au choix',
+      'URL publique vcard.app/votre-nom',
+      'Mise à jour temps réel',
     ],
-    missing: ['Stats & analytics', 'Agenda intégré', 'Custom domain', 'Export leads CSV'],
+    missing: ['Stats & analytics', 'Export leads CSV', 'URL personnalisée', 'Templates Pro'],
     cta: 'Commencer gratuitement',
     highlight: false,
   },
@@ -28,51 +41,59 @@ const PLANS = [
     id: 'starter',
     name: 'Starter',
     price: { monthly: 5, yearly: 4 },
-    description: 'L\'essentiel pour se lancer',
+    description: 'L\'essentiel pour se lancer pro',
     features: [
-      '1 carte digitale',
-      'QR code + export',
-      'Stats basiques',
-      '3 templates',
-      'Sans watermark',
+      'Tout du plan Free, sans limite',
+      'Liens sociaux illimités',
+      'QR code HD téléchargeable (PNG/SVG)',
+      '3 templates Freelance (Dark · Light · Color)',
+      'Stats basiques (vues, clics, device)',
+      '500 leads/mois + Export CSV',
+      'Sans watermark — 100% à votre image',
+      'Export .vcf (carnet de contacts)',
     ],
-    missing: ['Agenda intégré', 'Custom domain', 'Export leads CSV'],
-    cta: 'Essai gratuit 14j',
+    missing: ['Calendly intégré', 'URL personnalisée', 'Template Influenceur'],
+    cta: '14 jours offerts — sans CB',
     highlight: false,
   },
   {
     id: 'pro',
     name: 'Pro',
     price: { monthly: 15, yearly: 12 },
-    description: 'Pour les pros qui veulent tout',
+    description: 'Pour les pros qui veulent convertir',
     features: [
-      '1 carte digitale',
-      'Toutes les stats & analytics',
-      'Agenda Google Calendar',
-      'Custom domain',
-      'Tous les templates',
-      'Leads dashboard + CSV',
-      'Support NFC',
+      'Tout du plan Starter, boosté',
+      'Tous les templates + Template Influenceur',
+      'Couleur d\'accent personnalisée',
+      'Calendly intégré — RDV en 1 clic',
+      'Statut dispo en temps réel',
+      'URL personnalisée (Vanity URL)',
+      '2 000 leads/mois + Notifications instantanées',
+      'Analytics avancés (géo · device · heure de pointe)',
+      'Support NFC compatible',
+      'Support prioritaire — réponse < 48h',
     ],
     missing: [],
-    cta: 'Essai gratuit 14j',
+    cta: '14 jours offerts — sans CB',
     highlight: true,
   },
   {
-    id: 'business',
-    name: 'Business',
-    price: { monthly: 30, yearly: 24 },
-    description: 'Pour les équipes et agences',
+    id: 'micro-services',
+    name: 'Micro services',
+    price: { monthly: null, yearly: null },
+    description: 'Photographe, coiffeur, resto, bien-être…',
     features: [
-      '5 cartes digitales',
-      'Tout le plan Pro',
-      'Export CSV avancé',
-      'Support prioritaire',
-      'Statistiques comparatives',
+      'Tout du plan Pro inclus',
+      'Galerie photos / portfolio pro',
+      'Booking & prise de RDV directe',
+      'Horaires + statut ouvert/fermé temps réel',
+      'Avis clients intégrés',
+      '5 000 leads/mois',
     ],
     missing: [],
-    cta: 'Essai gratuit 14j',
+    cta: 'Bientôt disponible',
     highlight: false,
+    comingSoon: true,
   },
 ];
 
@@ -88,7 +109,7 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-zinc-950 via-black to-zinc-950 text-white">
-      <div className="max-w-6xl mx-auto px-4 py-20 flex flex-col items-center gap-16">
+      <div className="max-w-6xl mx-auto px-4 py-14 flex flex-col items-center gap-10">
 
         {/* Header */}
         <motion.div
@@ -99,9 +120,9 @@ export default function PricingPage() {
           <Image
             src="/logo/logo-vertical-white.svg"
             alt="vCard"
-            width={200}
-            height={200}
-            className="h-20 sm:h-32 w-auto mb-2"
+            width={260}
+            height={260}
+            className="h-28 sm:h-44 w-auto mb-2"
             priority
           />
           <span className="text-xs font-semibold tracking-widest text-orange-400 uppercase bg-orange-500/10 border border-orange-500/20 px-4 py-1.5 rounded-full">
@@ -145,50 +166,91 @@ export default function PricingPage() {
           {PLANS.map((plan, i) => (
             <motion.div
               key={plan.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
+              transition={{ delay: i * 0.08, duration: 0.5, ease: 'easeOut' }}
+              whileHover={!plan.comingSoon ? { y: -6, transition: { duration: 0.25 } } : undefined}
               className={[
                 'relative flex flex-col rounded-2xl p-6 border transition-all duration-300',
-                plan.highlight
-                  ? 'bg-zinc-900 border-orange-500/40 shadow-[0_0_40px_rgba(249,115,22,0.12)]'
-                  : 'bg-zinc-900/60 border-zinc-800/60 hover:border-zinc-700/60',
+                plan.comingSoon
+                  ? 'bg-zinc-900/30 border-zinc-800/40 opacity-60 grayscale'
+                  : plan.highlight
+                  ? 'bg-linear-to-b from-zinc-900 to-zinc-900/80 border-orange-500/60 shadow-[0_0_60px_rgba(249,115,22,0.18)] hover:shadow-[0_0_80px_rgba(249,115,22,0.3)] scale-[1.02]'
+                  : 'bg-zinc-900/60 border-zinc-800/60 hover:border-orange-500/30 hover:shadow-[0_0_40px_rgba(249,115,22,0.08)]',
               ].join(' ')}
             >
               {plan.highlight && (
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                  <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-linear-to-r from-orange-500 to-orange-600 shadow-lg shadow-orange-500/40 px-4 py-1.5 rounded-full whitespace-nowrap">
+                    <Zap size={11} className="fill-white" />
+                    Recommandé
+                  </span>
+                </div>
+              )}
+              {plan.comingSoon && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="flex items-center gap-1 text-xs font-semibold text-orange-400 bg-orange-500/15 border border-orange-500/30 px-3 py-1 rounded-full">
-                    <Zap size={10} />
-                    Populaire
+                  <span className="text-xs font-semibold text-zinc-400 bg-zinc-800 border border-zinc-700/60 px-3 py-1 rounded-full whitespace-nowrap">
+                    Bientôt disponible
                   </span>
                 </div>
               )}
 
+              {/* Brand mark */}
+              <div className="flex items-center justify-between mb-4">
+                <Image
+                  src="/logo/logo-horizontal-white.svg"
+                  alt="vCard"
+                  width={160}
+                  height={42}
+                  className={`h-10 w-auto ${plan.comingSoon ? 'opacity-50' : 'opacity-100'}`}
+                />
+                {plan.highlight && (
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-orange-400/80">Best</span>
+                )}
+              </div>
+
               <div className="flex flex-col gap-1 mb-6">
-                <h3 className="text-lg font-bold text-white">{plan.name}</h3>
+                <h3 className={`text-lg font-bold ${plan.comingSoon ? 'text-zinc-400' : 'text-white'}`}>{plan.name}</h3>
                 <p className="text-xs text-zinc-500">{plan.description}</p>
               </div>
 
-              <div className="flex items-end gap-1 mb-6">
-                <span className="text-4xl font-bold text-white">
-                  {plan.price[billing] === 0 ? 'Gratuit' : `${plan.price[billing]}€`}
-                </span>
-                {plan.price[billing] > 0 && (
-                  <span className="text-zinc-500 text-sm mb-1">/mois</span>
+              <div className="flex flex-col gap-1 mb-6">
+                <div className="flex items-end gap-1">
+                  {plan.comingSoon ? (
+                    <span className="text-3xl font-bold text-zinc-500">Bientôt</span>
+                  ) : (
+                    <>
+                      {billing === 'yearly' && plan.price.monthly !== null && plan.price.monthly > 0 && (
+                        <span className="text-lg text-zinc-600 line-through mr-2 mb-1">{plan.price.monthly}€</span>
+                      )}
+                      <span className="text-4xl font-bold text-white">
+                        {plan.price[billing] === 0 ? 'Gratuit' : `${plan.price[billing]}€`}
+                      </span>
+                      {plan.price[billing] !== null && plan.price[billing]! > 0 && (
+                        <span className="text-zinc-500 text-sm mb-1">/mois</span>
+                      )}
+                    </>
+                  )}
+                </div>
+                {billing === 'yearly' && !plan.comingSoon && plan.price.monthly !== null && plan.price.monthly > 0 && (
+                  <span className={`text-xs font-semibold ${plan.highlight ? 'text-orange-400' : 'text-emerald-400'}`}>
+                    Économie de {(plan.price.monthly - (plan.price.yearly ?? 0)) * 12}€/an · −20%
+                  </span>
                 )}
               </div>
 
               <Button
                 variant={plan.highlight ? 'primary' : 'outline'}
                 className="w-full mb-6"
+                disabled={plan.comingSoon}
               >
                 {plan.cta}
               </Button>
 
               <div className="flex flex-col gap-2">
                 {plan.features.map((f) => (
-                  <div key={f} className="flex items-start gap-2 text-sm text-zinc-300">
-                    <Check size={14} className="text-emerald-400 mt-0.5 shrink-0" />
+                  <div key={f} className={`flex items-start gap-2 text-sm ${plan.comingSoon ? 'text-zinc-500' : 'text-zinc-300'}`}>
+                    <Check size={14} className={`mt-0.5 shrink-0 ${plan.comingSoon ? 'text-zinc-600' : 'text-emerald-400'}`} />
                     {f}
                   </div>
                 ))}
