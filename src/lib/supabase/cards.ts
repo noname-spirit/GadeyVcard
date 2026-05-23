@@ -27,6 +27,10 @@ export interface SupabaseCard {
   calendly_url: string | null;
   availability_status: string | null;
   availability_text: string | null;
+  // Stats influenceur
+  stat_followers: string | null;
+  stat_engagement: string | null;
+  stat_collab: string | null;
   // Meta
   is_active: boolean;
   view_count: number;
@@ -62,6 +66,11 @@ export function supabaseCardToCardData(c: SupabaseCard): CardData {
     calendlyUrl: c.calendly_url ?? undefined,
     availabilityStatus: c.availability_status ?? undefined,
     availabilityText: c.availability_text ?? undefined,
+    stats: {
+      followers: c.stat_followers ?? undefined,
+      engagement: c.stat_engagement ?? undefined,
+      collab: c.stat_collab ?? undefined,
+    },
   };
 }
 
@@ -99,6 +108,9 @@ export async function updateCard(id: string, card: {
   calendly_url?: string | null;
   availability_status?: string | null;
   availability_text?: string | null;
+  stat_followers?: string | null;
+  stat_engagement?: string | null;
+  stat_collab?: string | null;
 }): Promise<boolean> {
   const supabase = createClient();
   const { contact, socials, ...rest } = card;
@@ -121,6 +133,9 @@ export async function updateCard(id: string, card: {
        calendly_url: card.calendly_url ?? null,
        availability_status: card.availability_status ?? null,
        availability_text: card.availability_text ?? null,
+       stat_followers: card.stat_followers ?? null,
+       stat_engagement: card.stat_engagement ?? null,
+       stat_collab: card.stat_collab ?? null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', id);
@@ -141,6 +156,9 @@ export async function upsertCard(uid: string, card: {
   calendly_url?: string | null;
   availability_status?: string | null;
   availability_text?: string | null;
+  stat_followers?: string | null;
+  stat_engagement?: string | null;
+  stat_collab?: string | null;
 }): Promise<{ slug: string } | null> {
   const supabase = createClient();
   const { contact, socials, ...rest } = card;

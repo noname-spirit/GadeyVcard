@@ -20,6 +20,12 @@ export interface CardCaptureForm {
   ctaLabel?: string;    // ex: "Recevoir mon audit" | "Envoyer mes infos"
 }
 
+export interface CardStats {
+  followers?: string;   // Ex : "128K"
+  engagement?: string;  // Ex : "4.2%"
+  collab?: string;      // Ex : "50+"
+}
+
 export interface CardData {
   id: string;
   slug: string;           // URL : domain.com/slug
@@ -36,6 +42,7 @@ export interface CardData {
   calendlyUrl?: string;
   availabilityStatus?: string;
   availabilityText?: string;
+  stats?: CardStats;
 }
 
 export type CardTheme = 'dark' | 'light';

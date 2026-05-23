@@ -2,17 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Sun, Moon, CalendarDays, X } from 'lucide-react';
-import { VCard } from '@/components/card';
+import { VCard, CardFooter } from '@/components/card';
 import { Watermark } from '@/components/card/Watermark';
 import { LeadCaptureForm } from '@/components/card/LeadCaptureForm';
 import { LeadCaptureFormInfluencer } from '@/components/card/LeadCaptureFormInfluencer';
 import { CardFrontRestaurant, RestaurantMenuPanel } from '@/components/card/CardFrontRestaurant';
+import { CardFrontInfluencer } from '@/components/card/CardFrontInfluencer';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 import { getCardBySlug, supabaseCardToCardData } from '@/lib/supabase/cards';
 import { LinkType, trackCardEvent } from '@/lib/supabase/events';
-import Link from 'next/link';
+
 import Image from 'next/image';
 
 const BASE_CARD: CardData = {
@@ -89,6 +90,7 @@ function CalendlyModal({ url, onClose }: { url: string; onClose: () => void }) {
 
 export default function CardPage() {
   const { slug } = useParams<{ slug: string }>();
+  const router = useRouter();
   const [card, setCard] = useState<CardData>(BASE_CARD);
   const [theme, setTheme] = useState<CardTheme>('dark');
   const [language, setLanguage] = useState<CardLanguage>('en');
@@ -160,18 +162,19 @@ function getDeviceType() {
       <div className="flex flex-col items-center w-full max-w-md px-4 py-8 gap-6">
 
         <div className="flex items-center gap-3 justify-center w-full relative">
-          <Link
-            href="/dashboard"
+          <button
+            type="button"
+            onClick={() => router.push('/dashboard')}
             className={`absolute left-0 text-xs font-medium transition-colors ${dark ? 'text-zinc-600 hover:text-zinc-300' : 'text-zinc-400 hover:text-zinc-700'}`}
           >
             ← Accueil
-          </Link>
+          </button>
           <Image
             src={dark ? '/logo/logo-horizontal-white.svg' : '/logo/logo-horizontal-color.svg'}
             alt="vCard"
             width={260}
             height={84}
-            className="h-20 w-auto"
+            className="h-12 sm:h-16 w-auto"
             priority
           />
           <div className={`flex gap-1 ${langBg} rounded-full px-1.5 py-1 border backdrop-blur-xl transition-colors duration-300`}>
@@ -233,6 +236,13 @@ function getDeviceType() {
                     address: undefined,
                     hours: undefined,
                   },
+                  socials: {
+                    instagram: card.socials?.instagram,
+                    youtube: card.socials?.youtube,
+                    tiktok: card.socials?.tiktok,
+                    linkedin: card.socials?.linkedin,
+                    twitter: card.socials?.twitter,
+                  },
                   menu: [
                     { id: '1', name: 'Soupe du jour', price: 8, category: 'Entrées', available: true, emoji: '🍲' },
                     { id: '2', name: 'Buddha Bowl', price: 14, category: 'Plats', available: true, emoji: '🥗' },
@@ -272,6 +282,49 @@ function getDeviceType() {
                   />
                 )}
               </AnimatePresence>
+              <CardFooter theme={theme} accentColor={card.accentColor} />
+            </div>
+          ) : card.template === 'influencer' ? (
+            <div
+              style={{ '--accent': card.accentColor || '#a855f7' } as React.CSSProperties}
+              className="flex flex-col gap-2 w-full"
+            >
+              <CardFrontInfluencer
+                card={{
+                  id: card.id,
+                  slug: card.slug,
+                  name: card.name,
+                  handle: `@${card.slug}`,
+                  niche: card.title || '',
+                  photo: card.photo || '/noname-spirit.jpg',
+                  stats: {
+                    followers: card.stats?.followers || '—',
+                    engagement: card.stats?.engagement || '—',
+                    collab: card.stats?.collab || '—',
+                  },
+                  links: {
+                    instagram: card.socials?.instagram,
+                    youtube: card.socials?.youtube,
+                    tiktok: card.socials?.tiktok,
+                    linkedin: card.socials?.linkedin,
+                    twitter: card.socials?.twitter,
+                    website: card.socials?.website,
+                  },
+                  accentColor: card.accentColor,
+                  updatedAt: card.updatedAt,
+                }}
+                theme={theme}
+                language={language}
+                isSaving={isSaving}
+                onSaveContact={handleSaveContact}
+              />
+              <LeadCaptureFormInfluencer
+                card={card}
+                theme={theme}
+                language={language}
+                locked={!card.plan || card.plan === 'free'}
+              />
+              <CardFooter theme={theme} accentColor={card.accentColor} />
             </div>
           ) : (
             <>
@@ -283,21 +336,13 @@ function getDeviceType() {
                 isSaving={isSaving}
                 onCalendlyClick={card.calendlyUrl && (card.plan === 'pro' || card.plan === 'business') ? () => { trackCardEvent(card.id, 'calendly'); setShowCalendly(true); } : undefined}
               />
-              {card.template === 'influencer' ? (
-                <LeadCaptureFormInfluencer
-                  card={card}
-                  theme={theme}
-                  language={language}
-                  locked={!card.plan || card.plan === 'free'}
-                />
-              ) : (
-                <LeadCaptureForm
-                  card={card}
-                  theme={theme}
-                  language={language}
-                  locked={!card.plan || card.plan === 'free'}
-                />
-              )}
+              <LeadCaptureForm
+                card={card}
+                theme={theme}
+                language={language}
+                locked={!card.plan || card.plan === 'free'}
+              />
+              <CardFooter theme={theme} accentColor={card.accentColor} />
             </>
           )}
         </div>

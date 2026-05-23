@@ -1,16 +1,23 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 
-export const metadata = { title: 'Politique de confidentialité — Smart vCard' };
-
 export default function PrivacyPage() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <div className="max-w-2xl mx-auto px-6 py-16 flex flex-col gap-8">
 
-        <a href="/" className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-200 transition-colors w-fit">
+        <button
+          type="button"
+          onClick={() => router.push('/')}
+          className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-200 transition-colors w-fit"
+        >
           <ArrowLeft size={14} />
           Retour à l'accueil
-        </a>
+        </button>
 
         <div>
           <h1 className="text-3xl font-bold text-white">Politique de confidentialité</h1>

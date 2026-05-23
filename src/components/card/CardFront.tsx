@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Download, Instagram, Youtube, Globe, Linkedin, Phone, Mail, MessageCircle, CalendarDays } from 'lucide-react';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 import { trackCardEvent, type LinkType } from '@/lib/supabase/events';
+import { TikTokIcon, XIcon } from './SocialIcons';
 
 const LINE_ICON = (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -59,7 +60,9 @@ export function CardFront({ card, theme, language, isSaving, freshnessBadge, onS
   const socials = [
     card.socials.instagram && { href: card.socials.instagram, icon: Instagram, label: 'Instagram' },
     card.socials.youtube && { href: card.socials.youtube, icon: Youtube, label: 'YouTube' },
+    card.socials.tiktok && { href: card.socials.tiktok, icon: TikTokIcon, label: 'TikTok' },
     card.socials.linkedin && { href: card.socials.linkedin, icon: Linkedin, label: 'LinkedIn' },
+    card.socials.twitter && { href: card.socials.twitter, icon: XIcon, label: 'Twitter' },
     card.socials.website && { href: card.socials.website, icon: Globe, label: 'Website' },
   ].filter(Boolean) as { href: string; icon: React.ElementType; label: string }[];
 
