@@ -120,9 +120,9 @@ export default function PricingPage() {
           <Image
             src="/logo/logo-vertical-white.svg"
             alt="vCard"
-            width={260}
-            height={260}
-            className="h-28 sm:h-44 w-auto mb-2"
+            width={200}
+            height={200}
+            className="h-20 sm:h-32 w-auto mb-2"
             priority
           />
           <span className="text-xs font-semibold tracking-widest text-orange-400 uppercase bg-orange-500/10 border border-orange-500/20 px-4 py-1.5 rounded-full">
