@@ -85,7 +85,15 @@ export default function LeadsPage() {
     thisMonth: leads.filter((l) => new Date(l.createdAt) > new Date(NOW - 30 * 86400000)).length,
     thisWeek: leads.filter((l) => new Date(l.createdAt) > new Date(NOW - 7 * 86400000)).length,
   }), [leads]);
+  const leadsRegisterLeft = useMemo(() => {
+    switch (userPlan) {
+      case 'free': return leads.length;
+      case 'starter': return 500 - leads.length;
+      case 'pro': return 1000 - leads.length;
+      default: return 0;
+    } 
 
+  }, [userPlan, leads]);
   return (
     <DashboardLayout active="Leads">
       <div className="flex flex-col gap-6">
@@ -112,11 +120,12 @@ export default function LeadsPage() {
         </div>
 
         {/* Stats rapides */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-3">
           {[
             { label: 'Total', value: leads.length, icon: Users, color: 'text-orange-400 bg-orange-500/10' },
             { label: 'Ce mois', value: thisMonth, icon: Users, color: 'text-emerald-400 bg-emerald-500/10' },
             { label: 'Cette semaine', value: thisWeek, icon: Users, color: 'text-blue-400 bg-blue-500/10' },
+               { label: 'Stockage de leads restant', value: leadsRegisterLeft , icon: Users, color: 'text-blue-400 bg-blue-500/10' },
           ].map((s) => (
             <div key={s.label} className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-4 flex flex-col gap-2">
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${s.color}`}>

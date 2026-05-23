@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Check, AlertCircle, ScanLine, X, Lock } from 'lucide-react';
+import { Send, Check, AlertCircle, ScanLine, X, Lock, TrendingUp } from 'lucide-react';
 import type { CardData, CardTheme, CardLanguage } from '@/types/card';
 import type { LeadFormData } from '@/types/lead';
 
@@ -38,6 +38,9 @@ const labels = {
     industryPopupTitle: 'Secteur manquant',
     industryPopupMessage: 'Veuillez sélectionner votre secteur d\'activité avant d\'envoyer.',
     industryPopupCta: 'Sélectionner',
+    limitPopupTitle: 'Limite atteinte',
+    limitPopupMessage: (plan: string, limit: number) => `Ce compte ${plan} a atteint sa limite de ${limit} leads. Passez au plan supérieur pour continuer à recevoir des contacts.`,
+    limitPopupCta: 'Passer au Pro',
   },
   en: {
     defaultTitle: "Let's stay in touch",
@@ -63,6 +66,9 @@ const labels = {
     industryPopupTitle: 'Industry missing',
     industryPopupMessage: 'Please select your industry before sending.',
     industryPopupCta: 'Select',
+    limitPopupTitle: 'Limit reached',
+    limitPopupMessage: (plan: string, limit: number) => `This ${plan} account has reached its ${limit} leads limit. Upgrade to keep receiving contacts.`,
+    limitPopupCta: 'Upgrade to Pro',
   },
   th: {
     defaultTitle: 'ติดต่อกันไว้นะ',
@@ -88,6 +94,9 @@ const labels = {
     industryPopupTitle: 'ไม่ได้เลือกประเภทธุรกิจ',
     industryPopupMessage: 'กรุณาเลือกประเภทธุรกิจก่อนส่งข้อมูล',
     industryPopupCta: 'เลือก',
+    limitPopupTitle: 'ถึงขีดจำกัดแล้ว',
+    limitPopupMessage: (plan: string, limit: number) => `บัญชี ${plan} นี้ถึงขีดจำกัด ${limit} ลีดแล้ว อัปเกรดเพื่อรับลีดต่อไป`,
+    limitPopupCta: 'อัปเกรดเป็น Pro',
   },
 };
 
@@ -143,6 +152,7 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [showIndustryPopup, setShowIndustryPopup] = useState(false);
+  const [limitPopup, setLimitPopup] = useState<{ plan: string; limit: number } | null>(null);
   const [showScanner, setShowScanner] = useState(false);
   const [scannerReady, setScannerReady] = useState(false);
   const scannerRef = useRef<HTMLDivElement>(null);
@@ -278,6 +288,10 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
+        if (data.error === 'LIMIT_REACHED') {
+          setLimitPopup({ plan: data.plan, limit: data.limit });
+          return;
+        }
         showFeedback('error', data.error || l.errorServer);
         return;
       }
@@ -549,6 +563,58 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
               >
                 {l.industryPopupCta}
               </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Popup limite de leads */}
+      <AnimatePresence>
+        {limitPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+            onClick={() => setLimitPopup(null)}
+          >
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            <motion.div
+              initial={{ opacity: 0, y: 24, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 24, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`relative w-full max-w-sm rounded-2xl border p-6 flex flex-col gap-4 shadow-2xl ${modalBg}`}
+            >
+              <button
+                onClick={() => setLimitPopup(null)}
+                className={`absolute top-3 right-3 p-1.5 rounded-lg transition-all ${closeBtn}`}
+              >
+                <X size={14} />
+              </button>
+
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-orange-500/15 border border-orange-500/20 flex items-center justify-center shrink-0">
+                  <TrendingUp size={18} className="text-orange-400" />
+                </div>
+                <p className={`font-bold text-base ${modalTitle}`}>{l.limitPopupTitle}</p>
+              </div>
+
+              <p className={`text-sm leading-relaxed ${modalHint}`}>
+                {l.limitPopupMessage(limitPopup.plan, limitPopup.limit)}
+              </p>
+
+              <a
+                href="/dashboard/upgrade"
+                className="w-full py-2.5 rounded-xl font-semibold text-sm text-white text-center transition-all"
+                style={{
+                  background: `linear-gradient(to right, ${accent}, color-mix(in srgb, ${accent} 75%, black))`,
+                  boxShadow: `0 6px 20px color-mix(in srgb, ${accent} 25%, transparent)`,
+                }}
+              >
+                {l.limitPopupCta}
+              </a>
             </motion.div>
           </motion.div>
         )}
