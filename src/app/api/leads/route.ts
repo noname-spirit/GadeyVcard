@@ -4,6 +4,11 @@ import { createAdminClient } from '@/lib/supabase/server';
 import { sendLeadNotificationEmail } from '@/lib/email';
 import type { Lead } from '@/types/lead';
 
+const PLAN_LIMITS: Record<string, number> = {
+  starter: 500,
+  pro: 1000,
+};
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -14,6 +19,39 @@ export async function POST(req: NextRequest) {
         { error: 'Champs obligatoires manquants (card_id, nom, contact).' },
         { status: 400 }
       );
+    }
+
+    // Vérification limite de leads selon le plan
+    const supabase = createAdminClient();
+    const { data: card } = await supabase
+      .from('cards')
+      .select('user_id')
+      .eq('id', card_id)
+      .single();
+
+    if (card?.user_id) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('plan')
+        .eq('id', card.user_id)
+        .single();
+
+      const plan = profile?.plan as string;
+      const limit = PLAN_LIMITS[plan];
+
+      if (limit !== undefined) {
+        const { count } = await supabase
+          .from('leads')
+          .select('id', { count: 'exact', head: true })
+          .eq('card_id', card_id);
+
+        if ((count ?? 0) >= limit) {
+          return NextResponse.json(
+            { error: 'LIMIT_REACHED', plan, limit },
+            { status: 403 }
+          );
+        }
+      }
     }
 
     const lead: Lead = {
