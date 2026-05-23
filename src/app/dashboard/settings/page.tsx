@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Save,
   ExternalLink,
+  Eye,
+  X,
   Palette,
   User,
   Link2,
@@ -25,7 +26,7 @@ import {
 import { QRCodeCanvas } from 'qrcode.react';
 import { Button } from "@/components/ui/Button";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { VCard } from "@/components/card";
+import { VCard, CardFooter } from "@/components/card";
 import { CardFrontInfluencer } from "@/components/card/CardFrontInfluencer";
 import { CardFrontRestaurant, RestaurantMenuPanel } from "@/components/card/CardFrontRestaurant";
 import { LeadCaptureForm } from "@/components/card/LeadCaptureForm";
@@ -37,11 +38,11 @@ import { getProfile } from "@/lib/supabase/profile";
 import { LockedFeature } from "@/components/ui/LockedFeature";
 
 const TABS = [
-  { id: "profile", label: "Profil", icon: User },
-  { id: "links", label: "Liens", icon: Link2 },
-  { id: "design", label: "Design", icon: Palette },
-  { id: "notifications", label: "Notifications", icon: Bell },
-  { id: "pro", label: "Pro", icon: Zap },
+  { id: "profile", label: "Profil", icon: User, hidden: false },
+  { id: "links", label: "Liens", icon: Link2, hidden: false },
+  { id: "design", label: "Design", icon: Palette, hidden: false },
+  { id: "notifications", label: "Notifications", icon: Bell, hidden: true },
+  { id: "pro", label: "Pro", icon: Zap, hidden: false },
 ] as const;
 
 type Tab = (typeof TABS)[number]["id"];
@@ -118,10 +119,11 @@ const TEMPLATES = [
   },
   {
     id: "restaurant",
-    label: "Restaurant",
-    bg: "from-emerald-700 to-emerald-900",
-    text: "text-white",
+    label: "Micro services",
+    bg: "from-zinc-700 to-zinc-900",
+    text: "text-zinc-400",
     pro: true,
+    comingSoon: true,
   },
 ] as const;
 
@@ -162,9 +164,13 @@ export default function SettingsPage() {
   const [calendlyUrl, setCalendlyUrl] = useState("");
   const [availabilityStatus, setAvailabilityStatus] = useState("");
   const [availabilityText, setAvailabilityText] = useState("");
+  const [statFollowers, setStatFollowers] = useState("");
+  const [statEngagement, setStatEngagement] = useState("");
+  const [statCollab, setStatCollab] = useState("");
   const [copiedSignature, setCopiedSignature] = useState(false);
   const [cardId, setCardId] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const [userPlan, setUserPlan] = useState<'free' | 'starter' | 'pro' | 'business'>('free');
   const isPro = userPlan === 'pro' || userPlan === 'business';
   const canExportQr = userPlan !== 'free';
@@ -213,6 +219,9 @@ export default function SettingsPage() {
       setCalendlyUrl(c.calendly_url ?? "");
       setAvailabilityStatus(c.availability_status ?? "");
       setAvailabilityText(c.availability_text ?? "");
+      setStatFollowers(c.stat_followers ?? "");
+      setStatEngagement(c.stat_engagement ?? "");
+      setStatCollab(c.stat_collab ?? "");
     }).catch(() => {});
   }, [uid]);
 
@@ -231,6 +240,9 @@ export default function SettingsPage() {
       calendly_url: calendlyUrl || null,
       availability_status: availabilityStatus || null,
       availability_text: availabilityText || null,
+      stat_followers: statFollowers || null,
+      stat_engagement: statEngagement || null,
+      stat_collab: statCollab || null,
     };
     try {
       let ok: boolean;
@@ -271,46 +283,56 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout active="Paramètres">
-      <div className="flex flex-col xl:flex-row gap-8 items-start">
+      <div className="flex flex-col xl:flex-row gap-8 xl:items-start">
 
       {/* Colonne formulaire */}
       <div className="flex-1 min-w-0 flex flex-col gap-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex flex-col gap-1">
-            <Link
-              href="/dashboard"
+            <button
+              type="button"
+              onClick={() => router.push('/dashboard')}
               className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-200 transition-colors w-fit"
             >
               <ArrowLeft size={13} />
               Retour au dashboard
-            </Link>
+            </button>
             <h2 className="text-xl lg:text-2xl font-bold text-white">
               Paramètres
             </h2>
-            <Link
-              href={`/${slug}`}
-              target="_blank"
+            <button
+              type="button"
+              onClick={() => window.open(`/${slug}`, '_blank')}
               className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-orange-400 transition-colors"
             >
               <ExternalLink size={11} />
               vcard.app/{slug}
-            </Link>
+            </button>
           </div>
-          <Button
-            onClick={handleSave}
-            loading={saving}
-            size="sm"
-            className="flex items-center gap-2 self-start sm:self-auto"
-          >
-            <Save size={14} />
-            {saved ? "Sauvegardé ✓" : saveError ? "Erreur — réessayer" : "Sauvegarder"}
-          </Button>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <button
+              onClick={() => setShowPreview(!showPreview)}
+              className="xl:hidden flex items-center gap-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-100 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700/40 px-3 py-2 rounded-xl transition-all"
+            >
+              <Eye size={13} />
+              {showPreview ? 'Masquer' : 'Aperçu'}
+            </button>
+            <Button
+              onClick={handleSave}
+              loading={saving}
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Save size={14} />
+              {saved ? "Sauvegardé ✓" : saveError ? "Erreur — réessayer" : "Sauvegarder"}
+            </Button>
+          </div>
         </div>
 
         {/* Tabs */}
         <div className="flex gap-1 bg-zinc-900 border border-zinc-800/60 rounded-2xl p-1 overflow-x-auto">
-          {TABS.map((t) => (
+          {TABS.filter((t) => !t.hidden).map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
@@ -476,26 +498,73 @@ export default function SettingsPage() {
               <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
                 <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Template</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {TEMPLATES.map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => (t.pro && !isPro) ? router.push('/dashboard/upgrade') : setTemplate(t.id as typeof template)}
-                      className={[
-                        `relative h-20 rounded-xl bg-linear-to-br ${t.bg} border-2 transition-all flex flex-col items-start justify-end p-2.5 overflow-hidden`,
-                        template === t.id ? 'border-orange-500 scale-105' : 'border-transparent opacity-70 hover:opacity-100',
-                      ].join(' ')}
-                    >
-                      <span className={`text-xs font-semibold ${t.text} leading-tight`}>{t.label}</span>
-                      {t.pro && !isPro && (
-                        <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-full px-2 py-0.5">
-                          <Lock size={9} className="text-amber-400" />
-                          <span className="text-[10px] font-bold text-amber-400">Pro</span>
-                        </div>
-                      )}
-                    </button>
-                  ))}
+                  {TEMPLATES.map((t) => {
+                    const comingSoon = 'comingSoon' in t && t.comingSoon;
+                    return (
+                      <button
+                        key={t.id}
+                        disabled={comingSoon}
+                        onClick={() => {
+                          if (comingSoon) return;
+                          if (t.pro && !isPro) {
+                            router.push('/dashboard/upgrade');
+                          } else {
+                            setTemplate(t.id as typeof template);
+                          }
+                        }}
+                        className={[
+                          `relative h-20 rounded-xl bg-linear-to-br ${t.bg} border-2 transition-all flex flex-col items-start justify-end p-2.5 overflow-hidden`,
+                          comingSoon
+                            ? 'border-transparent opacity-40 grayscale cursor-not-allowed'
+                            : template === t.id
+                            ? 'border-orange-500 scale-105'
+                            : 'border-transparent opacity-70 hover:opacity-100',
+                        ].join(' ')}
+                      >
+                        <span className={`text-xs font-semibold ${t.text} leading-tight`}>{t.label}</span>
+                        {comingSoon ? (
+                          <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/60 backdrop-blur-sm rounded-full px-2 py-0.5">
+                            <span className="text-[10px] font-bold text-zinc-300">Bientôt</span>
+                          </div>
+                        ) : t.pro && !isPro ? (
+                          <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-full px-2 py-0.5">
+                            <Lock size={9} className="text-amber-400" />
+                            <span className="text-[10px] font-bold text-amber-400">Pro</span>
+                          </div>
+                        ) : null}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
+
+              {template === 'influencer' && (
+                <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-4">
+                  <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Stats Influenceur</h3>
+                  <p className="text-xs text-zinc-500">Laisse vide pour afficher « — »</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <Field
+                      label="Abonnés"
+                      value={statFollowers}
+                      onChange={setStatFollowers}
+                      placeholder="128K"
+                    />
+                    <Field
+                      label="Engagement"
+                      value={statEngagement}
+                      onChange={setStatEngagement}
+                      placeholder="4.2%"
+                    />
+                    <Field
+                      label="Collabs"
+                      value={statCollab}
+                      onChange={setStatCollab}
+                      placeholder="50+"
+                    />
+                  </div>
+                </div>
+              )}
+
               {isPro ? (
                 <div className="bg-zinc-900 border border-zinc-800/60 rounded-2xl p-5 flex flex-col gap-3">
                   <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">Couleur d&apos;accent</h3>
@@ -729,9 +798,31 @@ export default function SettingsPage() {
         </motion.div>
       </div>{/* fin colonne formulaire */}
 
-      {/* Colonne aperçu persistante */}
-      <div className="xl:w-80 w-full flex flex-col gap-3 xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto xl:pb-4">
-        <p className="text-xs text-zinc-500 uppercase tracking-wide font-medium">Aperçu en direct</p>
+      {/* Backdrop mobile */}
+      {showPreview && (
+        <div
+          className="xl:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          onClick={() => setShowPreview(false)}
+        />
+      )}
+
+      {/* Colonne aperçu — bottom sheet sur mobile, sidebar sur xl */}
+      <div className={
+        showPreview
+          ? 'flex flex-col gap-3 fixed bottom-0 left-0 right-0 z-50 bg-zinc-950 rounded-t-3xl border-t border-zinc-800/60 px-4 pt-3 pb-8 max-h-[88vh] overflow-y-auto xl:z-auto xl:rounded-none xl:border-0 xl:px-0 xl:pt-0 xl:pb-4 xl:bg-transparent xl:w-80 xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)]'
+          : 'hidden xl:flex xl:flex-col xl:gap-3 xl:w-80 xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto xl:pb-4'
+      }>
+        {/* En-tête mobile avec fermeture */}
+        <div className="xl:hidden flex items-center justify-between shrink-0 pb-2 border-b border-zinc-800/40 mb-1">
+          <p className="text-xs text-zinc-500 uppercase tracking-wide font-medium">Aperçu en direct</p>
+          <button
+            onClick={() => setShowPreview(false)}
+            className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-all"
+          >
+            <X size={14} />
+          </button>
+        </div>
+        <p className="hidden xl:block text-xs text-zinc-500 uppercase tracking-wide font-medium">Aperçu en direct</p>
         {template === 'restaurant' ? (
           <div style={{ '--accent': accent } as React.CSSProperties} className="flex flex-col gap-2">
             <CardFrontRestaurant
@@ -746,6 +837,13 @@ export default function SettingsPage() {
                   website: website || 'https://lebotaniste.fr',
                   address: '14 rue Oberkampf',
                   hours: '12h–22h · Lun–Sam',
+                },
+                socials: {
+                  instagram: instagram || undefined,
+                  youtube: youtube || undefined,
+                  tiktok: tiktok || undefined,
+                  linkedin: linkedin || undefined,
+                  twitter: twitter || undefined,
                 },
                 menu: [
                   { id: '1', name: 'Soupe du jour', price: 8, category: 'Entrées', available: true, emoji: '🍲' },
@@ -785,19 +883,31 @@ export default function SettingsPage() {
                 />
               )}
             </AnimatePresence>
+            <CardFooter theme="dark" accentColor={accent} />
           </div>
         ) : template === 'influencer' ? (
           <div style={{ '--accent': accent } as React.CSSProperties} className="flex flex-col gap-2">
             <CardFrontInfluencer
               card={{
                 id: 'preview',
-                slug: 'preview',
+                slug: slug || 'preview',
                 name,
                 handle: `@${slug || 'votre-pseudo'}`,
                 niche: title || 'Votre niche · Lifestyle · Créatif',
-                photo: '/noname-spirit.jpg',
-                stats: { followers: '—', engagement: '—', collab: '—' },
-                links: { instagram: instagram || undefined, website: website || undefined },
+                photo: photo || '/noname-spirit.jpg',
+                stats: {
+                  followers: statFollowers || '—',
+                  engagement: statEngagement || '—',
+                  collab: statCollab || '—',
+                },
+                links: {
+                  instagram: instagram || undefined,
+                  youtube: youtube || undefined,
+                  tiktok: tiktok || undefined,
+                  linkedin: linkedin || undefined,
+                  twitter: twitter || undefined,
+                  website: website || undefined,
+                },
                 accentColor: accent,
               }}
               theme="dark"
@@ -810,6 +920,7 @@ export default function SettingsPage() {
               language="fr"
               locked={!userPlan || userPlan === 'free'}
             />
+            <CardFooter theme="dark" accentColor={accent} />
           </div>
         ) : (
           <div className="flex flex-col gap-2">
@@ -825,6 +936,7 @@ export default function SettingsPage() {
               language="fr"
               locked={!userPlan || userPlan === 'free'}
             />
+            <CardFooter theme={template === 'light' ? 'light' : 'dark'} accentColor={accent} />
           </div>
         )}
         <a
