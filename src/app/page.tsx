@@ -521,10 +521,6 @@ export default function LandingPage() {
               Créer ma carte gratuitement
               <ArrowRight size={16} />
             </Button>
-          </form>
-          
-
-          <div className="flex flex-col sm:flex-row items-center gap-3">
             <Button variant="outline" size="md" onClick={() => router.push('/templates')}>
               Voir la démo live
             </Button>
@@ -961,7 +957,7 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
             <Button size="lg" className="flex items-center gap-2" onClick={() => router.push('/register')}>
-              Démarrer maintenant — c'est gratuit
+              Démarrer maintenant — c&apos;est gratuit
               <ArrowRight size={16} />
             </Button>
             <Button variant="outline" size="lg" onClick={() => router.push('/templates')}>
