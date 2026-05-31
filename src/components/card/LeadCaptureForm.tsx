@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Check, AlertCircle, ScanLine, X, Lock, TrendingUp } from 'lucide-react';
@@ -39,8 +40,8 @@ const labels = {
     industryPopupMessage: 'Veuillez sélectionner votre secteur d\'activité avant d\'envoyer.',
     industryPopupCta: 'Sélectionner',
     limitPopupTitle: 'Limite atteinte',
-    limitPopupMessage: (plan: string, limit: number) => `Ce compte ${plan} a atteint sa limite de ${limit} leads. Passez au plan supérieur pour continuer à recevoir des contacts.`,
-    limitPopupCta: 'Passer au Pro',
+    limitPopupMessage: (plan: string, limit: number) => `Vous avez atteint la limite de ${limit} leads de votre plan ${plan}. Exportez vos leads en CSV depuis votre dashboard pour libérer votre quota et reprendre la capture de vos ${limit} prochains contacts.`,
+    limitPopupCta: 'Exporter mes leads',
   },
   en: {
     defaultTitle: "Let's stay in touch",
@@ -67,8 +68,8 @@ const labels = {
     industryPopupMessage: 'Please select your industry before sending.',
     industryPopupCta: 'Select',
     limitPopupTitle: 'Limit reached',
-    limitPopupMessage: (plan: string, limit: number) => `This ${plan} account has reached its ${limit} leads limit. Upgrade to keep receiving contacts.`,
-    limitPopupCta: 'Upgrade to Pro',
+    limitPopupMessage: (plan: string, limit: number) => `You've reached the ${limit} leads limit of your ${plan} plan. Export your leads as CSV from your dashboard to free up your quota and resume capturing your next ${limit} contacts.`,
+    limitPopupCta: 'Export my leads',
   },
   th: {
     defaultTitle: 'ติดต่อกันไว้นะ',
@@ -95,8 +96,8 @@ const labels = {
     industryPopupMessage: 'กรุณาเลือกประเภทธุรกิจก่อนส่งข้อมูล',
     industryPopupCta: 'เลือก',
     limitPopupTitle: 'ถึงขีดจำกัดแล้ว',
-    limitPopupMessage: (plan: string, limit: number) => `บัญชี ${plan} นี้ถึงขีดจำกัด ${limit} ลีดแล้ว อัปเกรดเพื่อรับลีดต่อไป`,
-    limitPopupCta: 'อัปเกรดเป็น Pro',
+    limitPopupMessage: (plan: string, limit: number) => `คุณถึงขีดจำกัด ${limit} ลีดของแพ็คเกจ ${plan} แล้ว ส่งออกลีดของคุณเป็น CSV จากแดชบอร์ดเพื่อรีเซ็ตโควต้าและบันทึก ${limit} ลีดถัดไปต่อได้ทันที`,
+    limitPopupCta: 'ส่งออกลีดของฉัน',
   },
 };
 
@@ -253,12 +254,13 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
       showFeedback('error', l.errorCamera);
       setShowScanner(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [card.slug, language, l]);
 
   // ── SUBMIT FORM ───────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
 
     if (!form.nom.trim() || !form.contact.trim()) {
       showFeedback('error', l.errorRequired);
@@ -501,11 +503,10 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.96 }}
               transition={{ duration: 0.25 }}
-              className={`mt-3 px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium border ${
-                feedback.type === 'success'
-                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                  : 'bg-red-500/10 border-red-500/30 text-red-400'
-              }`}
+              className={`mt-3 px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium border ${feedback.type === 'success'
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                : 'bg-red-500/10 border-red-500/30 text-red-400'
+                }`}
             >
               {feedback.type === 'success'
                 ? <Check size={15} className="shrink-0" />
@@ -605,8 +606,8 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
                 {l.limitPopupMessage(limitPopup.plan, limitPopup.limit)}
               </p>
 
-              <a
-                href="/dashboard/upgrade"
+              <Link
+                href="/dashboard/leads"
                 className="w-full py-2.5 rounded-xl font-semibold text-sm text-white text-center transition-all"
                 style={{
                   background: `linear-gradient(to right, ${accent}, color-mix(in srgb, ${accent} 75%, black))`,
@@ -614,7 +615,7 @@ export function LeadCaptureForm({ card, theme, language, locked = false }: LeadC
                 }}
               >
                 {l.limitPopupCta}
-              </a>
+              </Link>
             </motion.div>
           </motion.div>
         )}
